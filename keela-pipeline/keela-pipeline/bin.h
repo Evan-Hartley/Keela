@@ -5,10 +5,8 @@
 #ifndef BIN_H
 #define BIN_H
 #include <memory>
-#include <stdexcept>
 #include <string>
 #include <gstreamer-1.0/gst/gst.h>
-#include <spdlog/spdlog.h>
 
 #include "elementbase.h"
 
@@ -17,11 +15,9 @@ namespace Keela {
     public:
         explicit Bin(const std::string &name);
 
-        //Bin(const Bin &bin);
         Bin();
 
         ~Bin() override;
-
 
         operator GstElement *() const override;
 
@@ -37,24 +33,23 @@ namespace Keela {
             gst_bin_add_many(static_cast<GstBin *>(*this), static_cast<GstElement *>(elements)..., nullptr);
         }
 
-    protected
-    :
+    protected:
         std::shared_ptr<GstBin> bin;
-        //GstBin *bin;
 
         /**
          * Create a ghost pad for an internal GstElement
          */
         void add_ghost_pad(GstElement *element, const std::string &pad_name) const;
 
-    private
-    :
-        /* Create required elements and add them to the bin
+    private:
+        /*
+         * Create required elements and add them to the bin
          */
         virtual void init() {
         };
 
-        /* Link elements together
+        /*
+         * Link elements together
          */
         virtual void link() {
         }
