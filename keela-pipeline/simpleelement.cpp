@@ -26,7 +26,9 @@ Keela::SimpleElement::~SimpleElement() {
 
 Keela::SimpleElement::SimpleElement(const std::string &element, const std::string &name): SimpleElement(element) {
     spdlog::info("Named {} {}", __func__, name);
-    const auto ret = gst_element_set_name(m_element.get(), name.c_str());
+    std::stringstream ss;
+    ss << element << "_" << name;
+    const auto ret = gst_element_set_name(m_element.get(), ss.str().c_str());
     if (!ret) {
         throw std::runtime_error("Failed to set name of element");
     }

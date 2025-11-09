@@ -78,7 +78,7 @@ void Keela::TransformBin::scale(const int width, const int height) {
     const int w = width / 2;
     const int h = height / 2;
     caps.set_resolution(w, h);
-    g_object_set(caps_filter, "caps", static_cast<GstCaps *>(caps), nullptr);
+    g_object_set(scaled_caps_filter, "caps", static_cast<GstCaps *>(caps), nullptr);
 }
 
 void Keela::TransformBin::rotate(const std::string &direction) const {
@@ -100,9 +100,20 @@ void Keela::TransformBin::init() {
 }
 
 void Keela::TransformBin::link() {
-    add_elements(video_scale, caps_filter, rotation, flip_h, flip_v);
-    element_link_many(video_scale, caps_filter, rotation, flip_h, flip_v);
+    add_elements(video_scale, scaled_caps_filter, rotation, flip_h, flip_v);
+    element_link_many(video_scale, scaled_caps_filter, rotation, flip_h, flip_v);
     link_queue(video_scale);
 
     add_ghost_pad(flip_v, "src");
+}
+
+void Keela::TransformBin::SetResolution(uint32_t width, uint32_t height) {
+}
+
+void Keela::TransformBin::SetBinning(uint32_t binning) {
+    binning_factor = binning;
+    // do stuff to our resolution
+}
+
+void Keela::TransformBin::ResetCameraResolution() {
 }

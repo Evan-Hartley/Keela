@@ -16,12 +16,13 @@
 #include "keela-pipeline/recordbin.h"
 #include "keela-widgets/plugin_utils.h"
 
-Keela::CameraManager::CameraManager(guint id, std::string pix_fmt, bool split_streams) : Bin("camera_" + std::to_string(id)), camera(Keela::get_video_source_name()) {
+Keela::CameraManager::CameraManager(guint id, std::string pix_fmt, bool split_streams) : Bin("camera_" + std::to_string(
+            id)), camera(Keela::get_video_source_name()) {
     try {
         spdlog::info("Creating camera manager {}", id);
         this->id = id;
 
-        Bin camera_stream_bin = static_cast<Bin & >(*camera_stream_even);
+        Bin camera_stream_bin = static_cast<Bin &>(*camera_stream_even);
 
         // Add all elements to the bin
         add_elements(camera, caps_filter, transform, tee_main, camera_stream_bin);
@@ -133,7 +134,8 @@ std::pair<double, double> Keela::CameraManager::get_exposure_time_range() const 
     // Query the actual hardware exposure time limits
     arv_camera_get_exposure_time_bounds(aravis_camera, &min_exposure, &max_exposure, &error);
     if (error == nullptr) {
-        spdlog::info("Queried hardware exposure time range from camera: {:.1f} to {:.1f} us", min_exposure, max_exposure);
+        spdlog::info("Queried hardware exposure time range from camera: {:.1f} to {:.1f} us", min_exposure,
+                     max_exposure);
     } else {
         spdlog::warn("Error querying exposure time range from camera: {}", error->message);
         g_error_free(error);
@@ -224,7 +226,7 @@ void Keela::CameraManager::stop_recording() {
 
 GstPadProbeReturn Keela::CameraManager::frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {
     GstBuffer *buffer = GST_PAD_PROBE_INFO_BUFFER(info);
-    FrameProbeData* probe_data = static_cast<FrameProbeData*>(user_data);
+    FrameProbeData *probe_data = static_cast<FrameProbeData *>(user_data);
     int parity = probe_data->parity;
 
     int frame_number = 0;
@@ -239,9 +241,9 @@ GstPadProbeReturn Keela::CameraManager::frame_parity_probe_cb(GstPad *pad, GstPa
     }
 
     if (frame_number % 2 == parity) {
-        return GST_PAD_PROBE_OK;  // Pass the frame
+        return GST_PAD_PROBE_OK; // Pass the frame
     } else {
-        return GST_PAD_PROBE_DROP;  // Drop the frame
+        return GST_PAD_PROBE_DROP; // Drop the frame
     }
 }
 
@@ -264,8 +266,8 @@ void Keela::CameraManager::set_frame_splitting(bool enabled) {
 
         // Eject the odd CameraStreamBin
         camera_stream_odd->PrepareEject();
-        camera_stream_odd->Eject(false);  // false = don't send EOS
-        camera_stream_odd = nullptr;      // clear the shared_ptr to allow re-creation later
+        camera_stream_odd->Eject(false); // false = don't send EOS
+        camera_stream_odd = nullptr; // clear the shared_ptr to allow re-creation later
         spdlog::info("Ejected camera_stream_odd from pipeline");
     }
 }
@@ -308,7 +310,7 @@ std::string Keela::CameraManager::get_filename(std::string directory, guint cam_
 }
 
 void Keela::CameraManager::add_odd_camera_stream() {
-    Bin camera_stream_odd_bin = static_cast<Bin & >(*camera_stream_odd);
+    Bin camera_stream_odd_bin = static_cast<Bin &>(*camera_stream_odd);
 
     add_elements(camera_stream_odd_bin);
 

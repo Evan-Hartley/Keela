@@ -8,9 +8,10 @@
 #include "queuebin.h"
 #include "simpleelement.h"
 #include "bin.h"
+#include "IControlCameraResolution.h"
 
 namespace Keela {
-    class TransformBin final : public QueueBin {
+    class TransformBin final : public QueueBin, public IControlCameraResolution {
     public:
         TransformBin();
 
@@ -41,6 +42,7 @@ namespace Keela {
          * @param width base width
          * @param height base height
          */
+        [[deprecated("Use software binning instead")]]
         void scale(int width, int height);
 
     private:
@@ -74,12 +76,29 @@ namespace Keela {
 
         void link() override;
 
+    public:
+        void SetResolution(uint32_t width, uint32_t height) override;
+
+        void SetBinning(uint32_t binning) override;
+
+        uint32_t GetBinning() override { return binning_factor };
+
+        uint32_t GetBinningMin() override { return std::numeric_limits<uint32_t>::min(); };
+
+        uint32_t GetBinningMax() override { return std::numeric_limits<uint32_t>::max(); };
+
+        void ResetCameraResolution() override;
+
+    private:
         Keela::SimpleElement video_scale = SimpleElement("videoscale");
-        Keela::SimpleElement caps_filter = SimpleElement("capsfilter");
+        Keela::SimpleElement scaled_caps_filter = SimpleElement("capsfilter", "scaled");
+        Keela::SimpleElement native_caps_filter = SimpleElement("capsfilter", "native");
         Keela::Caps caps;
         Keela::SimpleElement rotation = SimpleElement("videoflip");
         Keela::SimpleElement flip_h = SimpleElement("videoflip");
         Keela::SimpleElement flip_v = SimpleElement("videoflip");
+
+        uint32_t binning_factor = 1;
     };
 }
 #endif //TRANSFORMBIN_H
