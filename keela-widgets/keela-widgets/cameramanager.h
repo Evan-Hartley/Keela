@@ -26,8 +26,9 @@ namespace Keela {
     // Structure to pass both parity and counter to frame probe callback
     struct FrameProbeData {
         int parity;
-        guint64* counter;
+        guint64 *counter;
     };
+
     class CameraManager final : public Keela::Bin {
     public:
         explicit CameraManager(guint id, std::string pix_fmt, bool split_streams);
@@ -66,7 +67,7 @@ namespace Keela {
         std::shared_ptr<CameraStreamBin> camera_stream_odd = std::make_shared<CameraStreamBin>("camera_stream_odd");
 
         SimpleElement camera;
-        SimpleElement caps_filter = SimpleElement("capsfilter");
+        SimpleElement caps_filter = SimpleElement("capsfilter", "framerate");
         TransformBin transform = TransformBin("transform");
 
     private:
@@ -75,7 +76,7 @@ namespace Keela {
 
         // Per-camera frame counter for sources that don't set buffer offset
         guint64 manual_frame_counter = 0;
-        
+
         // Data structures for frame probes
         FrameProbeData even_probe_data{EVEN_FRAME, &manual_frame_counter};
         FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
@@ -131,5 +132,5 @@ namespace Keela {
 
         ArvCamera *aravis_camera = nullptr;
     };
-}  // namespace Keela
+} // namespace Keela
 #endif  // CAMERAMANAGER_H

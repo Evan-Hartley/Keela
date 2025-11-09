@@ -74,11 +74,11 @@ void Keela::TransformBin::rotate_270() const {
 }
 
 void Keela::TransformBin::scale(const int width, const int height) {
-    caps = Caps(static_cast<GstCaps *>(caps));
+    scaled_caps = Caps(static_cast<GstCaps *>(scaled_caps));
     const int w = width / 2;
     const int h = height / 2;
-    caps.set_resolution(w, h);
-    g_object_set(scaled_caps_filter, "caps", static_cast<GstCaps *>(caps), nullptr);
+    scaled_caps.set_resolution(w, h);
+    g_object_set(scaled_caps_filter, "caps", static_cast<GstCaps *>(scaled_caps), nullptr);
 }
 
 void Keela::TransformBin::rotate(const std::string &direction) const {
@@ -100,19 +100,31 @@ void Keela::TransformBin::init() {
 }
 
 void Keela::TransformBin::link() {
-    add_elements(video_scale, scaled_caps_filter, rotation, flip_h, flip_v);
-    element_link_many(video_scale, scaled_caps_filter, rotation, flip_h, flip_v);
-    link_queue(video_scale);
+    add_elements(native_caps_filter, video_scale, scaled_caps_filter, rotation, flip_h, flip_v);
+    element_link_many(native_caps_filter, video_scale, scaled_caps_filter, rotation, flip_h, flip_v);
+    link_queue(native_caps_filter);
 
     add_ghost_pad(flip_v, "src");
 }
 
 void Keela::TransformBin::SetResolution(uint32_t width, uint32_t height) {
+    native_caps = Caps(static_cast<GstCaps *>(native_caps));
+    scaled_caps = Caps(static_cast<GstCaps *>(scaled_caps));
+
+    resolution_width = width;
+    resolution_height = height;
+    scaled_caps.set_resolution(width, height);
+    auto native_w = width * binning_factor;
+    auto native_h = height * binning_factor;
+    native_caps.set_resolution(native_w, native_h);
+
+    g_object_set(scaled_caps_filter, "caps", static_cast<GstCaps *>(scaled_caps), nullptr);
+    g_object_set(native_caps_filter, "caps", static_cast<GstCaps *>(native_caps), nullptr);
 }
 
 void Keela::TransformBin::SetBinning(uint32_t binning) {
     binning_factor = binning;
-    // do stuff to our resolution
+    SetResolution(resolution_width, resolution_height);
 }
 
 void Keela::TransformBin::ResetCameraResolution() {

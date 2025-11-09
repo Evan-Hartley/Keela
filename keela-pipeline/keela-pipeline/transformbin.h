@@ -81,7 +81,7 @@ namespace Keela {
 
         void SetBinning(uint32_t binning) override;
 
-        uint32_t GetBinning() override { return binning_factor };
+        uint32_t GetBinning() override { return binning_factor; };
 
         uint32_t GetBinningMin() override { return std::numeric_limits<uint32_t>::min(); };
 
@@ -93,12 +93,16 @@ namespace Keela {
         Keela::SimpleElement video_scale = SimpleElement("videoscale");
         Keela::SimpleElement scaled_caps_filter = SimpleElement("capsfilter", "scaled");
         Keela::SimpleElement native_caps_filter = SimpleElement("capsfilter", "native");
-        Keela::Caps caps;
+        Keela::Caps scaled_caps;
+        Keela::Caps native_caps;
         Keela::SimpleElement rotation = SimpleElement("videoflip");
         Keela::SimpleElement flip_h = SimpleElement("videoflip");
         Keela::SimpleElement flip_v = SimpleElement("videoflip");
 
-        uint32_t binning_factor = 1;
+        uint32_t binning_factor = 2;
+        // TODO: perhaps pull in supported resolutions directly from the camera
+        uint32_t resolution_width = 720;
+        uint32_t resolution_height = 540;
     };
 }
 #endif //TRANSFORMBIN_H
