@@ -87,8 +87,6 @@ namespace Keela {
 
         uint32_t GetBinningMax() override { return std::numeric_limits<uint32_t>::max(); };
 
-        void ResetCameraResolution() override;
-
     private:
         Keela::SimpleElement video_scale = SimpleElement("videoscale");
         Keela::SimpleElement scaled_caps_filter = SimpleElement("capsfilter", "scaled");

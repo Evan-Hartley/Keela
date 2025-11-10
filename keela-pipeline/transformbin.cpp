@@ -126,6 +126,3 @@ void Keela::TransformBin::SetBinning(uint32_t binning) {
     binning_factor = binning;
     SetResolution(resolution_width, resolution_height);
 }
-
-void Keela::TransformBin::ResetCameraResolution() {
-}

@@ -80,12 +80,6 @@ void Keela::CameraManager::set_resolution(const int width, const int height) {
     if (width <= 0 || height <= 0) {
         throw std::invalid_argument("width and height must be greater than zero");
     }
-    /*
-    // create a copy of our current caps
-    base_caps = Caps(static_cast<GstCaps *>(base_caps));
-    base_caps.set_resolution(width, height);
-    g_object_set(caps_filter, "caps", static_cast<GstCaps *>(base_caps), nullptr);
-    transform.scale(width, height);*/
     transform.SetResolution(width, height);
 }
 
