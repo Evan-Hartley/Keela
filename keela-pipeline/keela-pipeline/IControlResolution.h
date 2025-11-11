@@ -7,6 +7,7 @@
 #include "keela-pipeline/transformbin.h"
 #include <cstdint>
 #include <limits>
+#include <memory>
 #include <vector>
 
 namespace Keela {
