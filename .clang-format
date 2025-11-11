@@ -1,0 +1,32 @@
+BasedOnStyle: Google
+IndentWidth: 4
+# Uncomment if we decide to switch to tabs
+# TabWidth: 4
+# UseTab: Always
+ColumnLimit: 120
+Standard: Latest
+
+# Function and class formatting
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+BreakBeforeBraces: Attach
+
+# Pointer alignment
+PointerAlignment: Right
+ReferenceAlignment: Right
+
+# Include sorting
+SortIncludes: CaseSensitive
+IncludeCategories:
+  - Regex: '^<.*\.h>'
+    Priority: 1
+  - Regex: "^<.*>"
+    Priority: 2
+  - Regex: ".*"
+    Priority: 3
+
+# Other formatting preferences
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceBeforeParens: Never
