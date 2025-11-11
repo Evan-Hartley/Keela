@@ -1,8 +1,8 @@
 #include "keela-widgets/videopresentation.h"
 
 Keela::VideoPresentation::VideoPresentation(const std::string& label_text,
-                                            std::shared_ptr<Keela::PresentationBin> presentation_bin,
-                                            int width, int height)
+                                            std::shared_ptr<Keela::PresentationBin> presentation_bin, int width,
+                                            int height)
     : Gtk::Box(Gtk::ORIENTATION_VERTICAL),
       gl_area(std::make_unique<GLCameraRender>(presentation_bin)),
       label(label_text) {

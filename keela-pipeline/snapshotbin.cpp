@@ -23,7 +23,7 @@ void Keela::SnapshotBin::take_snapshot() {
     GstSample *sample;
     g_signal_emit_by_name(app_sink, "pull-sample", &sample);
 
-    if (!sample) {
+    if(!sample) {
         throw std::runtime_error("Failed to get sample from appsink");
     }
     // TODO: save the snapshot data to disk

@@ -4,28 +4,27 @@
 
 #include "keela-pipeline/presentationbin.h"
 
-#include <stdexcept>
-#include <spdlog/spdlog.h>
-
 #include <keela-pipeline/gtkglsink.h>
 #include <keela-pipeline/gtksink.h>
+#include <spdlog/spdlog.h>
+
+#include <stdexcept>
 
 #include "keela-pipeline/utils.h"
 
-
-Keela::PresentationBin::PresentationBin(const std::string &name): QueueBin(name) {
+Keela::PresentationBin::PresentationBin(const std::string &name) : QueueBin(name) {
     spdlog::info("{}", __func__);
     PresentationBin::init();
     gboolean ret = false;
-    ret = gst_element_set_name(GST_OBJECT(static_cast<GstElement*>(video_rate)), (name+"_videorate").c_str());
+    ret = gst_element_set_name(GST_OBJECT(static_cast<GstElement *>(video_rate)), (name + "_videorate").c_str());
     // TODO: name sink
-    if (!ret) {
+    if(!ret) {
         spdlog::warn("{} Failed to name elements", __func__);
     }
     PresentationBin::link();
 }
 
-Keela::PresentationBin::PresentationBin(): QueueBin() {
+Keela::PresentationBin::PresentationBin() : QueueBin() {
     spdlog::info("{}", __func__);
     PresentationBin::init();
     PresentationBin::link();
@@ -52,5 +51,5 @@ void Keela::PresentationBin::link() {
     add_elements(video_rate, caps_filter, sink);
     element_link_many(video_rate, caps_filter, sink);
     link_queue(video_rate);
-    //add_ghost_pad(video_rate, "sink");
+    // add_ghost_pad(video_rate, "sink");
 }

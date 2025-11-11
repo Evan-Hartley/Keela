@@ -7,12 +7,12 @@
 #include "elementbase.h"
 
 namespace Keela {
-    class WidgetElement {
-        public:
-        virtual ~WidgetElement() = default;
+class WidgetElement {
+   public:
+    virtual ~WidgetElement() = default;
 
-        /// return a pointer to the widget managed by this element
-        virtual gpointer get_widget() = 0;
-    };
-}
-#endif //WIDGETELEMENT_H
+    /// return a pointer to the widget managed by this element
+    virtual gpointer get_widget() = 0;
+};
+}  // namespace Keela
+#endif  // WIDGETELEMENT_H

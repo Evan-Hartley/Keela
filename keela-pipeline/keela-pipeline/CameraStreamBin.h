@@ -2,8 +2,8 @@
 #define CAMERASTREAMBIN_H
 
 #include <keela-pipeline/presentationbin.h>
-#include <keela-pipeline/snapshotbin.h>
 #include <keela-pipeline/recordbin.h>
+#include <keela-pipeline/snapshotbin.h>
 
 #include "EjectableElement.h"
 #include "caps.h"
@@ -12,41 +12,43 @@
 #include "simpleelement.h"
 
 namespace Keela {
-    class CameraStreamBin final : public QueueBin, public EjectableElement {
-    public:
-        explicit CameraStreamBin(const std::string &name);
+class CameraStreamBin final : public QueueBin, public EjectableElement {
+   public:
+    explicit CameraStreamBin(const std::string &name);
 
-        ~CameraStreamBin() override;
+    ~CameraStreamBin() override;
 
-        SimpleElement internal_tee = SimpleElement("tee");
+    SimpleElement internal_tee = SimpleElement("tee");
 
-        std::shared_ptr<PresentationBin> presentation;
-        std::shared_ptr<SnapshotBin> snapshot;
-        std::shared_ptr<TraceBin> trace;
+    std::shared_ptr<PresentationBin> presentation;
+    std::shared_ptr<SnapshotBin> snapshot;
+    std::shared_ptr<TraceBin> trace;
 
-        std::shared_ptr<RecordBin> record_bin = nullptr;
-        
-        void start_recording(const std::string& filename);
+    std::shared_ptr<RecordBin> record_bin = nullptr;
 
-        void stop_recording();
+    void start_recording(const std::string &filename);
 
-        std::shared_ptr<TraceBin> get_trace() { return trace; }
+    void stop_recording();
 
-    private:
-        void link() override;
+    std::shared_ptr<TraceBin> get_trace() {
+        return trace;
+    }
 
-        Keela::Element *Head() override {
-            return &queue;
-        };
+   private:
+    void link() override;
 
-        std::vector<Keela::Element *> Leaves() override {
-            if (record_bin != nullptr) {
-                return std::vector<Keela::Element *>{record_bin.get()};
-            }
-            return std::vector<Keela::Element *>{};
-        }
-
-        std::string name;
+    Keela::Element *Head() override {
+        return &queue;
     };
+
+    std::vector<Keela::Element *> Leaves() override {
+        if(record_bin != nullptr) {
+            return std::vector<Keela::Element *>{record_bin.get()};
+        }
+        return std::vector<Keela::Element *>{};
+    }
+
+    std::string name;
+};
 }  // namespace Keela
 #endif  // CAMERASTREAMBIN_H

@@ -9,20 +9,20 @@
 #include "simpleelement.h"
 
 namespace Keela {
-    class SnapshotBin final : public Keela::QueueBin {
-    public:
-        explicit SnapshotBin(const std::string &name);
+class SnapshotBin final : public Keela::QueueBin {
+   public:
+    explicit SnapshotBin(const std::string &name);
 
-        ~SnapshotBin() override;
+    ~SnapshotBin() override;
 
-        void take_snapshot();
+    void take_snapshot();
 
-    private:
-        SimpleElement app_sink = SimpleElement("appsink");
+   private:
+    SimpleElement app_sink = SimpleElement("appsink");
 
-        void init() override;
+    void init() override;
 
-        void link() override;
-    };
-}
-#endif //SNAPSHOTBIN_H
+    void link() override;
+};
+}  // namespace Keela
+#endif  // SNAPSHOTBIN_H

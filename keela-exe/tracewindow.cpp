@@ -18,7 +18,7 @@ Keela::TraceWindow::~TraceWindow() {
 }
 
 void Keela::TraceWindow::addTraces(const std::vector<std::shared_ptr<Keela::ITraceable>>& traces_to_add) {
-    if (traces_to_add.empty()) {
+    if(traces_to_add.empty()) {
         return;
     }
 
@@ -26,7 +26,7 @@ void Keela::TraceWindow::addTraces(const std::vector<std::shared_ptr<Keela::ITra
     auto row_box = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
     row_box->set_spacing(10);
 
-    for (const auto& trace : traces_to_add) {
+    for(const auto& trace : traces_to_add) {
         auto widget = std::make_shared<GLTraceRender>(trace);
         traces.push_back(widget);
         row_box->pack_start(*widget, true, true, 0);
@@ -40,7 +40,7 @@ void Keela::TraceWindow::addTraces(const std::vector<std::shared_ptr<Keela::ITra
 void Keela::TraceWindow::removeTraceRow() {
     // Get the most recently added row box
     auto children = container.get_children();
-    if (!children.empty()) {
+    if(!children.empty()) {
         auto* last_row = children.back();
         container.remove(*last_row);
 
@@ -49,7 +49,7 @@ void Keela::TraceWindow::removeTraceRow() {
         int traces_in_last_row = last_row_box->get_children().size();
 
         // Remove the corresponding number of traces
-        for (int i = 0; i < traces_in_last_row; i++) {
+        for(int i = 0; i < traces_in_last_row; i++) {
             traces.pop_back();
         }
 
@@ -66,16 +66,15 @@ void Keela::TraceWindow::set_on_closed_callback(std::function<void()> callback) 
 }
 
 bool Keela::TraceWindow::on_timeout() {
-    for (const auto &trace: traces) {
+    for(const auto& trace : traces) {
         trace->queue_draw();
     }
     return true;
 }
 
 bool Keela::TraceWindow::on_delete_event(GdkEventAny* any_event) {
-    if (on_window_closed_callback) {
+    if(on_window_closed_callback) {
         on_window_closed_callback();
     }
-    return false; // Allow the default handler to destroy the window
+    return false;  // Allow the default handler to destroy the window
 }
-

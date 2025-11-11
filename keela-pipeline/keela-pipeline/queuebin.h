@@ -10,23 +10,23 @@
 #include "simpleelement.h"
 
 namespace Keela {
-    class QueueBin : public Bin {
-    public:
-        QueueBin();
+class QueueBin : public Bin {
+   public:
+    QueueBin();
 
-        ~QueueBin() override;
+    ~QueueBin() override;
 
-        explicit QueueBin(const std::string &name);
+    explicit QueueBin(const std::string &name);
 
-        Keela::SimpleElement queue = SimpleElement("queue");
+    Keela::SimpleElement queue = SimpleElement("queue");
 
-    protected:
-        void link_queue(GstElement *sink) const;
+   protected:
+    void link_queue(GstElement *sink) const;
 
-    private:
-        void init() override;
+   private:
+    void init() override;
 
-        void link() override;
-    };
-}
-#endif //QUEUEBIN_H
+    void link() override;
+};
+}  // namespace Keela
+#endif  // QUEUEBIN_H

@@ -39,9 +39,11 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
     gain_spin.m_spin.signal_value_changed().connect(sigc::mem_fun(*this, &CameraControlWindow::on_gain_changed));
     v_container.add(gain_spin);
 
-    // Disable exposure time control until camera is ready and we can query for exposure time support and supported range
+    // Disable exposure time control until camera is ready and we can query for exposure time support and supported
+    // range
     exposure_time_spin.m_spin.set_sensitive(false);
-    exposure_time_spin.m_spin.signal_value_changed().connect(sigc::mem_fun(*this, &CameraControlWindow::on_exposure_time_changed));
+    exposure_time_spin.m_spin.signal_value_changed().connect(
+        sigc::mem_fun(*this, &CameraControlWindow::on_exposure_time_changed));
     v_container.add(exposure_time_spin);
 
     // TODO: add rotation options
@@ -58,8 +60,10 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
     flip_vert_check.signal_toggled().connect(sigc::mem_fun(*this, &CameraControlWindow::on_flip_vert_changed));
     v_container.add(flip_vert_check);
 
-    // TODO: dynamically cast camera_manager->presentation to a WidgetElement to get a handle to a widget to add to the window
-    // TODO: do we need to take a snapshot of the odd stream too? maybe not because we just need it for scale calibration?
+    // TODO: dynamically cast camera_manager->presentation to a WidgetElement to get a handle to a widget to add to the
+    // window
+    // TODO: do we need to take a snapshot of the odd stream too? maybe not because we just need it for scale
+    // calibration?
     fetch_image_button.signal_clicked().connect(
         sigc::mem_fun(*camera_manager->camera_stream_even->snapshot, &Keela::SnapshotBin::take_snapshot));
     v_container.add(fetch_image_button);
@@ -70,16 +74,15 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
     trace_gizmo_even = std::make_shared<TraceGizmo>();
 
     // Set up video presentations, frame_widget_even renders all frames unless split is enabled
-    frame_widget_even = std::make_unique<VideoPresentation>(
-        "Camera " + std::to_string(id),
-        camera_manager->camera_stream_even->presentation,
-        640,  // width
-        480   // height
+    frame_widget_even = std::make_unique<VideoPresentation>("Camera " + std::to_string(id),
+                                                            camera_manager->camera_stream_even->presentation,
+                                                            640,  // width
+                                                            480   // height
     );
     frame_widget_even->add_overlay_widget(*trace_gizmo_even);
     video_hbox.pack_start(*frame_widget_even, false, false, 10);
 
-    if (camera_manager->is_frame_splitting_enabled()) {
+    if(camera_manager->is_frame_splitting_enabled()) {
         add_split_frame_ui();
     }
 
@@ -119,14 +122,14 @@ void Keela::CameraControlWindow::set_resolution(const int width, const int heigh
     this->camera_manager->set_resolution(width, height);
     // TODO: can we set a minimum size or allow the user to scale the gl area themselves?
     const auto rotation = rotation_combo.m_combo.get_active_id();
-    if (rotation == ROTATION_90 || rotation == ROTATION_270) {
+    if(rotation == ROTATION_90 || rotation == ROTATION_270) {
         frame_widget_even->set_video_size(height, width);
-        if (frame_widget_odd) {
+        if(frame_widget_odd) {
             frame_widget_odd->set_video_size(height, width);
         }
     } else {
         frame_widget_even->set_video_size(width, height);
-        if (frame_widget_odd) {
+        if(frame_widget_odd) {
             frame_widget_odd->set_video_size(width, height);
         }
     }
@@ -140,18 +143,18 @@ void Keela::CameraControlWindow::on_rotation_changed() {
     spdlog::trace("rotation changed");
     // NOTE: this appears to mess with the caps of the video stream
     const auto value = rotation_combo.m_combo.get_active_id();
-    if (value == ROTATION_NONE) {
+    if(value == ROTATION_NONE) {
         camera_manager->transform.rotate_identity();
-    } else if (value == ROTATION_90) {
+    } else if(value == ROTATION_90) {
         camera_manager->transform.rotate_90();
-    } else if (value == ROTATION_180) {
+    } else if(value == ROTATION_180) {
         camera_manager->transform.rotate_180();
-    } else if (value == ROTATION_270) {
+    } else if(value == ROTATION_270) {
         camera_manager->transform.rotate_270();
     } else {
         throw std::runtime_error(value + "is an invalid rotation");
     }
-    if (m_width > 0 && m_height > 0) {
+    if(m_width > 0 && m_height > 0) {
         set_resolution(m_width, m_height);
     } else {
         spdlog::warn("Skipping resolution change - resolution not initialized");
@@ -170,7 +173,7 @@ void Keela::CameraControlWindow::on_flip_vert_changed() const {
 
 void Keela::CameraControlWindow::update_split_frame_state(bool should_split_frames) {
     camera_manager->set_frame_splitting(should_split_frames);
-    if (should_split_frames) {
+    if(should_split_frames) {
         spdlog::info("Adding split frame UI");
         add_split_frame_ui();
     } else {
@@ -183,13 +186,13 @@ void Keela::CameraControlWindow::update_split_frame_state(bool should_split_fram
 
 std::vector<std::shared_ptr<Keela::ITraceable>> Keela::CameraControlWindow::get_traces() {
     // Lazily create traces if not already done
-    if (m_traces.empty()) {
+    if(m_traces.empty()) {
         update_traces();
     }
 
     std::vector<std::shared_ptr<ITraceable>> traces;
     traces.reserve(m_traces.size());
-    for (const auto& trace : m_traces) {
+    for(const auto& trace : m_traces) {
         traces.push_back(trace);
     }
     return traces;
@@ -200,66 +203,61 @@ void Keela::CameraControlWindow::update_traces() {
 
     // Always add the even trace
     std::string even_name = "Camera " + std::to_string(id);
-    if (camera_manager->is_frame_splitting_enabled()) {
+    if(camera_manager->is_frame_splitting_enabled()) {
         even_name += " (Even)";
     }
 
-    auto even_trace = std::make_shared<CameraTrace>(
-        camera_manager->camera_stream_even->get_trace(),
-        trace_gizmo_even,
-        even_name);
+    auto even_trace =
+        std::make_shared<CameraTrace>(camera_manager->camera_stream_even->get_trace(), trace_gizmo_even, even_name);
     m_traces.push_back(even_trace);
 
     // Add odd trace if frame splitting is enabled
-    if (camera_manager->is_frame_splitting_enabled() && trace_gizmo_odd) {
-        auto odd_trace = std::make_shared<CameraTrace>(
-            camera_manager->camera_stream_odd->get_trace(),
-            trace_gizmo_odd,
-            "Camera " + std::to_string(id) + " (Odd)");
+    if(camera_manager->is_frame_splitting_enabled() && trace_gizmo_odd) {
+        auto odd_trace = std::make_shared<CameraTrace>(camera_manager->camera_stream_odd->get_trace(), trace_gizmo_odd,
+                                                       "Camera " + std::to_string(id) + " (Odd)");
         m_traces.push_back(odd_trace);
     }
 }
 
 void Keela::CameraControlWindow::apply_trace_framerate(guint fps) {
     spdlog::info("Applying trace framerate {} to all traces for camera {}", fps, id);
-    for (const auto& trace : m_traces) {
+    for(const auto& trace : m_traces) {
         auto trace_bin = trace->get_trace_bin();
-        if (trace_bin) {
+        if(trace_bin) {
             trace_bin->set_trace_framerate(fps);
         }
     }
 }
 
 void Keela::CameraControlWindow::add_split_frame_ui() {
-    if (frame_widget_odd) return;  // Already added
+    if(frame_widget_odd)
+        return;  // Already added
 
     // Create trace gizmo for odd frames
     trace_gizmo_odd = std::make_shared<TraceGizmo>();
 
     const auto rotation = rotation_combo.m_combo.get_active_id();
-    if (rotation == ROTATION_90 || rotation == ROTATION_270) {
-        frame_widget_odd = std::make_unique<VideoPresentation>(
-            "Odd Frames",
-            camera_manager->camera_stream_odd->presentation,
-            480,  // width
-            640   // height
-        );
+    if(rotation == ROTATION_90 || rotation == ROTATION_270) {
+        frame_widget_odd =
+            std::make_unique<VideoPresentation>("Odd Frames", camera_manager->camera_stream_odd->presentation,
+                                                480,  // width
+                                                640   // height
+            );
     } else {
-        frame_widget_odd = std::make_unique<VideoPresentation>(
-            "Odd Frames",
-            camera_manager->camera_stream_odd->presentation,
-            640,  // width
-            480   // height
-        );
+        frame_widget_odd =
+            std::make_unique<VideoPresentation>("Odd Frames", camera_manager->camera_stream_odd->presentation,
+                                                640,  // width
+                                                480   // height
+            );
     }
 
     frame_widget_odd->add_overlay_widget(*trace_gizmo_odd);
     video_hbox.pack_start(*frame_widget_odd, false, false, 10);
 
     // Ensure the new widget matches the current resolution
-    if (m_width > 0 && m_height > 0) {
+    if(m_width > 0 && m_height > 0) {
         const auto rotation = rotation_combo.m_combo.get_active_id();
-        if (rotation == ROTATION_90 || rotation == ROTATION_270) {
+        if(rotation == ROTATION_90 || rotation == ROTATION_270) {
             frame_widget_odd->set_video_size(m_height, m_width);
         } else {
             frame_widget_odd->set_video_size(m_width, m_height);
@@ -270,7 +268,7 @@ void Keela::CameraControlWindow::add_split_frame_ui() {
 }
 
 void Keela::CameraControlWindow::remove_split_frame_ui() {
-    if (frame_widget_odd) {
+    if(frame_widget_odd) {
         video_hbox.remove(*frame_widget_odd);
         frame_widget_odd.reset();
     }
@@ -282,7 +280,7 @@ void Keela::CameraControlWindow::update_gain_range() {
     double min_gain = gain_range.first;
     double max_gain = gain_range.second;
 
-    if (min_gain == 0.0 && max_gain == 0.0) {
+    if(min_gain == 0.0 && max_gain == 0.0) {
         gain_spin.m_spin.set_sensitive(false);
         spdlog::warn("Gain control not supported by camera - disabling gain control UI");
         return;
@@ -300,13 +298,14 @@ void Keela::CameraControlWindow::update_exposure_time_range() {
     double min_exposure_time = exposure_time_range.first;
     double max_exposure_time = exposure_time_range.second;
 
-    if (min_exposure_time == 0.0 && max_exposure_time == 0.0) {
+    if(min_exposure_time == 0.0 && max_exposure_time == 0.0) {
         exposure_time_spin.m_spin.set_sensitive(false);
         spdlog::warn("Exposure time control not supported by camera - disabling exposure time control UI");
         return;
     }
     // update the exposure time spin with the new range
-    exposure_time_spin.m_spin.set_adjustment(Gtk::Adjustment::create(min_exposure_time, min_exposure_time, max_exposure_time, 1000.0));
+    exposure_time_spin.m_spin.set_adjustment(
+        Gtk::Adjustment::create(min_exposure_time, min_exposure_time, max_exposure_time, 1000.0));
     exposure_time_spin.m_spin.set_sensitive(true);
 
     spdlog::info("Updated exposure time control range to {:.1f} - {:.1f} μs", min_exposure_time, max_exposure_time);

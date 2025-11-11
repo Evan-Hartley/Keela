@@ -12,4 +12,4 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif //SHADER_RESOURCES_H
+#endif  // SHADER_RESOURCES_H

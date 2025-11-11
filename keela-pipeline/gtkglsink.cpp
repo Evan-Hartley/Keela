@@ -12,13 +12,13 @@ Keela::GtkGlSink::GtkGlSink() {
     link();
 }
 
-Keela::GtkGlSink::GtkGlSink(const std::string &name): Bin(name) {
+Keela::GtkGlSink::GtkGlSink(const std::string &name) : Bin(name) {
     spdlog::info("{}", __func__);
     init();
     gboolean ret = false;
-    ret = gst_element_set_name(GST_ELEMENT(static_cast<GstElement*>(glsink)), (name + "_gl").c_str());
-    ret |= gst_element_set_name(GST_ELEMENT(static_cast<GstElement*>(glsink)), (name + "_gtkgl").c_str());
-    if (!ret) {
+    ret = gst_element_set_name(GST_ELEMENT(static_cast<GstElement *>(glsink)), (name + "_gl").c_str());
+    ret |= gst_element_set_name(GST_ELEMENT(static_cast<GstElement *>(glsink)), (name + "_gtkgl").c_str());
+    if(!ret) {
         spdlog::warn("Could not set name of elements");
     }
     link();
@@ -33,7 +33,7 @@ void Keela::GtkGlSink::init() {
     gtkglsink = gst_element_factory_make("gtkglsink", NULL);*/
     // if (glsink && gtkglsink) {
     spdlog::info("Successfully created Gtk OpenGL elements");
-    g_object_set(glsink, "sink", gtkglsink,NULL);
+    g_object_set(glsink, "sink", gtkglsink, NULL);
     // } else {
     //   throw std::runtime_error("Failed to create Gtk OpenGL element");
     //}
@@ -48,7 +48,7 @@ void Keela::GtkGlSink::link() {
 gpointer Keela::GtkGlSink::get_widget() {
     GObject *o = nullptr;
     g_object_get(glsink, "widget", &o, nullptr);
-    if (!o) {
+    if(!o) {
         throw std::runtime_error("Could not get GTK widget");
     }
     spdlog::info("Got GTK widget");

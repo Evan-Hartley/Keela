@@ -5,23 +5,20 @@
 #ifndef LABELEDSPINBUTTON_H
 #define LABELEDSPINBUTTON_H
 #include <gtkmm-3.0/gtkmm.h>
-namespace Keela
-{
+namespace Keela {
 
+/**
+ * Composition of Gtk::Label and Gtk::SpinButton
+ */
+class LabeledSpinButton final : public Gtk::Box {
+   public:
     /**
-     * Composition of Gtk::Label and Gtk::SpinButton
+     * @param label label text of spin button
      */
-    class LabeledSpinButton final : public Gtk::Box
-    {
-    public:
-
-        /**
-         * @param label label text of spin button
-         */
-        explicit LabeledSpinButton(const std::string& label);
-        LabeledSpinButton() = default;
-        Gtk::Label m_label;
-        Gtk::SpinButton m_spin;
-    };
-}
-#endif //LABELEDSPINBUTTON_H
+    explicit LabeledSpinButton(const std::string& label);
+    LabeledSpinButton() = default;
+    Gtk::Label m_label;
+    Gtk::SpinButton m_spin;
+};
+}  // namespace Keela
+#endif  // LABELEDSPINBUTTON_H

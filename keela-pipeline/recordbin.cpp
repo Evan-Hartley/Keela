@@ -3,22 +3,25 @@
 //
 
 #include "keela-pipeline/recordbin.h"
-#include <stdexcept>
+
 #include <spdlog/spdlog.h>
+
+#include <stdexcept>
+
 #include "keela-pipeline/gst-helpers.h"
 #include "keela-pipeline/utils.h"
 
 using namespace spdlog;
 
-Keela::RecordBin::RecordBin(const std::string &name): QueueBin(name) {
+Keela::RecordBin::RecordBin(const std::string &name) : QueueBin(name) {
     spdlog::info("{}", __func__);
     RecordBin::init();
     gboolean ret = false;
 
-    ret = gst_object_set_name(GST_OBJECT(static_cast<GstElement*>(this->enc)), (name + "_enc").c_str());
-    ret &= gst_object_set_name(GST_OBJECT(static_cast<GstElement*>(mux)), (name + "_mux").c_str());
-    ret &= gst_object_set_name(GST_OBJECT(static_cast<GstElement*>(sink)), (name + "_sink").c_str());
-    if (!ret) {
+    ret = gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(this->enc)), (name + "_enc").c_str());
+    ret &= gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(mux)), (name + "_mux").c_str());
+    ret &= gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(sink)), (name + "_sink").c_str());
+    if(!ret) {
         throw std::runtime_error("Failed to name Elements");
     }
     RecordBin::link();
@@ -36,7 +39,7 @@ void Keela::RecordBin::init() {
     g_object_set(enc, "pass", variant, nullptr);
 }
 
-Keela::RecordBin::RecordBin(): QueueBin() {
+Keela::RecordBin::RecordBin() : QueueBin() {
     spdlog::info("{}", __func__);
     RecordBin::init();
     RecordBin::link();

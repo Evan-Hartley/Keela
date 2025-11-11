@@ -4,24 +4,25 @@
 
 #include "keela-pipeline/transformbin.h"
 
-#include <stdexcept>
 #include <spdlog/spdlog.h>
+
+#include <stdexcept>
 
 #include "keela-pipeline/gst-helpers.h"
 #include "keela-pipeline/utils.h"
 
-Keela::TransformBin::TransformBin(): QueueBin() {
+Keela::TransformBin::TransformBin() : QueueBin() {
     spdlog::info("{}", __func__);
     TransformBin::init();
     TransformBin::link();
 }
 
-Keela::TransformBin::TransformBin(const std::string &name): QueueBin(name) {
+Keela::TransformBin::TransformBin(const std::string &name) : QueueBin(name) {
     spdlog::info("{}", __func__);
     TransformBin::init();
     gboolean ret = false;
-    ret = gst_object_set_name(GST_OBJECT(static_cast<GstElement*>(video_scale)), (name + "_scale").c_str());
-    if (!ret) {
+    ret = gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(video_scale)), (name + "_scale").c_str());
+    if(!ret) {
         spdlog::warn("{} Failed to name elements", __func__);
     }
     TransformBin::link();
@@ -35,10 +36,10 @@ void Keela::TransformBin::flip_horizontal(const bool apply_flip) const {
     auto direction = apply_flip ? FLIP_HORIZONTAL : IDENTITY;
     try {
         const auto variant =
-                gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(flip_h)), FLIP_PROP, direction);
+            gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(flip_h)), FLIP_PROP, direction);
 
         g_object_set(flip_h, FLIP_PROP.c_str(), variant, nullptr);
-    } catch (const std::exception &e) {
+    } catch(const std::exception &e) {
         spdlog::error("Could not set horizontal flip of transformbin: {}", e.what());
         throw;
     }
@@ -48,10 +49,10 @@ void Keela::TransformBin::flip_vertical(bool apply_flip) const {
     auto direction = apply_flip ? FLIP_VERTICAL : IDENTITY;
     try {
         const auto variant =
-                gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(flip_v)), FLIP_PROP, direction);
+            gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(flip_v)), FLIP_PROP, direction);
 
         g_object_set(flip_v, FLIP_PROP.c_str(), variant, nullptr);
-    } catch (const std::exception &e) {
+    } catch(const std::exception &e) {
         spdlog::error("Could not set vertical flip of transformbin: {}", e.what());
         throw;
     }
@@ -84,18 +85,18 @@ void Keela::TransformBin::scale(const int width, const int height) {
 void Keela::TransformBin::rotate(const std::string &direction) const {
     try {
         const auto variant =
-                gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(rotation)), FLIP_PROP, direction);
+            gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(rotation)), FLIP_PROP, direction);
 
         g_object_set(rotation, FLIP_PROP.c_str(), variant, nullptr);
-    } catch (const std::exception &e) {
+    } catch(const std::exception &e) {
         spdlog::error("Could not set rotation of transformbin: {}", e.what());
         throw;
     }
 }
 
 void Keela::TransformBin::init() {
-    auto variant = Keela::gst_enum_variant_by_nick(
-        G_OBJECT(static_cast<GstElement*>(video_scale)), "method", "bilinear");
+    auto variant =
+        Keela::gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(video_scale)), "method", "bilinear");
     g_object_set(video_scale, "method", variant, nullptr);
 }
 

@@ -8,13 +8,13 @@
 #include "widgetelement.h"
 
 namespace Keela {
-    class GtkSink final : public SimpleElement, public WidgetElement {
-    public:
-        GtkSink();
-        explicit GtkSink(const std::string &name);
-        ~GtkSink() override;
+class GtkSink final : public SimpleElement, public WidgetElement {
+   public:
+    GtkSink();
+    explicit GtkSink(const std::string &name);
+    ~GtkSink() override;
 
-        gpointer get_widget() override;
-    };
-}
-#endif //GTKSINK_H
+    gpointer get_widget() override;
+};
+}  // namespace Keela
+#endif  // GTKSINK_H

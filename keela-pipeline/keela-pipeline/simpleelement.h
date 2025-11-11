@@ -4,25 +4,27 @@
 
 #ifndef ELEMENT_H
 #define ELEMENT_H
+#include <gstreamer-1.0/gst/gst.h>
+
 #include <memory>
 #include <string>
-#include <gstreamer-1.0/gst/gst.h>
+
 #include "elementbase.h"
 
 namespace Keela {
-    class SimpleElement : public virtual Keela::Element {
-    public:
-        explicit SimpleElement(const std::string &element);
+class SimpleElement : public virtual Keela::Element {
+   public:
+    explicit SimpleElement(const std::string &element);
 
-        ~SimpleElement() override;
+    ~SimpleElement() override;
 
-        SimpleElement(const std::string &element, const std::string &name);
+    SimpleElement(const std::string &element, const std::string &name);
 
-        operator GstElement *() const override;
+    operator GstElement *() const override;
 
-    protected:
-        std::string element_name;
-        std::shared_ptr<GstElement> m_element;
-    };
-}
-#endif //ELEMENT_H
+   protected:
+    std::string element_name;
+    std::shared_ptr<GstElement> m_element;
+};
+}  // namespace Keela
+#endif  // ELEMENT_H

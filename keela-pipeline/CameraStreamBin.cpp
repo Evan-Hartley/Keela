@@ -34,13 +34,13 @@ void Keela::CameraStreamBin::link() {
     link_queue(internal_tee);
 }
 
-void Keela::CameraStreamBin::start_recording(const std::string & filename) {
+void Keela::CameraStreamBin::start_recording(const std::string &filename) {
     record_bin = std::make_shared<RecordBin>("recordbin_" + name);
     record_bin->set_directory(filename);
     add_elements(static_cast<Bin &>(*record_bin));
     gboolean sync_result = gst_element_sync_state_with_parent(static_cast<Bin &>(*record_bin));
 
-    if (!sync_result) {
+    if(!sync_result) {
         throw std::runtime_error("Failed to sync record_bin state with parent");
     }
 
@@ -51,8 +51,8 @@ void Keela::CameraStreamBin::start_recording(const std::string & filename) {
 void Keela::CameraStreamBin::stop_recording() {
     // notes from example to dynamically remove a bin from a playing pipeline:
     // add a blocking downstream probe to the queue "src" pad
-    // inside the blocking callback, add the EOS probe to the last source pad of the bin (it is unclear if this can also be a sink pad)
-    // after installing the EOS callback, send an EOS event to the sink pad of the beginning of the bin
+    // inside the blocking callback, add the EOS probe to the last source pad of the bin (it is unclear if this can also
+    // be a sink pad) after installing the EOS callback, send an EOS event to the sink pad of the beginning of the bin
     // inside the EOS callback, set the state of the bin to NULL and remove the bin from the pipeline
     record_bin->PrepareEject();
     record_bin->Eject(false);

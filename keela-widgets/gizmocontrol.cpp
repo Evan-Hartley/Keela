@@ -6,11 +6,11 @@
 
 #include <spdlog/spdlog.h>
 
-Keela::GizmoControl::GizmoControl(): Gdk::Rectangle(0, 0, width, width) {
+Keela::GizmoControl::GizmoControl() : Gdk::Rectangle(0, 0, width, width) {
 }
 
-Keela::GizmoControl::GizmoControl(const int x, const int y): Gdk::Rectangle(x - HALF(width), y - HALF(width), width,
-                                                                            width) {
+Keela::GizmoControl::GizmoControl(const int x, const int y)
+    : Gdk::Rectangle(x - HALF(width), y - HALF(width), width, width) {
 }
 
 Keela::GizmoControl::~GizmoControl() {
@@ -20,7 +20,7 @@ void Keela::GizmoControl::draw(const Cairo::RefPtr<Cairo::Context> &cr) const {
     cr->save();
 
     cr->rectangle(get_x(), get_y(), get_width(), get_height());
-    if (hovered) {
+    if(hovered) {
         cr->fill();
     } else {
         cr->stroke();

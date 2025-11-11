@@ -3,29 +3,30 @@
 //
 
 #include "keela-widgets/GLCameraRender.h"
-#include <glad/glad.h>
+
 #include <gio/gio.h>
+#include <glad/glad.h>
+#include <glibmm/main.h>
 #include <spdlog/spdlog.h>
 
 #include <utility>
-#include <glibmm/main.h>
 
 #include "keela-pipeline/consts.h"
 
 Keela::GLCameraRender::GLCameraRender(std::shared_ptr<PresentationBin> bin) {
     GError *error = nullptr;
     spdlog::debug("{}: Loading vertex shader resource", __func__);
-    auto vertex_res = g_resources_lookup_data("/org/gatech/keela/shaders/video-vertex.glsl",
-                                              G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
-    if (!vertex_res && !error) {
+    auto vertex_res =
+        g_resources_lookup_data("/org/gatech/keela/shaders/video-vertex.glsl", G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
+    if(!vertex_res && !error) {
         std::stringstream ss;
         ss << "Could not load vertex shader resource: " << error->message;
         throw std::runtime_error(ss.str());
     }
     spdlog::debug("{}: Loading fragment shader resource", __func__);
-    auto fragment_res = g_resources_lookup_data("/org/gatech/keela/shaders/video-fragment.glsl",
-                                                G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
-    if (!fragment_res && !error) {
+    auto fragment_res =
+        g_resources_lookup_data("/org/gatech/keela/shaders/video-fragment.glsl", G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
+    if(!fragment_res && !error) {
         std::stringstream ss;
         ss << "Could not load fragment shader resource: " << error->message;
         throw std::runtime_error(ss.str());
@@ -74,13 +75,13 @@ void Keela::GLCameraRender::new_tex_sample(GstSample *sample) {
     assert(ret);
     spdlog::trace("New tex sample width: {} height: {} format: {}", width, height, fmt);
     GstMapInfo mapInfo;
-    if (gst_buffer_map(buf, &mapInfo, GST_MAP_READ)) {
+    if(gst_buffer_map(buf, &mapInfo, GST_MAP_READ)) {
         auto tex_fmt = fmt == GRAY8 ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;
 
         // if pixel format is greater than 8 bits, check if we need to swap bytes
-        if (fmt == GRAY16_BE && std::endian::native != std::endian::big) {
+        if(fmt == GRAY16_BE && std::endian::native != std::endian::big) {
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
-        } else if (fmt == GRAY16_LE && std::endian::native != std::endian::little) {
+        } else if(fmt == GRAY16_LE && std::endian::native != std::endian::little) {
             glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_TRUE);
         }
         // otherwise, we can just use host order
@@ -89,7 +90,7 @@ void Keela::GLCameraRender::new_tex_sample(GstSample *sample) {
         }
 
         glBindTexture(GL_TEXTURE_2D, texture);
-        glTexImage2D(GL_TEXTURE_2D, 0,GL_RED, width, height, 0,GL_RED, tex_fmt, mapInfo.data);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, tex_fmt, mapInfo.data);
 
         gst_buffer_unmap(buf, &mapInfo);
     } else {
@@ -100,14 +101,13 @@ void Keela::GLCameraRender::new_tex_sample(GstSample *sample) {
     gst_sample_unref(sample);
 }
 
-
 void Keela::GLCameraRender::on_realize() {
     spdlog::info("GLCameraRender::{}", __func__);
     GLArea::on_realize();
     make_current();
 
     // make sure opengl symbols are loaded before we do any opengl stuff
-    if (!gladLoadGL()) {
+    if(!gladLoadGL()) {
         throw std::runtime_error("Failed to load OpenGL symbols");
     }
 
@@ -116,7 +116,7 @@ void Keela::GLCameraRender::on_realize() {
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices,GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     const char *vertex_cstr = vertexShaderSource.c_str();
@@ -125,8 +125,8 @@ void Keela::GLCameraRender::on_realize() {
 
     int success;
     char infoLog[512];
-    glGetShaderiv(vertexShader,GL_COMPILE_STATUS, &success);
-    if (!success) {
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
         std::stringstream ss;
         ss << "Vertex shader compilation failed: " << infoLog;
@@ -139,8 +139,8 @@ void Keela::GLCameraRender::on_realize() {
     glShaderSource(fragmentShader, 1, &fragment_cstr, nullptr);
     glCompileShader(fragmentShader);
 
-    glGetShaderiv(fragmentShader,GL_COMPILE_STATUS, &success);
-    if (!success) {
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
+    if(!success) {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
         std::stringstream ss;
         ss << "Fragment shader compilation failed: " << infoLog;
@@ -153,8 +153,8 @@ void Keela::GLCameraRender::on_realize() {
     glAttachShader(shaderProgram, fragmentShader);
     glLinkProgram(shaderProgram);
 
-    glGetProgramiv(shaderProgram,GL_LINK_STATUS, &success);
-    if (!success) {
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if(!success) {
         glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
         std::stringstream ss;
         ss << "Program linking failed: " << infoLog;
@@ -164,17 +164,17 @@ void Keela::GLCameraRender::on_realize() {
     glDeleteShader(fragmentShader);
 
     // position attribute
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) 0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)0);
     glEnableVertexAttribArray(0);
     // color attribute
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *) (2 * sizeof(float)));
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     // set nearest neighbors interpolation
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 bool Keela::GLCameraRender::on_render(const Glib::RefPtr<Gdk::GLContext> &context) {
@@ -185,7 +185,7 @@ bool Keela::GLCameraRender::on_render(const Glib::RefPtr<Gdk::GLContext> &contex
     GstSample *sample = nullptr;
 
     g_signal_emit_by_name(bin->sink, "try-pull-sample", 0, &sample, nullptr);
-    if (sample) {
+    if(sample) {
         new_tex_sample(sample);
     }
 

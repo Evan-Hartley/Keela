@@ -8,36 +8,36 @@
 #include "queuebin.h"
 
 namespace Keela {
-    class TraceBin final : public QueueBin {
-    public:
-        TraceBin();
+class TraceBin final : public QueueBin {
+   public:
+    TraceBin();
 
-        explicit TraceBin(const std::string &name);
+    explicit TraceBin(const std::string &name);
 
-        ~TraceBin() override;
+    ~TraceBin() override;
 
-        /*
-         * Whether to enable tracing or not
-         */
-        void enable_trace(bool do_enable);
+    /*
+     * Whether to enable tracing or not
+     */
+    void enable_trace(bool do_enable);
 
-        /*
-        * Set the target framerate for trace subsampling
-        */
-        void set_trace_framerate(guint framerate);
+    /*
+     * Set the target framerate for trace subsampling
+     */
+    void set_trace_framerate(guint framerate);
 
-    private:
-        void init() override;
+   private:
+    void init() override;
 
-        void link() override;
+    void link() override;
 
-    public:
-        SimpleElement video_rate = SimpleElement("videorate");
-        SimpleElement caps_filter = SimpleElement("capsfilter");
-        SimpleElement sink = SimpleElement("appsink");
+   public:
+    SimpleElement video_rate = SimpleElement("videorate");
+    SimpleElement caps_filter = SimpleElement("capsfilter");
+    SimpleElement sink = SimpleElement("appsink");
 
-    private:
-        Caps trace_caps = Caps();
-    };
-}
+   private:
+    Caps trace_caps = Caps();
+};
+}  // namespace Keela
 #endif  // TRACEBIN_H

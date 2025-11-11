@@ -9,12 +9,12 @@
 #include "keela-pipeline/gst-helpers.h"
 #include "keela-pipeline/utils.h"
 
-Keela::TraceBin::TraceBin(): QueueBin("TraceBin") {
+Keela::TraceBin::TraceBin() : QueueBin("TraceBin") {
     TraceBin::init();
     TraceBin::link();
 }
 
-Keela::TraceBin::TraceBin(const std::string &name): QueueBin(name) {
+Keela::TraceBin::TraceBin(const std::string &name) : QueueBin(name) {
     TraceBin::init();
     TraceBin::link();
 }

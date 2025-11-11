@@ -6,19 +6,18 @@
 #define MAINWINDOW_H
 
 #include <gtkmm-3.0/gtkmm.h>
-
 #include <keela-widgets/labeledspinbutton.h>
 
 #include "cameracontrolwindow.h"
 #include "tracewindow.h"
 
 class MainWindow final : public Gtk::Window {
-public:
+   public:
     MainWindow();
 
     ~MainWindow() override;
 
-private:
+   private:
     GstPipeline *pipeline = nullptr;
     Gtk::Button record_button;
     Gtk::Button directory_button;
@@ -29,7 +28,6 @@ private:
     Keela::LabeledSpinButton data_matrix_w_spin = Keela::LabeledSpinButton("Data Width");
     Keela::LabeledSpinButton data_matrix_h_spin = Keela::LabeledSpinButton("Data Height");
 
-
     Gtk::CheckButton cv_recording_check;
     Keela::LabeledSpinButton num_camera_spin = Keela::LabeledSpinButton("Number of Cameras");
     Gtk::CheckButton show_trace_check;
@@ -38,7 +36,7 @@ private:
     Gtk::Button dump_graph_button = Gtk::Button("Dump Pipeline Graph (debug)");
 
     Gtk::Box container;
-    std::vector<std::shared_ptr<Keela::CameraControlWindow> > cameras;
+    std::vector<std::shared_ptr<Keela::CameraControlWindow>> cameras;
     std::shared_ptr<Keela::TraceWindow> trace_window = nullptr;
     sigc::connection trace_signal_connection;
 
@@ -80,5 +78,4 @@ private:
     void set_pix_fmt();
 };
 
-
-#endif //MAINWINDOW_H
+#endif  // MAINWINDOW_H

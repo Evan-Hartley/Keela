@@ -7,4 +7,4 @@
 #define GRAY8 "GRAY8"
 #define GRAY16_LE "GRAY16_LE"
 #define GRAY16_BE "GRAY16_BE"
-#endif //CONSTS_H
+#endif  // CONSTS_H

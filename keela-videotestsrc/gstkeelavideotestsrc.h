@@ -7,16 +7,13 @@
 
 G_BEGIN_DECLS
 
-#define GST_TYPE_KEELA_VIDEO_TEST_SRC \
-    (gst_keela_video_test_src_get_type())
+#define GST_TYPE_KEELA_VIDEO_TEST_SRC (gst_keela_video_test_src_get_type())
 #define GST_KEELA_VIDEO_TEST_SRC(obj) \
     (G_TYPE_CHECK_INSTANCE_CAST((obj), GST_TYPE_KEELA_VIDEO_TEST_SRC, GstKeelaVideoTestSrc))
 #define GST_KEELA_VIDEO_TEST_SRC_CLASS(klass) \
     (G_TYPE_CHECK_CLASS_CAST((klass), GST_TYPE_KEELA_VIDEO_TEST_SRC, GstKeelaVideoTestSrcClass))
-#define GST_IS_KEELA_VIDEO_TEST_SRC(obj) \
-    (G_TYPE_CHECK_INSTANCE_TYPE((obj), GST_TYPE_KEELA_VIDEO_TEST_SRC))
-#define GST_IS_KEELA_VIDEO_TEST_SRC_CLASS(klass) \
-    (G_TYPE_CHECK_CLASS_TYPE((klass), GST_TYPE_KEELA_VIDEO_TEST_SRC))
+#define GST_IS_KEELA_VIDEO_TEST_SRC(obj) (G_TYPE_CHECK_INSTANCE_TYPE((obj), GST_TYPE_KEELA_VIDEO_TEST_SRC))
+#define GST_IS_KEELA_VIDEO_TEST_SRC_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE((klass), GST_TYPE_KEELA_VIDEO_TEST_SRC))
 
 typedef struct _GstKeelaVideoTestSrc GstKeelaVideoTestSrc;
 typedef struct _GstKeelaVideoTestSrcClass GstKeelaVideoTestSrcClass;

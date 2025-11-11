@@ -5,16 +5,18 @@
 #include "keela-widgets/GLTraceRender.h"
 
 #include <spdlog/spdlog.h>
+
+#include <bit>
+#include <execution>
+#include <ranges>
 #include <thread>
 #include <utility>
-#include <ranges>
-#include <execution>
+
 #include "glad/glad.h"
 #include "keela-pipeline/consts.h"
-#include <bit>
 
-Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_trace): Gtk::Box(
-    Gtk::ORIENTATION_VERTICAL) {
+Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_trace)
+    : Gtk::Box(Gtk::ORIENTATION_VERTICAL) {
     spdlog::info(__func__);
     name_label.set_text(cam_to_trace->get_name());
     auto hbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
@@ -28,9 +30,9 @@ Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_tr
 
     spdlog::debug("{}: Loading vertex shader resource", __func__);
     GError *error = nullptr;
-    auto vertex_res = g_resources_lookup_data("/org/gatech/keela/shaders/trace-vertex.glsl",
-                                              G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
-    if (!vertex_res && !error) {
+    auto vertex_res =
+        g_resources_lookup_data("/org/gatech/keela/shaders/trace-vertex.glsl", G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
+    if(!vertex_res && !error) {
         std::stringstream ss;
         ss << "Could not load vertex shader resource: " << error->message;
         throw std::runtime_error(ss.str());
@@ -43,9 +45,9 @@ Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_tr
     g_free(vertex_shader_dup);
 
     spdlog::debug("{}: Loading fragment shader resource", __func__);
-    auto fragment_res = g_resources_lookup_data("/org/gatech/keela/shaders/trace-fragment.glsl",
-                                                G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
-    if (!fragment_res && !error) {
+    auto fragment_res =
+        g_resources_lookup_data("/org/gatech/keela/shaders/trace-fragment.glsl", G_RESOURCE_LOOKUP_FLAGS_NONE, &error);
+    if(!fragment_res && !error) {
         std::stringstream ss;
         ss << "Could not load fragment shader resource: " << error->message;
         throw std::runtime_error(ss.str());
@@ -62,11 +64,8 @@ Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_tr
     gl_area.signal_render().connect(sigc::mem_fun(this, &GLTraceRender::on_gl_render));
     show_all();
 
-
     // start processor
-    worker_thread = std::jthread([this](const std::stop_token &token) {
-        this->process_video_data(token);
-    });
+    worker_thread = std::jthread([this](const std::stop_token &token) { this->process_video_data(token); });
 }
 
 Keela::GLTraceRender::~GLTraceRender() = default;
@@ -74,7 +73,7 @@ Keela::GLTraceRender::~GLTraceRender() = default;
 void Keela::GLTraceRender::set_framerate(double framerate) {
     // calculate new buffer size
     auto tmp_plot_length = static_cast<unsigned long long>(PLOT_DURATION_SEC * framerate);
-    if (tmp_plot_length == plot_length)
+    if(tmp_plot_length == plot_length)
         return;
 
     plot_length = tmp_plot_length;
@@ -83,7 +82,7 @@ void Keela::GLTraceRender::set_framerate(double framerate) {
     std::scoped_lock _(worker_mutex);
 
     // determine if current buffer needs any modification
-    if (plot_length < plot_points.size()) {
+    if(plot_length < plot_points.size()) {
         // essentially discards the first *diff* elements from plot_points
         const int diff = static_cast<int>(plot_points.size() - plot_length);
         std::ranges::rotate(plot_points, plot_points.begin() + diff);
@@ -92,7 +91,7 @@ void Keela::GLTraceRender::set_framerate(double framerate) {
 }
 
 void Keela::GLTraceRender::on_gl_realize() {
-    if (!Box::get_realized()) {
+    if(!Box::get_realized()) {
         spdlog::warn("GLTraceRender::{}: Not realized", __func__);
         Box::on_realize();
         return;
@@ -111,8 +110,8 @@ void Keela::GLTraceRender::on_gl_realize() {
 
     int succes;
     char infolog[512];
-    glGetShaderiv(vertexShader,GL_COMPILE_STATUS, &succes);
-    if (!succes) {
+    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &succes);
+    if(!succes) {
         glGetShaderInfoLog(vertexShader, 512, nullptr, infolog);
         std::stringstream ss;
         ss << "Vertex shader compilation failed:\n " << infolog;
@@ -124,8 +123,8 @@ void Keela::GLTraceRender::on_gl_realize() {
     const char *fragment_cstr = fragment_shader_source.c_str();
     glShaderSource(fragmentShader, 1, &fragment_cstr, nullptr);
     glCompileShader(fragmentShader);
-    glGetShaderiv(fragmentShader,GL_COMPILE_STATUS, &succes);
-    if (!succes) {
+    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &succes);
+    if(!succes) {
         glGetShaderInfoLog(fragmentShader, 512, nullptr, infolog);
         std::stringstream ss;
         ss << "Fragment shader compilation failed:\n " << infolog;
@@ -137,8 +136,8 @@ void Keela::GLTraceRender::on_gl_realize() {
     glAttachShader(shader_program, vertexShader);
     glAttachShader(shader_program, fragmentShader);
     glLinkProgram(shader_program);
-    glGetProgramiv(shader_program,GL_LINK_STATUS, &succes);
-    if (!succes) {
+    glGetProgramiv(shader_program, GL_LINK_STATUS, &succes);
+    if(!succes) {
         glGetProgramInfoLog(shader_program, 512, nullptr, infolog);
         std::stringstream ss;
         ss << "Program linking failed:\n " << infolog;
@@ -152,14 +151,7 @@ void Keela::GLTraceRender::on_gl_realize() {
     // setup attribute pointers
     // location 0 is a vec2 representing a point in non-clip coordinates
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-        0,
-        1,
-        GL_FLOAT,
-        GL_FALSE,
-        0,
-        nullptr
-    );
+    glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, 0, nullptr);
     // uint is a uniform representing the number of samples
     spdlog::info("GLTraceRender::{} successfully realized", __func__);
 }
@@ -171,7 +163,7 @@ bool Keela::GLTraceRender::on_gl_render(const Glib::RefPtr<Gdk::GLContext> &cont
 
     std::ranges::copy(plot_points, plot_points_vec.begin());
 
-    if (!plot_points_vec.empty()) {
+    if(!plot_points_vec.empty()) {
         plot_max = *std::ranges::max_element(plot_points_vec);
         plot_min = *std::ranges::min_element(plot_points_vec);
 
@@ -184,7 +176,6 @@ bool Keela::GLTraceRender::on_gl_render(const Glib::RefPtr<Gdk::GLContext> &cont
         min_label.set_label(ss.str());
     }
     // might need to check for NaN?
-
 
     gl_area.make_current();
     glUseProgram(shader_program);
@@ -201,16 +192,15 @@ bool Keela::GLTraceRender::on_gl_render(const Glib::RefPtr<Gdk::GLContext> &cont
     auto xoffset = plot_length - plot_points.size();
     glUniform1f(loc, static_cast<float>(xoffset));
 
-    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(plot_points.size() * sizeof(float)),
-                 plot_points_vec.data(),
+    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(plot_points.size() * sizeof(float)), plot_points_vec.data(),
                  GL_DYNAMIC_DRAW);
     glDrawArrays(GL_LINE_STRIP, 0, static_cast<int>(plot_points.size()));
     return true;
 }
 
 /**
-*    NOTE: At higher trace FPS, if the target computer isn't fast enough, this will result in backpressure on the pipeline
-     backpressure will manifest as slowly increasing memory usage - this is not a memory leak!
+*    NOTE: At higher trace FPS, if the target computer isn't fast enough, this will result in backpressure on the
+pipeline backpressure will manifest as slowly increasing memory usage - this is not a memory leak!
  * @param token used to detect when to stop processing video data
  */
 void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
@@ -221,12 +211,12 @@ void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
     assert(bin->sink != nullptr);
     GstSample *sample = nullptr;
 
-    while (!token.stop_requested()) {
+    while(!token.stop_requested()) {
         auto gizmo = this->trace->get_trace_gizmo();
 
-        //double mean = 0;
+        // double mean = 0;
         g_signal_emit_by_name(bin->sink, "try-pull-sample", 0, &sample, nullptr);
-        if (!sample) {
+        if(!sample) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 30));
             continue;
         }
@@ -237,27 +227,26 @@ void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
         assert(structure != nullptr);
         gint framerate_numerator, framerate_denominator;
         auto ret = gst_structure_get_fraction(structure, "framerate", &framerate_numerator, &framerate_denominator);
-        if (ret == 0) {
+        if(ret == 0) {
             throw std::runtime_error("Failed to get framerate from structure");
         }
         set_framerate(static_cast<double>(framerate_numerator) / framerate_denominator);
         auto fmt = std::string(gst_structure_get_string(structure, "format"));
-        if (fmt == GRAY8) {
+        if(fmt == GRAY8) {
             mean = calculate_roi_average<guint8>(sample, structure, std::endian::native);
-        } else if (fmt == GRAY16_LE) {
+        } else if(fmt == GRAY16_LE) {
             mean = calculate_roi_average<gushort>(sample, structure, std::endian::little);
-        } else if (fmt == GRAY16_BE) {
+        } else if(fmt == GRAY16_BE) {
             mean = calculate_roi_average<gushort>(sample, structure, std::endian::big);
         } else {
             throw std::runtime_error("GLTraceRender: unsupported format");
         }
 
-
         spdlog::trace("GLTraceRender::{}: {}", __func__, mean);
         gst_sample_unref(sample);
         sample = nullptr;
         std::scoped_lock _(worker_mutex);
-        if (plot_points.size() >= plot_length) {
+        if(plot_points.size() >= plot_length) {
             plot_points.pop_front();
         }
         plot_points.push_back(static_cast<float>(mean));
@@ -268,28 +257,27 @@ void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
     bin->enable_trace(false);
 }
 
-template<typename T>
+template <typename T>
 double Keela::GLTraceRender::calculate_roi_average(GstSample *sample, GstStructure *structure, std::endian endianness) {
     auto gizmo = this->trace->get_trace_gizmo();
     auto buf = gst_sample_get_buffer(sample);
     assert(buf != nullptr);
 
-
     gint width, height;
     bool ret = false;
     ret = gst_structure_get_int(structure, "width", &width);
     ret &= gst_structure_get_int(structure, "height", &height);
-    if (!ret) {
+    if(!ret) {
         throw std::runtime_error("Could not get dimensions of sample");
     }
 
     // protect against division by zero
-    if (width == 0) {
+    if(width == 0) {
         return std::numeric_limits<double>::quiet_NaN();
     }
 
     GstMapInfo mapInfo;
-    if (!gst_buffer_map(buf, &mapInfo, GST_MAP_READ)) {
+    if(!gst_buffer_map(buf, &mapInfo, GST_MAP_READ)) {
         std::stringstream ss;
         ss << __func__ << "Buffer mapping failed";
         throw std::runtime_error(ss.str());
@@ -302,36 +290,34 @@ double Keela::GLTraceRender::calculate_roi_average(GstSample *sample, GstStructu
     // and the second element in the tuple is the count of pixels in the ROI
     std::pair<size_t, size_t> sum_count = std::make_pair(0, 0);
 
-    sum_count = std::transform_reduce(std::execution::par_unseq,
-                                      indices.begin(),
-                                      indices.end(),
-                                      std::make_pair(0, 0),
-                                      // reduce
-                                      [](const std::pair<size_t, size_t> &a, const std::pair<size_t, size_t> &b) {
-                                          return std::make_pair(a.first + b.first, a.second + b.second);
-                                      },
-                                      // map
-                                      [&](unsigned int index) {
-                                          T tmp = mapInfo.data[index * sizeof(T)];
-                                          if (endianness != std::endian::native) {
-                                              tmp = std::byteswap(tmp);
-                                          }
-                                          if (gizmo->get_enabled()) {
-                                              const auto x = index % width;
-                                              const auto y = index / width;
-                                              if (gizmo->intersects(x * 2, y * 2)) {
-                                                  return static_cast<std::pair<size_t, size_t>>(std::make_pair(tmp, 1));
-                                              }
-                                              return static_cast<std::pair<size_t, size_t>>(std::make_pair(0, 0));
-                                          }
-                                          return static_cast<std::pair<size_t, size_t>>(std::make_pair(tmp, 1));
-                                      });
+    sum_count = std::transform_reduce(
+        std::execution::par_unseq, indices.begin(), indices.end(), std::make_pair(0, 0),
+        // reduce
+        [](const std::pair<size_t, size_t> &a, const std::pair<size_t, size_t> &b) {
+            return std::make_pair(a.first + b.first, a.second + b.second);
+        },
+        // map
+        [&](unsigned int index) {
+            T tmp = mapInfo.data[index * sizeof(T)];
+            if(endianness != std::endian::native) {
+                tmp = std::byteswap(tmp);
+            }
+            if(gizmo->get_enabled()) {
+                const auto x = index % width;
+                const auto y = index / width;
+                if(gizmo->intersects(x * 2, y * 2)) {
+                    return static_cast<std::pair<size_t, size_t>>(std::make_pair(tmp, 1));
+                }
+                return static_cast<std::pair<size_t, size_t>>(std::make_pair(0, 0));
+            }
+            return static_cast<std::pair<size_t, size_t>>(std::make_pair(tmp, 1));
+        });
     auto sum = sum_count.first;
     auto count = sum_count.second;
     gst_buffer_unmap(buf, &mapInfo);
 
-    //protect against division by zero. set sample to NaN to prevent this sample from showing up in the plot
-    if (count == 0) {
+    // protect against division by zero. set sample to NaN to prevent this sample from showing up in the plot
+    if(count == 0) {
         return std::numeric_limits<double>::quiet_NaN();
     }
     return static_cast<double>(sum) / static_cast<double>(count);
