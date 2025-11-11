@@ -31,7 +31,8 @@ add_library(keela-pipeline presentationbin.cpp keela-pipeline/presentationbin.h
         keela-pipeline/consts.h
         CameraStreamBin.cpp
         keela-pipeline/CameraStreamBin.h
-        keela-pipeline/IControlCameraResolution.h
+        keela-pipeline/IControlResolution.h
+        IControlResolution.cpp
 )
 target_link_libraries(keela-pipeline PUBLIC PkgConfig::GSTREAMER PkgConfig::SPDLOG)
 
