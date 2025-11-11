@@ -12,9 +12,9 @@ namespace Keela {
  */
 class Element {
    public:
-    virtual ~Element() = default;
+	virtual ~Element() = default;
 
-    virtual operator GstElement *() const = 0;
+	virtual operator GstElement *() const = 0;
 };
 }  // namespace Keela
 #endif  // ELEMENTBASE_H

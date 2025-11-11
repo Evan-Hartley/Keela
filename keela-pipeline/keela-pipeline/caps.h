@@ -12,28 +12,28 @@
 namespace Keela {
 class Caps {
    public:
-    Caps();
+	Caps();
 
-    explicit Caps(GstCaps *c);
+	explicit Caps(GstCaps *c);
 
-    ~Caps();
+	~Caps();
 
-    operator GstCaps *() const;
+	operator GstCaps *() const;
 
-    void set_framerate(int numerator, int denominator);
+	void set_framerate(int numerator, int denominator);
 
-    void set_resolution(int width, int height);
+	void set_resolution(int width, int height);
 
    private:
-    std::shared_ptr<GstCaps> m_caps;
+	std::shared_ptr<GstCaps> m_caps;
 
-    template <typename... Args>
-    void set_props(Args... args) {
-        if(!gst_caps_is_writable(m_caps.get())) {
-            throw std::runtime_error("Caps is not writable");
-        }
-        gst_caps_set_simple(m_caps.get(), args..., nullptr);
-    }
+	template <typename... Args>
+	void set_props(Args... args) {
+		if(!gst_caps_is_writable(m_caps.get())) {
+			throw std::runtime_error("Caps is not writable");
+		}
+		gst_caps_set_simple(m_caps.get(), args..., nullptr);
+	}
 };
 }  // namespace Keela
 #endif  // CAPS_H

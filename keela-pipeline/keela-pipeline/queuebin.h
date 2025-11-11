@@ -12,21 +12,21 @@
 namespace Keela {
 class QueueBin : public Bin {
    public:
-    QueueBin();
+	QueueBin();
 
-    ~QueueBin() override;
+	~QueueBin() override;
 
-    explicit QueueBin(const std::string &name);
+	explicit QueueBin(const std::string &name);
 
-    Keela::SimpleElement queue = SimpleElement("queue");
+	Keela::SimpleElement queue = SimpleElement("queue");
 
    protected:
-    void link_queue(GstElement *sink) const;
+	void link_queue(GstElement *sink) const;
 
    private:
-    void init() override;
+	void init() override;
 
-    void link() override;
+	void link() override;
 };
 }  // namespace Keela
 #endif  // QUEUEBIN_H

@@ -11,18 +11,18 @@
 namespace Keela {
 class SnapshotBin final : public Keela::QueueBin {
    public:
-    explicit SnapshotBin(const std::string &name);
+	explicit SnapshotBin(const std::string &name);
 
-    ~SnapshotBin() override;
+	~SnapshotBin() override;
 
-    void take_snapshot();
+	void take_snapshot();
 
    private:
-    SimpleElement app_sink = SimpleElement("appsink");
+	SimpleElement app_sink = SimpleElement("appsink");
 
-    void init() override;
+	void init() override;
 
-    void link() override;
+	void link() override;
 };
 }  // namespace Keela
 #endif  // SNAPSHOTBIN_H

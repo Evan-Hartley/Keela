@@ -9,10 +9,10 @@
 namespace Keela {
 class WidgetElement {
    public:
-    virtual ~WidgetElement() = default;
+	virtual ~WidgetElement() = default;
 
-    /// return a pointer to the widget managed by this element
-    virtual gpointer get_widget() = 0;
+	/// return a pointer to the widget managed by this element
+	virtual gpointer get_widget() = 0;
 };
 }  // namespace Keela
 #endif  // WIDGETELEMENT_H

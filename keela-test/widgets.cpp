@@ -14,13 +14,13 @@ TEST(KeelaWidgets, ConstructGLCameraRender) {
 }*/
 
 TEST(KeelaWidgets, ConstructCameraManagerGRAY8) {
-    auto cm = Keela::CameraManager(0, GRAY8, false);
+	auto cm = Keela::CameraManager(0, GRAY8, false);
 }
 
 TEST(KeelaWidgets, ConstructCameraManagerGRAY16LE) {
-    auto cm = Keela::CameraManager(0, GRAY16_LE, false);
+	auto cm = Keela::CameraManager(0, GRAY16_LE, false);
 }
 
 TEST(KeelaWidgets, ConstructCameraManagerGRAY16BE) {
-    auto cm = Keela::CameraManager(0, GRAY16_BE, false);
+	auto cm = Keela::CameraManager(0, GRAY16_BE, false);
 }

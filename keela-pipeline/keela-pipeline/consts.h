@@ -10,4 +10,4 @@
 
 #define DEFAULT_TRACE_FPS 125
 
-#endif //CONSTS_H
+#endif  // CONSTS_H

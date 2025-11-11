@@ -11,31 +11,31 @@
 namespace Keela {
 class GLCameraRender final : public Gtk::GLArea {
    public:
-    GLCameraRender(std::shared_ptr<PresentationBin> bin);
+	GLCameraRender(std::shared_ptr<PresentationBin> bin);
 
-    ~GLCameraRender() override;
+	~GLCameraRender() override;
 
-    void new_tex_sample(GstSample *sample);
+	void new_tex_sample(GstSample *sample);
 
    protected:
-    void on_realize() override;
+	void on_realize() override;
 
-    bool on_render(const Glib::RefPtr<Gdk::GLContext> &context) override;
+	bool on_render(const Glib::RefPtr<Gdk::GLContext> &context) override;
 
    private:
-    std::string vertexShaderSource;
-    std::string fragmentShaderSource;
+	std::string vertexShaderSource;
+	std::string fragmentShaderSource;
 
-    bool on_timeout();
+	bool on_timeout();
 
-    unsigned int VBO;
-    unsigned int vertexShader;
-    unsigned int fragmentShader;
-    unsigned int shaderProgram;
-    unsigned int VAO;
-    unsigned int texture;
-    std::shared_ptr<PresentationBin> bin;
-    float vertices[24] = {-1, -1, 0, 1, 1, 1, 1, 0, -1, 1, 0, 0, 1, -1, 1, 1, 1, 1, 1, 0, -1, -1, 0, 1};
+	unsigned int VBO;
+	unsigned int vertexShader;
+	unsigned int fragmentShader;
+	unsigned int shaderProgram;
+	unsigned int VAO;
+	unsigned int texture;
+	std::shared_ptr<PresentationBin> bin;
+	float vertices[24] = {-1, -1, 0, 1, 1, 1, 1, 0, -1, 1, 0, 0, 1, -1, 1, 1, 1, 1, 1, 0, -1, -1, 0, 1};
 };
 }  // namespace Keela
 #endif  // GLCAMERARENDER_H

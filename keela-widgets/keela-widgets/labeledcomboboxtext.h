@@ -9,12 +9,12 @@
 namespace Keela {
 class LabeledComboBoxText final : public Gtk::Box {
    public:
-    explicit LabeledComboBoxText(const std::string &name);
+	explicit LabeledComboBoxText(const std::string &name);
 
-    Gtk::ComboBoxText m_combo;
+	Gtk::ComboBoxText m_combo;
 
    private:
-    Gtk::Label m_label;
+	Gtk::Label m_label;
 };
 }  // namespace Keela
 #endif  // LABELEDCOMBOBOXTEXT_H

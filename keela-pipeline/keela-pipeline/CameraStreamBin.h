@@ -14,41 +14,41 @@
 namespace Keela {
 class CameraStreamBin final : public QueueBin, public EjectableElement {
    public:
-    explicit CameraStreamBin(const std::string &name);
+	explicit CameraStreamBin(const std::string &name);
 
-    ~CameraStreamBin() override;
+	~CameraStreamBin() override;
 
-    SimpleElement internal_tee = SimpleElement("tee");
+	SimpleElement internal_tee = SimpleElement("tee");
 
-    std::shared_ptr<PresentationBin> presentation;
-    std::shared_ptr<SnapshotBin> snapshot;
-    std::shared_ptr<TraceBin> trace;
+	std::shared_ptr<PresentationBin> presentation;
+	std::shared_ptr<SnapshotBin> snapshot;
+	std::shared_ptr<TraceBin> trace;
 
-    std::shared_ptr<RecordBin> record_bin = nullptr;
+	std::shared_ptr<RecordBin> record_bin = nullptr;
 
-    void start_recording(const std::string &filename);
+	void start_recording(const std::string &filename);
 
-    void stop_recording();
+	void stop_recording();
 
-    std::shared_ptr<TraceBin> get_trace_bin() {
-        return trace;
-    }
+	std::shared_ptr<TraceBin> get_trace_bin() {
+		return trace;
+	}
 
    private:
-    void link() override;
+	void link() override;
 
-    Keela::Element *Head() override {
-        return &queue;
-    };
+	Keela::Element *Head() override {
+		return &queue;
+	};
 
-    std::vector<Keela::Element *> Leaves() override {
-        if(record_bin != nullptr) {
-            return std::vector<Keela::Element *>{record_bin.get()};
-        }
-        return std::vector<Keela::Element *>{};
-    }
+	std::vector<Keela::Element *> Leaves() override {
+		if(record_bin != nullptr) {
+			return std::vector<Keela::Element *>{record_bin.get()};
+		}
+		return std::vector<Keela::Element *>{};
+	}
 
-    std::string name;
+	std::string name;
 };
 }  // namespace Keela
 #endif  // CAMERASTREAMBIN_H

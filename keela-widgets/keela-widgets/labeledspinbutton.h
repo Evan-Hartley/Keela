@@ -12,13 +12,13 @@ namespace Keela {
  */
 class LabeledSpinButton final : public Gtk::Box {
    public:
-    /**
-     * @param label label text of spin button
-     */
-    explicit LabeledSpinButton(const std::string& label);
-    LabeledSpinButton() = default;
-    Gtk::Label m_label;
-    Gtk::SpinButton m_spin;
+	/**
+	 * @param label label text of spin button
+	 */
+	explicit LabeledSpinButton(const std::string& label);
+	LabeledSpinButton() = default;
+	Gtk::Label m_label;
+	Gtk::SpinButton m_spin;
 };
 }  // namespace Keela
 #endif  // LABELEDSPINBUTTON_H

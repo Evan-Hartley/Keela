@@ -19,72 +19,71 @@ namespace Keela {
  */
 class ITraceable {
    public:
-    virtual ~ITraceable() = default;
+	virtual ~ITraceable() = default;
 
-    virtual std::shared_ptr<TraceBin> get_trace_bin() = 0;
+	virtual std::shared_ptr<TraceBin> get_trace_bin() = 0;
 
-    virtual std::shared_ptr<TraceGizmo> get_trace_gizmo() = 0;
+	virtual std::shared_ptr<TraceGizmo> get_trace_gizmo() = 0;
 
-    virtual std::string get_name() = 0;
+	virtual std::string get_name() = 0;
 };
 
 class GLTraceRender final : public Gtk::Box {
    public:
-    explicit GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_trace);
+	explicit GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_trace);
 
-    ~GLTraceRender() override;
+	~GLTraceRender() override;
 
+	void set_trace_render_framerate(double framerate);
 
-    void set_trace_render_framerate(double framerate);
-  
-    void set_plot_duration_sec(int duration_sec);
+	void set_plot_duration_sec(int duration_sec);
 
-    void update_trace_buffer_length();
-  
-    void clear_buffer();
- 
+	void update_trace_buffer_length();
+
+	void clear_buffer();
+
    private:
-    Gtk::GLArea gl_area;
-    Gtk::Label name_label;
-    Gtk::Label min_label;
-    Gtk::Label max_label;
+	Gtk::GLArea gl_area;
+	Gtk::Label name_label;
+	Gtk::Label min_label;
+	Gtk::Label max_label;
 
-    // *basically* a pointer to the camera control window
-    std::shared_ptr<Keela::ITraceable> trace;
+	// *basically* a pointer to the camera control window
+	std::shared_ptr<Keela::ITraceable> trace;
 
-    unsigned int shader_program{};
+	unsigned int shader_program{};
 
-    void on_gl_realize();
+	void on_gl_realize();
 
-    bool on_gl_render(const Glib::RefPtr<Gdk::GLContext> &context);
+	bool on_gl_render(const Glib::RefPtr<Gdk::GLContext> &context);
 
-    unsigned int VAO = -1;
-    unsigned int VBO = -1;
+	unsigned int VAO = -1;
+	unsigned int VBO = -1;
 
-    std::string vertex_shader_source;
-    std::string fragment_shader_source;
+	std::string vertex_shader_source;
+	std::string fragment_shader_source;
 
-    std::jthread worker_thread;
-    std::mutex worker_mutex;
-    std::deque<float> plot_points;
+	std::jthread worker_thread;
+	std::mutex worker_mutex;
+	std::deque<float> plot_points;
 
-    int plot_duration_sec = 10;
-    int trace_framerate = DEFAULT_TRACE_FPS;
-    /**
-     * target length of plot_points buffer. Should equal plot_duration_sec * framerate
-     */
-    unsigned long long plot_length = plot_duration_sec * trace_framerate;
-    float plot_max = 255;
-    float plot_min = 0;
+	int plot_duration_sec = 10;
+	int trace_framerate = DEFAULT_TRACE_FPS;
+	/**
+	 * target length of plot_points buffer. Should equal plot_duration_sec * framerate
+	 */
+	unsigned long long plot_length = plot_duration_sec * trace_framerate;
+	float plot_max = 255;
+	float plot_min = 0;
 
-    /**
-     * function to be used in worker_thread in order to process video data
-     * @param token
-     */
-    void process_video_data(const std::stop_token &token);
+	/**
+	 * function to be used in worker_thread in order to process video data
+	 * @param token
+	 */
+	void process_video_data(const std::stop_token &token);
 
-    template <typename T>
-    double calculate_roi_average(GstSample *sample, GstStructure *structure, std::endian endianness);
+	template <typename T>
+	double calculate_roi_average(GstSample *sample, GstStructure *structure, std::endian endianness);
 };
 }  // namespace Keela
 #endif  // GLTRACERENDER_H

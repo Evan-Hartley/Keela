@@ -14,17 +14,17 @@
 namespace Keela {
 class SimpleElement : public virtual Keela::Element {
    public:
-    explicit SimpleElement(const std::string &element);
+	explicit SimpleElement(const std::string &element);
 
-    ~SimpleElement() override;
+	~SimpleElement() override;
 
-    SimpleElement(const std::string &element, const std::string &name);
+	SimpleElement(const std::string &element, const std::string &name);
 
-    operator GstElement *() const override;
+	operator GstElement *() const override;
 
    protected:
-    std::string element_name;
-    std::shared_ptr<GstElement> m_element;
+	std::string element_name;
+	std::shared_ptr<GstElement> m_element;
 };
 }  // namespace Keela
 #endif  // ELEMENT_H

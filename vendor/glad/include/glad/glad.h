@@ -47,8 +47,8 @@ extern "C" {
 #endif
 
 struct gladGLversionStruct {
-    int major;
-    int minor;
+	int major;
+	int minor;
 };
 
 typedef void *(*GLADloadproc)(const char *name);

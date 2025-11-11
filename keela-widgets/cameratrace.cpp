@@ -6,13 +6,13 @@ Keela::CameraTrace::CameraTrace(std::shared_ptr<TraceBin> trace_bin, std::shared
 }
 
 std::shared_ptr<Keela::TraceBin> Keela::CameraTrace::get_trace_bin() {
-    return m_trace_bin;
+	return m_trace_bin;
 }
 
 std::shared_ptr<Keela::TraceGizmo> Keela::CameraTrace::get_trace_gizmo() {
-    return m_trace_gizmo;
+	return m_trace_gizmo;
 }
 
 std::string Keela::CameraTrace::get_name() {
-    return m_name;
+	return m_name;
 }
