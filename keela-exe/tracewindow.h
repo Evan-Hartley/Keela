@@ -27,6 +27,12 @@ class TraceWindow final : public Gtk::Window {
     /** Callback passed by the MainWindow to update "Show Traces" UI when we close the trace window */
     void set_on_closed_callback(std::function<void()> callback);
 
+    void set_trace_window_retention(guint trace_retention_seconds);
+  
+    void set_trace_render_framerate(double framerate);
+    
+    void clear_trace_buffer();
+
    private:
     std::vector<std::shared_ptr<GLTraceRender>> traces;
     Gtk::ScrolledWindow scrolled_window;

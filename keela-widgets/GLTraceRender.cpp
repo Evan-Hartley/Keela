@@ -70,24 +70,39 @@ Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_tr
 
 Keela::GLTraceRender::~GLTraceRender() = default;
 
-void Keela::GLTraceRender::set_framerate(double framerate) {
+void Keela::GLTraceRender::set_trace_render_framerate(double framerate) {
+    trace_framerate = framerate;
+    update_trace_buffer_length();
+}
+
+void Keela::GLTraceRender::set_plot_duration_sec(int duration_sec) {
+    plot_duration_sec = duration_sec;
+    update_trace_buffer_length();
+}
+
+void Keela::GLTraceRender::update_trace_buffer_length() {
     // calculate new buffer size
-    auto tmp_plot_length = static_cast<unsigned long long>(PLOT_DURATION_SEC * framerate);
+    auto tmp_plot_length = static_cast<unsigned long long>(plot_duration_sec * trace_framerate);
     if(tmp_plot_length == plot_length)
         return;
 
+    spdlog::info("Updating trace buffer length to {} samples", tmp_plot_length);
     plot_length = tmp_plot_length;
-    spdlog::info("GLTraceRender::{}: Setting framerate to {}", __func__, framerate);
     // acquire mutex to avoid race conditions
     std::scoped_lock _(worker_mutex);
 
     // determine if current buffer needs any modification
-    if(plot_length < plot_points.size()) {
-        // essentially discards the first *diff* elements from plot_points
-        const int diff = static_cast<int>(plot_points.size() - plot_length);
-        std::ranges::rotate(plot_points, plot_points.begin() + diff);
-        plot_points.resize(plot_length);
+    if (plot_length < plot_points.size()) {
+        // Keep only the most recent plot_length elements
+        while (plot_points.size() > plot_length) {
+            plot_points.pop_front();
+        }
     }
+}
+
+void Keela::GLTraceRender::clear_buffer() {
+    spdlog::info("Clearing trace buffers");
+    plot_points.resize(0);
 }
 
 void Keela::GLTraceRender::on_gl_realize() {
@@ -214,7 +229,6 @@ void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
     while(!token.stop_requested()) {
         auto gizmo = this->trace->get_trace_gizmo();
 
-        // double mean = 0;
         g_signal_emit_by_name(bin->sink, "try-pull-sample", 0, &sample, nullptr);
         if(!sample) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1000 / 30));
@@ -225,12 +239,6 @@ void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
         assert(caps != nullptr);
         auto structure = gst_caps_get_structure(caps, 0);
         assert(structure != nullptr);
-        gint framerate_numerator, framerate_denominator;
-        auto ret = gst_structure_get_fraction(structure, "framerate", &framerate_numerator, &framerate_denominator);
-        if(ret == 0) {
-            throw std::runtime_error("Failed to get framerate from structure");
-        }
-        set_framerate(static_cast<double>(framerate_numerator) / framerate_denominator);
         auto fmt = std::string(gst_structure_get_string(structure, "format"));
         if(fmt == GRAY8) {
             mean = calculate_roi_average<guint8>(sample, structure, std::endian::native);

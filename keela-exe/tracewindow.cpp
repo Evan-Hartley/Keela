@@ -61,6 +61,12 @@ int Keela::TraceWindow::num_traces() const {
     return traces.size();
 }
 
+void Keela::TraceWindow::set_trace_render_framerate(double framerate) {
+    for (const auto& trace : traces) {
+        trace->set_trace_render_framerate(framerate);
+    }
+}
+
 void Keela::TraceWindow::set_on_closed_callback(std::function<void()> callback) {
     on_window_closed_callback = std::move(callback);
 }
@@ -77,4 +83,16 @@ bool Keela::TraceWindow::on_delete_event(GdkEventAny* any_event) {
         on_window_closed_callback();
     }
     return false;  // Allow the default handler to destroy the window
+}
+
+void Keela::TraceWindow::set_trace_window_retention(guint trace_retention) {
+    for (const auto &trace: traces) {
+        trace->set_plot_duration_sec(trace_retention);
+    }
+}
+
+void Keela::TraceWindow::clear_trace_buffer() {
+    for (const auto &trace: traces) {
+        trace->clear_buffer();
+    }
 }

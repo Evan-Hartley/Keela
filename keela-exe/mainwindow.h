@@ -30,8 +30,12 @@ class MainWindow final : public Gtk::Window {
 
     Gtk::CheckButton cv_recording_check;
     Keela::LabeledSpinButton num_camera_spin = Keela::LabeledSpinButton("Number of Cameras");
+
     Gtk::CheckButton show_trace_check;
+    Gtk::Box trace_control_row_box;
     Keela::LabeledSpinButton trace_fps_spin = Keela::LabeledSpinButton("Trace Framerate (Hz)");
+    Keela::LabeledSpinButton trace_buffer_seconds_spin = Keela::LabeledSpinButton("Trace Buffer Retention (seconds)");
+    Gtk::Button trace_clear_buffer_button = Gtk::Button("Clear Trace Buffer");
 
     Gtk::Button dump_graph_button = Gtk::Button("Dump Pipeline Graph (debug)");
 
@@ -59,6 +63,10 @@ class MainWindow final : public Gtk::Window {
     void on_trace_button_clicked();
 
     void on_trace_fps_changed();
+
+    void on_trace_buffer_seconds_changed();
+
+    void on_trace_clear_buffer_button_clicked();
 
     void dump_graph() const;
 

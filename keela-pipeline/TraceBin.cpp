@@ -7,6 +7,7 @@
 #include <spdlog/spdlog.h>
 
 #include "keela-pipeline/gst-helpers.h"
+#include "keela-pipeline/consts.h"
 #include "keela-pipeline/utils.h"
 
 Keela::TraceBin::TraceBin() : QueueBin("TraceBin") {
@@ -42,6 +43,9 @@ void Keela::TraceBin::set_trace_framerate(guint framerate) {
 void Keela::TraceBin::init() {
     add_elements(video_rate, caps_filter, sink);
     enable_trace(false);
+
+    // Set default trace framerate
+    set_trace_framerate(DEFAULT_TRACE_FPS);
 }
 
 void Keela::TraceBin::link() {

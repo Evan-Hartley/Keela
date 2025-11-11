@@ -30,7 +30,7 @@ class CameraStreamBin final : public QueueBin, public EjectableElement {
 
     void stop_recording();
 
-    std::shared_ptr<TraceBin> get_trace() {
+    std::shared_ptr<TraceBin> get_trace_bin() {
         return trace;
     }
 

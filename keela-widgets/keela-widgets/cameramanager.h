@@ -17,8 +17,6 @@
 #include <atomic>
 #include <set>
 
-#include "keela-pipeline/TraceBin.h"
-
 #define EVEN_FRAME 0
 #define ODD_FRAME 1
 
