@@ -28,19 +28,21 @@ public:
 
   virtual ~IControlResolution() = default;
 
-  // TODO: not super happy with this method signature - i'm open to suggestions
-  void SetResolution(Resolution1D width, Resolution1D height);
+  void SetResolution(Resolution1D resolution_1d);
 
   // TODO: perhaps cache this?
   virtual uint32_t GetBinning(Dimension dimension) = 0;
 
 private:
+  std::unique_ptr<Resolution1D> res_width = nullptr;
+  std::unique_ptr<Resolution1D> res_height = nullptr;
+
   virtual uint32_t GetBinningMin(Dimension dimension) = 0;
 
   virtual uint32_t GetBinningMax(Dimension dimension) = 0;
 
   // TODO: maybe make this protected?
-  virtual void doSetBinning(Dimension dimension) = 0;
+  virtual void doSetBinning(Resolution1D resolution) = 0;
 
   /// the minimum physical resolution our camera supports in a particular
   /// dimension
@@ -51,7 +53,7 @@ private:
   virtual uint32_t GetResolutionMax(Dimension dimension) = 0;
 
   // TODO: maybe make this protected?
-  virtual void doSetResolution(Dimension dimension) = 0;
+  virtual void doSetResolution(Resolution1D resolution) = 0;
 
 public:
   /// returns a list of valid resolution/binning settings

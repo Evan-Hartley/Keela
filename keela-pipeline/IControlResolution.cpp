@@ -1,4 +1,25 @@
 #include "keela-pipeline/IControlResolution.h"
+void Keela::IControlResolution::SetResolution(Resolution1D res) {
+  // memorize the resolution setting for this dimension
+  switch (res.dimension) {
+  case Width:
+    res_width = std::make_unique<Resolution1D>(res);
+    break;
+  case Height:
+    res_height = std::make_unique<Resolution1D>(res);
+    break;
+  }
+
+  if (res_width) {
+    doSetBinning(*res_width);
+    doSetResolution(*res_width);
+  }
+
+  if (res_height) {
+    doSetBinning(*res_height);
+    doSetResolution(*res_height);
+  }
+}
 //
 // Created by brand on 11/10/2025.
 //
