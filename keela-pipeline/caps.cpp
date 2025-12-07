@@ -43,3 +43,12 @@ void Keela::Caps::set_framerate(const int numerator, const int denominator) {
 void Keela::Caps::set_resolution(const int width, const int height) {
 	set_props("width", G_TYPE_INT, width, "height", G_TYPE_INT, height);
 }
+void Keela::Caps::set_format(const std::string &format) {
+	set_props("format", G_TYPE_STRING, format.c_str());
+}
+void Keela::Caps::append_caps(GstCaps *caps) {
+	if(!gst_caps_is_writable(static_cast<GstCaps *>(*this))) {
+		throw std::invalid_argument("caps is not writable");
+	}
+	gst_caps_append(*this, caps);
+}

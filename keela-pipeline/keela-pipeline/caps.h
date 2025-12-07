@@ -8,6 +8,7 @@
 
 #include <memory>
 #include <stdexcept>
+#include <vector>
 
 namespace Keela {
 class Caps {
@@ -23,6 +24,10 @@ class Caps {
 	void set_framerate(int numerator, int denominator);
 
 	void set_resolution(int width, int height);
+
+	void set_format(const std::string &format);
+
+	void append_caps(GstCaps *caps);
 
    private:
 	std::shared_ptr<GstCaps> m_caps;
