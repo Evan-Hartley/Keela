@@ -27,8 +27,6 @@ class Caps {
 
 	void set_format(const std::string &format);
 
-	void append_caps(GstCaps *caps);
-
    private:
 	std::shared_ptr<GstCaps> m_caps;
 

@@ -46,9 +46,3 @@ void Keela::Caps::set_resolution(const int width, const int height) {
 void Keela::Caps::set_format(const std::string &format) {
 	set_props("format", G_TYPE_STRING, format.c_str());
 }
-void Keela::Caps::append_caps(GstCaps *caps) {
-	if(!gst_caps_is_writable(static_cast<GstCaps *>(*this))) {
-		throw std::invalid_argument("caps is not writable");
-	}
-	gst_caps_append(*this, caps);
-}

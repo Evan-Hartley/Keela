@@ -114,12 +114,7 @@ TEST(KeelaPipeline, CopyCaps) {
 	ASSERT_TRUE(gst_caps_is_equal(caps1, caps2));
 }
 
-TEST(KeelaPipeline, AppendCaps) {
+TEST(KeelaPipeline, SetCapsFormat) {
 	auto caps1 = Keela::Caps();
-	auto caps2 = Keela::Caps();
-
-	caps1.set_framerate(5000, 10);
-	caps2.set_format("GRAY8");
-	caps1.append_caps(caps2);
-	ASSERT_TRUE(GST_IS_CAPS(static_cast<GstCaps *>(caps2)));
+	caps1.set_format("GRAY8");
 }
