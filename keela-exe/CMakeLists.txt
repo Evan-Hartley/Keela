@@ -7,11 +7,14 @@ add_executable(keela main.cpp mainwindow.cpp mainwindow.h
 
 target_link_libraries(keela PRIVATE keela-widgets keela-pipeline PkgConfig::GSTREAMER PkgConfig::GTKMM PkgConfig::SPDLOG)
 
-install(TARGETS keela 
-    RUNTIME_DEPENDENCIES
-    PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
-    POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
-    DIRECTORIES 
+install(TARGETS keela
+        RUNTIME_DEPENDENCIES
+        PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+        POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+        DIRECTORIES
         "$ENV{MINGW_PREFIX}/bin"
-        "C:/msys64/mingw64/bin" 
+        "C:/msys64/mingw64/bin"
 )
+
+#C:\msys64\mingw64\lib\gstreamer-1.0
+install(DIRECTORY "C:/msys64/mingw64/lib/gstreamer-1.0/" DESTINATION bin/plugins)

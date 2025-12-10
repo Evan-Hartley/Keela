@@ -2,7 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela)
 find_package(PkgConfig)
 
+include(KeelaCPackConfig.cmake)
 include(CPack)
+
+install(FILES "LICENSE" DESTINATION ./)
 # GoogleTest requires at least C++17
 # We need C++20 for jthreads
 # need c++23 for std::byteswap
@@ -38,9 +41,9 @@ add_subdirectory(vendor)
 add_subdirectory(keela-widgets)
 add_subdirectory(keela-pipeline)
 add_subdirectory(keela-exe)
-if(ENABLE_TEST)
-add_subdirectory(keela-test)
-endif()
+if (ENABLE_TEST)
+    add_subdirectory(keela-test)
+endif ()
 add_subdirectory(reference)
 
 # Add a target to clean configuration when switching video test source modes

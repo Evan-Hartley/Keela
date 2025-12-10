@@ -26,7 +26,7 @@ target_compile_definitions(gstkeelavideotestsrc PRIVATE
 # Set plugin installation directory
 set(PLUGIN_INSTALL_DIR ${CMAKE_BINARY_DIR}/plugins)
 install(TARGETS gstkeelavideotestsrc
-        LIBRARY DESTINATION ${PLUGIN_INSTALL_DIR}
+        LIBRARY DESTINATION bin/plugins # DESTINATION is a relative path
 )
 
 # Copy plugin to installation directory after build
