@@ -37,10 +37,6 @@ Keela::CameraManager::CameraManager(guint id, bool split_streams)
 			add_odd_camera_stream();
 		}
 
-		// Set up camera control via aravissrc and AravisCamera
-		GstElement *camera_element = static_cast<GstElement *>(camera);
-		aravis_controller = std::make_unique<AravisController>(camera_element);
-
 		// Set up frame splitting if enabled
 		this->split_streams = split_streams;
 		if(split_streams) {
@@ -87,6 +83,13 @@ void Keela::CameraManager::set_framerate(double framerate) {
 
 void Keela::CameraManager::set_experiment_directory(const std::string &path) {
 	experiment_directory = path;
+}
+
+int Keela::CameraManager::init_aravis_controller() {
+	GstElement *camera_element = static_cast<GstElement *>(camera);
+	aravis_controller = std::make_unique<AravisController>(camera_element);
+	spdlog::info("Initialized AravisController for camera {}", id);
+	return 0;
 }
 
 std::pair<double, double> Keela::CameraManager::get_gain_range() const {
@@ -161,9 +164,10 @@ void Keela::CameraManager::set_binning_factors(int binning_factor_x, int binning
 	set_pipeline_state(GST_STATE_NULL);
 	aravis_controller->set_binning_factors(binning_factor_x, binning_factor_y);
 	set_pipeline_state(GST_STATE_PLAYING);
-	// This forces the camera to re-negotiate its caps after the binning change.
+	// This is a hack to force the camera to re-negotiate its caps after the binning change.
 	// The aravissrc doesn't reflect width/height changes until the element is set to NULL and back to PLAYING.
 	// Without this, we end up with mismatched resolutions between the camera source and the rest of the pipeline.
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	restart_pipeline();
 }
 
@@ -315,9 +319,6 @@ void Keela::CameraManager::set_pipeline_state(GstState state) {
 	if(ret == GST_STATE_CHANGE_FAILURE) {
 		spdlog::error("Failed to set pipeline state");
 	}
-	// Blocks until state change completes
-	gst_element_get_state(pipeline, nullptr, nullptr, GST_CLOCK_TIME_NONE);
-
 	g_object_unref(pipeline);
 }
 

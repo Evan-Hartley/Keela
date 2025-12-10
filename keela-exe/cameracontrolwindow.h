@@ -90,6 +90,13 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	// Method for main window to toggle split frame mode
 	void update_split_frame_state(bool enabled);
 
+	/**
+	 * Called after pipeline enters PLAYING state, which is when we get access to the aravis camera hardware
+	 *
+	 * @return 0 on success, -1 on failure
+	 */
+	int init_aravis_controller();
+
 	// Update gain range after camera is ready
 	void update_gain_range();
 

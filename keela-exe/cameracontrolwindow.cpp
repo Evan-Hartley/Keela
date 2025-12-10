@@ -76,6 +76,8 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	// TODO: dynamically cast camera_manager->presentation to a WidgetElement to
 	// get a handle to a widget to add to the window
+	// TODO: do we need to take a snapshot of the odd stream too? maybe not
+	// because we just need it for scale calibration?
 	fetch_image_button.signal_clicked().connect(
 	    sigc::mem_fun(*camera_manager->camera_stream_even->snapshot, &Keela::SnapshotBin::take_snapshot));
 	v_container.add(fetch_image_button);
@@ -99,14 +101,6 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	auto gl_bin = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
 	h_container.pack_start(*gl_bin, false, false, 10);
-
-	// Set ranges and current values in UI based on camera capabilities
-	if(camera_manager->has_aravis_controller()) {
-		update_binning_range();
-		update_gain_range();
-		update_exposure_time_range();
-		update_binning_modes();
-	}
 
 	show_all_children();
 	show();
@@ -299,6 +293,10 @@ void Keela::CameraControlWindow::remove_split_frame_ui() {
 		video_hbox.remove(*video_presentation_odd);
 		video_presentation_odd.reset();
 	}
+}
+
+int Keela::CameraControlWindow::init_aravis_controller() {
+	return camera_manager->init_aravis_controller();
 }
 
 void Keela::CameraControlWindow::update_gain_range() {

@@ -33,10 +33,6 @@ class CameraManager final : public Keela::Bin {
 
 	~CameraManager() override;
 
-	bool has_aravis_controller() const {
-		return aravis_controller != nullptr;
-	}
-
 	std::vector<std::string> get_available_pixel_formats() const;
 
 	void set_pix_fmt(const std::string &format);
@@ -44,6 +40,10 @@ class CameraManager final : public Keela::Bin {
 	void set_framerate(double framerate);
 
 	void set_experiment_directory(const std::string &path);
+
+	// Creates the AravisController once pipeline is in PLAYING state and we have access to the camera hardware
+	// Returns 0 on success, -1 on failure
+	int init_aravis_controller();
 
 	// Query hardware capabilities
 	std::pair<double, double> get_gain_range() const;

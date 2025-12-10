@@ -102,6 +102,25 @@ MainWindow::MainWindow() : Gtk::Window() {
 	on_camera_spin_changed();
 	gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
 
+	// Query hardware capabilities to set ranges in the UI
+	for(const auto &camera : cameras) {
+		// Must be called after pipeline is in PLAYING state.
+		// GStreamer elements are lazy and don't initialize hardware connections until pipeline starts playing.
+		// We need access to the aravis camera to query supported ranges.
+		int aravis_init_result = camera->init_aravis_controller();
+
+		if(aravis_init_result != 0) {
+			continue;
+		}
+
+		// Query the hardware capabilities to set ranges/options in the UI.
+		// Also updates UI with the current hardware setting as reported by the camera.
+		camera->update_binning_range();
+		camera->update_gain_range();
+		camera->update_exposure_time_range();
+		camera->update_binning_modes();
+	}
+
 	show_all_children();
 }
 

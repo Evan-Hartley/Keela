@@ -8,13 +8,6 @@
 namespace Keela {
 
 AravisController::AravisController(GstElement *camera) : aravis_source(camera) {
-	// ArvCamera isn't fully initialized until the source is in the PLAYING state
-	gst_element_set_state(aravis_source, GST_STATE_PLAYING);
-	// can't leave it in PLAYING state without any downstream consumers, so set to READY
-	gst_element_set_state(aravis_source, GST_STATE_READY);
-	// blocks until state change completes
-	gst_element_get_state(aravis_source, nullptr, nullptr, GST_CLOCK_TIME_NONE);
-
 	spdlog::info("AravisController initialized with camera pointer: {}", fmt::ptr(camera));
 
 	g_object_get(aravis_source, "camera", &aravis_camera, nullptr);
