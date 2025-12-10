@@ -91,16 +91,17 @@ MainWindow::MainWindow() : Gtk::Window() {
 	trace_signal_connection =
 	    show_trace_check.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_trace_button_clicked));
 	// create the pipeline
-	pipeline = GST_PIPELINE(gst_pipeline_new("pipeline"));
-	if(!pipeline) {
-		throw std::runtime_error("Failed to create pipeline");
-	}
+	// TODO: remove these comments
+	// pipeline = GST_PIPELINE(gst_pipeline_new("pipeline"));
+	// if(!pipeline) {
+	//	throw std::runtime_error("Failed to create pipeline");
+	//}
 
 	container.add(dump_graph_button);
 	dump_graph_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::dump_graph));
 	// Initialize recording settings here
 	on_camera_spin_changed();
-	gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
+	pipeline.set_state(GST_STATE_PLAYING, false);
 
 	// Query hardware capabilities to set ranges in the UI
 	for(const auto &camera : cameras) {
@@ -125,16 +126,13 @@ MainWindow::MainWindow() : Gtk::Window() {
 }
 
 MainWindow::~MainWindow() {
-	g_object_unref(pipeline);
+	// g_object_unref(pipeline);
 }
 
 void MainWindow::on_camera_spin_changed() {
 	const auto curr = cameras.size();
 	const auto next = static_cast<unsigned int>(num_camera_spin.m_spin.get_value_as_int());
-	auto ret = gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_NULL);
-	if(ret == GST_STATE_CHANGE_FAILURE) {
-		spdlog::error("Failed to set state of pipeline");
-	}
+	pipeline.set_state(GST_STATE_NULL);
 	if(next > curr) {
 		for(guint i = curr; i < next; i++) {
 			auto camera_id = i + 1;
@@ -169,10 +167,7 @@ void MainWindow::on_camera_spin_changed() {
 			}
 		}
 	}
-	ret = gst_element_set_state(GST_ELEMENT(pipeline), GST_STATE_PLAYING);
-	if(ret == GST_STATE_CHANGE_FAILURE) {
-		spdlog::error("Failed to set state of pipeline");
-	}
+	pipeline.set_state(GST_STATE_PLAYING, false);
 	dump_graph();
 }
 
@@ -191,12 +186,12 @@ void MainWindow::on_record_button_clicked() {
 			throw std::runtime_error("Experiment directory not specified");
 		}
 		directory_button.set_sensitive(false);
-		set_state(GST_STATE_NULL);
+		pipeline.set_state(GST_STATE_NULL);
 		for(const auto &camera : cameras) {
 			camera->camera_manager->start_recording();
 		}
 		// this resets the pipeline clock
-		set_state(GST_STATE_PLAYING);
+		pipeline.set_state(GST_STATE_PLAYING);
 	} else {
 		auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
 		message_dialog.run();
@@ -208,27 +203,11 @@ void MainWindow::on_record_button_clicked() {
 }
 
 void MainWindow::reset_cameras() {
-	set_state(GST_STATE_NULL);
+	pipeline.set_state(GST_STATE_NULL);
 	// apply settings while the pipeline isn't actively playing
 	set_framerate();
 	set_pix_fmt();
-	set_state(GST_STATE_PLAYING, false);
-}
-
-void MainWindow::set_state(GstState state, bool wait) {
-	auto ret = gst_element_set_state(GST_ELEMENT(pipeline), state);
-	switch(ret) {
-		case GST_STATE_CHANGE_FAILURE:
-			throw std::runtime_error("Failed to set state of pipeline to playing");
-		case GST_STATE_CHANGE_ASYNC:
-			ret = gst_element_get_state(GST_ELEMENT(pipeline), nullptr, nullptr, GST_CLOCK_TIME_NONE);
-			if(ret == GST_STATE_CHANGE_FAILURE && wait) {
-				throw std::runtime_error("Async state change failed");
-			}
-			break;
-		default:
-			spdlog::info("State change successful");
-	}
+	pipeline.set_state(GST_STATE_PLAYING, false);
 }
 
 void MainWindow::set_framerate() {

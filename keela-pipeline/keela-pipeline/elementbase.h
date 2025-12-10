@@ -15,6 +15,8 @@ class Element {
 	virtual ~Element() = default;
 
 	virtual operator GstElement *() const = 0;
+
+	void set_state(GstState state, bool wait = true);
 };
 }  // namespace Keela
 #endif  // ELEMENTBASE_H

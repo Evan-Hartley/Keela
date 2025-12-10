@@ -9,6 +9,7 @@
 #include <keela-widgets/labeledspinbutton.h>
 
 #include "cameracontrolwindow.h"
+#include "keela-pipeline/Pipeline.h"
 #include "tracewindow.h"
 
 class MainWindow final : public Gtk::Window {
@@ -18,7 +19,8 @@ class MainWindow final : public Gtk::Window {
 	~MainWindow() override;
 
    private:
-	GstPipeline *pipeline = nullptr;
+	Keela::Pipeline pipeline;
+	// GstPipeline *pipeline = nullptr;
 	Gtk::Button record_button;
 	Gtk::Button directory_button;
 	Gtk::Button restart_camera_button;
@@ -51,6 +53,7 @@ class MainWindow final : public Gtk::Window {
 
 	void reset_cameras();
 
+	[[obsolete]]
 	void set_state(GstState state, bool wait = true);
 
 	void set_framerate();
