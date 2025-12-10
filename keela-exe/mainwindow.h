@@ -53,9 +53,6 @@ class MainWindow final : public Gtk::Window {
 
 	void reset_cameras();
 
-	[[obsolete]]
-	void set_state(GstState state, bool wait = true);
-
 	void set_framerate();
 
 	void set_framerate(Keela::CameraManager *cm) const;

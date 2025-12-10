@@ -12,6 +12,7 @@
 #include <string>
 
 #include "elementbase.h"
+#include "simpleelement.h"
 
 namespace Keela {
 class Bin : public virtual Keela::Element {
@@ -36,9 +37,9 @@ class Bin : public virtual Keela::Element {
 	 * `GstElement` refcount.
 	 * @tparam First any type which can convert to GstElement*
 	 */
-	template <typename First, typename... Rest>
-	void add_elements(First first, Rest... rest) {
-		Keela::Element *e = &first;
+	template <typename... Rest>
+	void add_elements(Keela::Element *e, Rest... rest) {
+		// Keela::Element *e = &first;
 		GstElement *e_ptr = *e;
 		gst_object_ref(e_ptr);
 		GstBin *b = GST_BIN(static_cast<GstElement *>(*this));
@@ -49,6 +50,16 @@ class Bin : public virtual Keela::Element {
 		}
 		e->set_parent(this);
 		add_elements(rest...);
+	}
+
+	template <typename... Rest>
+	void add_elements(Keela::SimpleElement e, Rest... rest) {
+		add_elements(&e, rest...);
+	}
+
+	template <typename... Rest>
+	void add_elements(Keela::Bin e, Rest... rest) {
+		add_elements(&e, rest...);
 	}
 
 	static void add_elements() {

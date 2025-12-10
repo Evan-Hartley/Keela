@@ -137,13 +137,14 @@ void MainWindow::on_camera_spin_changed() {
 			const auto fps = static_cast<guint>(trace_fps_spin.m_spin.get_value());
 			c->set_trace_bin_framerate_caps(fps);
 
-			g_object_ref(static_cast<GstElement *>(*c->camera_manager));
-			auto inner_ret = gst_bin_add(GST_BIN(pipeline), *c->camera_manager);
+			pipeline.add_elements(static_cast<Keela::Bin>(*c->camera_manager));
+			/*
+			auto inner_ret = gst_bin_add(pipeline, *c->camera_manager);
 			if(!inner_ret) {
-				std::stringstream ss = std::stringstream();
-				ss << "Failed to add camera " << std::to_string(camera_id) << " to pipeline";
-				throw std::runtime_error(ss.str());
-			}
+			    std::stringstream ss = std::stringstream();
+			    ss << "Failed to add camera " << std::to_string(camera_id) << " to pipeline";
+			    throw std::runtime_error(ss.str());
+			}*/
 			set_experiment_directory(c);
 			cameras.push_back(c);
 			if(trace_window != nullptr) {
@@ -154,7 +155,7 @@ void MainWindow::on_camera_spin_changed() {
 	} else if(next < curr) {
 		for(guint i = curr; i > next; i--) {
 			auto camera_win = std::move(cameras.back());
-			gst_bin_remove(GST_BIN(pipeline), *camera_win->camera_manager);
+			gst_bin_remove(pipeline, *camera_win->camera_manager);
 			cameras.pop_back();
 			if(trace_window != nullptr) {
 				trace_window->removeTraceRow();
@@ -278,7 +279,8 @@ void MainWindow::on_trace_clear_buffer_button_clicked() {
 
 void MainWindow::dump_graph() const {
 	spdlog::info("{}: dumping pipeline graph", __func__);
-	gst_debug_bin_to_dot_file(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "keelapipeline");
+	pipeline.dump_bin_graph();
+	// gst_debug_bin_to_dot_file(GST_BIN(pipeline), GST_DEBUG_GRAPH_SHOW_ALL, "keelapipeline");
 }
 
 void MainWindow::on_directory_clicked() {

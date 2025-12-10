@@ -6,9 +6,10 @@
 #define PIPELINE_H
 #include <memory>
 
+#include "bin.h"
 #include "elementbase.h"
 namespace Keela {
-class Pipeline final : public Keela::Element {
+class Pipeline final : public Keela::Bin {
    public:
 	Pipeline();
 	~Pipeline() override = default;

@@ -310,16 +310,19 @@ void Keela::CameraManager::remove_frame_splitting_probes() {
 }
 
 void Keela::CameraManager::set_pipeline_state(GstState state) {
-	GstElement *pipeline = GST_ELEMENT(gst_element_get_parent(static_cast<GstElement *>(camera)));
-	if(!pipeline) {
-		spdlog::error("Failed to get parent pipeline for camera {}", id);
-		return;
-	}
-	GstStateChangeReturn ret = gst_element_set_state(pipeline, state);
-	if(ret == GST_STATE_CHANGE_FAILURE) {
-		spdlog::error("Failed to set pipeline state");
-	}
-	g_object_unref(pipeline);
+	Keela::Element *parent = camera.get_parent();
+
+	// GstElement *pipeline = GST_ELEMENT(gst_element_get_parent(static_cast<GstElement *>(camera)));
+	// if(!pipeline) {
+	//	spdlog::error("Failed to get parent pipeline for camera {}", id);
+	//	return;
+	// }
+	parent->set_state(state);
+	// GstStateChangeReturn ret = gst_element_set_state(pipeline, state);
+	// if(ret == GST_STATE_CHANGE_FAILURE) {
+	//	spdlog::error("Failed to set pipeline state");
+	// }
+	// g_object_unref(pipeline);
 }
 
 void Keela::CameraManager::restart_pipeline() {

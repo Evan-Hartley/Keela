@@ -19,7 +19,7 @@ class Element {
 	void set_state(GstState state, bool wait = true);
 
    public:
-	Keela::Element *get_parent();
+	Keela::Element *get_parent() const;
 
    protected:
 	/// associate a higher-level Keela::Element as the parent of this element. *parent __MUST__ be the same object

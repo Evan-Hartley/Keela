@@ -30,7 +30,7 @@ void Keela::Element::set_state(GstState state, bool wait) {
 			spdlog::info("{} state changed successfully to {}", element_name, state_name);
 	}
 }
-Keela::Element *Keela::Element::get_parent() {
+Keela::Element *Keela::Element::get_parent() const {
 	return m_parent;
 }
 void Keela::Element::set_parent(Keela::Element *parent) {
