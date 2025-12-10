@@ -112,3 +112,10 @@ TEST(KeelaPipeline, CopyCaps) {
 	auto caps2 = Keela::Caps(static_cast<GstCaps *>(caps1));
 	ASSERT_TRUE(gst_caps_is_equal(caps1, caps2));
 }
+
+TEST(KeelaPipeline, Bin_Parenting) {
+	auto bin = Keela::Bin();
+	auto e = Keela::SimpleElement("queue");
+	bin.add_elements(e);
+	ASSERT_TRUE(e.get_parent() == &bin);
+}

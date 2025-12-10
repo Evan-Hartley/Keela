@@ -137,7 +137,7 @@ void MainWindow::on_camera_spin_changed() {
 			const auto fps = static_cast<guint>(trace_fps_spin.m_spin.get_value());
 			c->set_trace_bin_framerate_caps(fps);
 
-			pipeline.add_elements(static_cast<Keela::Bin>(*c->camera_manager));
+			pipeline.add_elements(*c->camera_manager);
 			set_experiment_directory(c);
 			cameras.push_back(c);
 			if(trace_window != nullptr) {

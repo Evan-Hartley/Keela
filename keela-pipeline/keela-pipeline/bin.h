@@ -53,12 +53,12 @@ class Bin : public virtual Keela::Element {
 	}
 
 	template <typename... Rest>
-	void add_elements(Keela::SimpleElement e, Rest... rest) {
+	void add_elements(Keela::SimpleElement &e, Rest... rest) {
 		add_elements(&e, rest...);
 	}
 
 	template <typename... Rest>
-	void add_elements(Keela::Bin e, Rest... rest) {
+	void add_elements(Keela::Bin &e, Rest... rest) {
 		add_elements(&e, rest...);
 	}
 
