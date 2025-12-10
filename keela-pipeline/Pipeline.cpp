@@ -11,13 +11,5 @@ Keela::Pipeline::Pipeline() {
 		throw std::runtime_error("Failed to create pipeline");
 	}
 
-	m_pipeline = std::shared_ptr<GstElement>(e, Keela::delete_element);
-}
-Keela::Pipeline::operator struct _GstElement *() const {
-	if(m_pipeline) {
-		return GST_ELEMENT(m_pipeline.get());
-	}
-	const std::string message = "Internal pipeline is not initialized";
-	spdlog::error(message);
-	throw std::runtime_error(message);
+	bin = std::shared_ptr<GstBin>(GST_BIN(e), Keela::delete_bin);
 }

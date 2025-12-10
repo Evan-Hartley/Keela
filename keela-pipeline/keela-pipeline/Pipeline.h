@@ -13,10 +13,6 @@ class Pipeline final : public Keela::Bin {
    public:
 	Pipeline();
 	~Pipeline() override = default;
-	operator struct _GstElement *() const override;
-
-   private:
-	std::shared_ptr<GstElement> m_pipeline;
 };
 }  // namespace Keela
 #endif  // PIPELINE_H

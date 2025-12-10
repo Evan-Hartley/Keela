@@ -138,13 +138,6 @@ void MainWindow::on_camera_spin_changed() {
 			c->set_trace_bin_framerate_caps(fps);
 
 			pipeline.add_elements(static_cast<Keela::Bin>(*c->camera_manager));
-			/*
-			auto inner_ret = gst_bin_add(pipeline, *c->camera_manager);
-			if(!inner_ret) {
-			    std::stringstream ss = std::stringstream();
-			    ss << "Failed to add camera " << std::to_string(camera_id) << " to pipeline";
-			    throw std::runtime_error(ss.str());
-			}*/
 			set_experiment_directory(c);
 			cameras.push_back(c);
 			if(trace_window != nullptr) {
