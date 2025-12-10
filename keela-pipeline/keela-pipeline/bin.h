@@ -38,14 +38,16 @@ class Bin : public virtual Keela::Element {
 	 */
 	template <typename First, typename... Rest>
 	void add_elements(First first, Rest... rest) {
-		GstElement *e = first;
+		Keela::Element *e = &first;
+		GstElement *e_ptr = *e;
+		gst_object_ref(e_ptr);
+		GstBin *b = GST_BIN(static_cast<GstElement *>(*this));
 
-		gst_object_ref(e);
-		GstElement *b = *this;
-		auto ret = gst_bin_add(GST_BIN(b), GST_ELEMENT(e));
+		auto ret = gst_bin_add(b, e_ptr);
 		if(!ret) {
 			throw std::runtime_error("Failed to add element to bin");
 		}
+		e->set_parent(this);
 		add_elements(rest...);
 	}
 

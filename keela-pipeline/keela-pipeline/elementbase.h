@@ -17,6 +17,18 @@ class Element {
 	virtual operator GstElement *() const = 0;
 
 	void set_state(GstState state, bool wait = true);
+
+   public:
+	Keela::Element *get_parent();
+
+   protected:
+	/// associate a higher-level Keela::Element as the parent of this element. *parent __MUST__ be the same object
+	/// associated with the GstElement*'s parent
+	void set_parent(Keela::Element *parent);
+	friend class Bin;
+
+   private:
+	Keela::Element *m_parent = nullptr;
 };
 }  // namespace Keela
 #endif  // ELEMENTBASE_H

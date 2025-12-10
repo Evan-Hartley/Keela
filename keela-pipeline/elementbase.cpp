@@ -30,3 +30,24 @@ void Keela::Element::set_state(GstState state, bool wait) {
 			spdlog::info("{} state changed successfully to {}", element_name, state_name);
 	}
 }
+Keela::Element *Keela::Element::get_parent() {
+	return m_parent;
+}
+void Keela::Element::set_parent(Keela::Element *parent) {
+	auto name = GST_ELEMENT_NAME(static_cast<GstElement *>(*this));
+
+	if(m_parent && parent) {
+		spdlog::warn("{}: {} already has parent", __func__, name);
+		// but set the parent anyway
+	}
+	auto gst_parent = GST_ELEMENT_PARENT(static_cast<GstElement *>(*this));
+	if(parent) {
+		auto parent_name = GST_ELEMENT_NAME(static_cast<GstElement *>(*parent));
+		spdlog::debug("{}: setting parent of {} to {}", __func__, name, parent_name);
+		if(gst_parent != static_cast<GstElement *>(*parent)) {
+			spdlog::warn("{}: parent association does not match", name);
+			// but set the parent anyway
+		}
+	}
+	m_parent = parent;
+}

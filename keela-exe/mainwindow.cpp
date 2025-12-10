@@ -90,12 +90,6 @@ MainWindow::MainWindow() : Gtk::Window() {
 	// Store connection so we can block it when closing the window programmatically
 	trace_signal_connection =
 	    show_trace_check.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_trace_button_clicked));
-	// create the pipeline
-	// TODO: remove these comments
-	// pipeline = GST_PIPELINE(gst_pipeline_new("pipeline"));
-	// if(!pipeline) {
-	//	throw std::runtime_error("Failed to create pipeline");
-	//}
 
 	container.add(dump_graph_button);
 	dump_graph_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::dump_graph));
