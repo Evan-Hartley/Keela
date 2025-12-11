@@ -308,7 +308,7 @@ void Keela::CameraManager::remove_frame_splitting_probes() {
 	}
 }
 
-void Keela::CameraManager::set_pipeline_state(GstState state) {
+void Keela::CameraManager::set_pipeline_state(GstState state, bool wait) {
 	Keela::Element *parent = camera.get_parent();
 
 	// GstElement *pipeline = GST_ELEMENT(gst_element_get_parent(static_cast<GstElement *>(camera)));
@@ -316,7 +316,7 @@ void Keela::CameraManager::set_pipeline_state(GstState state) {
 	//	spdlog::error("Failed to get parent pipeline for camera {}", id);
 	//	return;
 	// }
-	parent->set_state(state);
+	parent->set_state(state, wait);
 	// GstStateChangeReturn ret = gst_element_set_state(pipeline, state);
 	// if(ret == GST_STATE_CHANGE_FAILURE) {
 	//	spdlog::error("Failed to set pipeline state");
@@ -331,9 +331,9 @@ void Keela::CameraManager::restart_pipeline() {
 	// aravis_controller holds a reference to ArvCamera*.
 	// ArvCamera's finalizer will only be called if its reference count is zero
 	// releasing aravis_controller will implicitly (through unique_ptr) unref the ArvCamera
-	aravis_controller.release();
+	aravis_controller.reset();
 	aravis_controller = nullptr;
-	set_pipeline_state(GST_STATE_PLAYING);
+	set_pipeline_state(GST_STATE_PLAYING, false);
 	// and of course we need to reinit araviscontroller
 	init_aravis_controller();
 }

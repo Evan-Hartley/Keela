@@ -166,7 +166,7 @@ class CameraManager final : public Keela::Bin {
 
 	void add_odd_camera_stream();
 
-	void set_pipeline_state(GstState state);
+	void set_pipeline_state(GstState state, bool wait = true);
 
 	/**
 	 * Stops and restarts the pipeline so we can apply changes to the camera/aravissrc.

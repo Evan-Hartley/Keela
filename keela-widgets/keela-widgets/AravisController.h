@@ -3,6 +3,7 @@
 
 #include <aravis-0.8/arv.h>
 #include <gst/gstelement.h>
+#include <spdlog/spdlog.h>
 
 #include <memory>
 #include <string>
@@ -21,7 +22,9 @@ class AravisController {
    public:
 	explicit AravisController(Keela::Element &camera);
 
-	~AravisController() = default;
+	~AravisController() {
+		spdlog::warn("{}", __func__);
+	};
 
 	/** |-----------------------------| */
 	/** v Query hardware capabilities v */
