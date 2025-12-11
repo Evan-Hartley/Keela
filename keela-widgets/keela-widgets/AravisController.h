@@ -4,11 +4,13 @@
 #include <aravis-0.8/arv.h>
 #include <gst/gstelement.h>
 
+#include <memory>
 #include <string>
 #include <utility>  // pair
 #include <vector>
 
 namespace Keela {
+class Element;
 /**
  * Controls Aravis camera operations and settings
  *
@@ -17,7 +19,7 @@ namespace Keela {
  */
 class AravisController {
    public:
-	explicit AravisController(GstElement *camera);
+	explicit AravisController(Keela::Element &camera);
 
 	~AravisController() = default;
 
@@ -113,8 +115,8 @@ class AravisController {
 	/** |---------------------------| */
 
    private:
-	GstElement *aravis_source;
-	ArvCamera *aravis_camera;
+	Keela::Element &aravis_source;
+	std::shared_ptr<ArvCamera> aravis_camera = nullptr;
 };
 }  // namespace Keela
 

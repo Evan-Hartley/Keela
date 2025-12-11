@@ -19,7 +19,7 @@ Keela::SimpleElement::SimpleElement(const std::string &element) {
 		throw std::runtime_error("Failed to create element: " + element);
 	}
 
-	m_element = std::shared_ptr<GstElement>(e, Keela::delete_element);
+	m_element = std::shared_ptr<GstElement>(e, Keela::delete_gobject<GstElement>);
 }
 
 Keela::SimpleElement::~SimpleElement() {

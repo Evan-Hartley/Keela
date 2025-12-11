@@ -86,8 +86,7 @@ void Keela::CameraManager::set_experiment_directory(const std::string &path) {
 }
 
 int Keela::CameraManager::init_aravis_controller() {
-	GstElement *camera_element = static_cast<GstElement *>(camera);
-	aravis_controller = std::make_unique<AravisController>(camera_element);
+	aravis_controller = std::make_unique<AravisController>(camera);
 	spdlog::info("Initialized AravisController for camera {}", id);
 	return 0;
 }
@@ -329,5 +328,12 @@ void Keela::CameraManager::restart_pipeline() {
 	spdlog::info("Restarting pipeline to apply camera settings");
 
 	set_pipeline_state(GST_STATE_NULL);
+	// aravis_controller holds a reference to ArvCamera*.
+	// ArvCamera's finalizer will only be called if its reference count is zero
+	// releasing aravis_controller will implicitly (through unique_ptr) unref the ArvCamera
+	aravis_controller.release();
+	aravis_controller = nullptr;
 	set_pipeline_state(GST_STATE_PLAYING);
+	// and of course we need to reinit araviscontroller
+	init_aravis_controller();
 }

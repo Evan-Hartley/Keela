@@ -119,3 +119,14 @@ TEST(KeelaPipeline, Bin_Parenting) {
 	bin.add_elements(e);
 	ASSERT_TRUE(e.get_parent() == &bin);
 }
+
+TEST(KeelaPipeline, GenericGstFinalizer) {
+	auto bin = new Keela::Bin();
+	GstBin *b = *bin;
+	gst_object_ref(b);
+	ASSERT_EQ(GST_OBJECT_REFCOUNT(b), 2);
+	delete bin;
+	ASSERT_EQ(GST_OBJECT_REFCOUNT(b), 1);
+	g_object_unref(b);
+	ASSERT_FALSE(G_IS_OBJECT(b));
+}

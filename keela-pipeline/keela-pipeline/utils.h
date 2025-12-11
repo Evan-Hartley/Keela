@@ -29,12 +29,31 @@ inline void element_link_many(First first, Second second, Rest... rest) {
 }
 
 /// custom deleter to use for `GstBin*` managed by `std::shared_ptr`
+[[obsolete]]
 void delete_bin(GstBin *bin);
 
 /// custom deleter to use for `GstElement*` managed by `std::shared_ptr`
+[[obsolete]]
 void delete_element(GstElement *e);
 
+[[obsolete]]
 void delete_caps(GstCaps *caps);
+
+template <typename T>
+void delete_gobject(T *obj) {
+	if(!G_IS_OBJECT(obj)) {
+		spdlog::warn("{} can not release invalid object", __func__);
+		return;
+	}
+	auto classname = G_OBJECT_CLASS_NAME(G_OBJECT_GET_CLASS(obj));
+	// gobject doesn't like it if you try to unref an object with a refcount of 0
+	auto refcount = GST_OBJECT_REFCOUNT(obj);
+	spdlog::debug("{} {} refcount {}", __func__, classname, refcount);
+	if(refcount > 0) {
+		spdlog::info("{}: releasing managed ref of {}", __func__, classname);
+		g_object_unref(obj);
+	}
+}
 }  // namespace Keela
 
 #endif  // UTILS_H

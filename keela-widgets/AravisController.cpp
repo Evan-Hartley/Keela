@@ -5,13 +5,19 @@
 #include <string>
 #include <vector>
 
+#include "keela-pipeline/elementbase.h"
+#include "keela-pipeline/utils.h"
+
 namespace Keela {
 
-AravisController::AravisController(GstElement *camera) : aravis_source(camera) {
-	spdlog::info("AravisController initialized with camera pointer: {}", fmt::ptr(camera));
+AravisController::AravisController(Keela::Element &camera) : aravis_source(camera) {
+	// spdlog::info("AravisController initialized with camera pointer: {}", fmt::ptr(camera));
 
-	g_object_get(aravis_source, "camera", &aravis_camera, nullptr);
-	spdlog::info("Setting AravisController camera pointer to: {}", fmt::ptr(aravis_camera));
+	ArvCamera *tmp_cam = nullptr;
+	g_object_get(aravis_source, "camera", &tmp_cam, nullptr);
+	assert(ARV_IS_CAMERA(tmp_cam));
+	aravis_camera = std::shared_ptr<ArvCamera>(tmp_cam, delete_gobject<ArvCamera>);
+	// spdlog::info("Setting AravisController camera pointer to: {}", fmt::ptr(aravis_camera));
 }
 
 std::pair<double, double> AravisController::get_gain_range() const {
@@ -27,7 +33,7 @@ std::pair<double, double> AravisController::get_gain_range() const {
 	double min_gain, max_gain;
 	GError *error = nullptr;
 	// Query the actual hardware gain limits
-	arv_camera_get_gain_bounds(aravis_camera, &min_gain, &max_gain, &error);
+	arv_camera_get_gain_bounds(aravis_camera.get(), &min_gain, &max_gain, &error);
 	if(error == nullptr) {
 		spdlog::info("Queried hardware gain range from camera: {:.1f} to {:.1f} dB", min_gain, max_gain);
 	} else {
@@ -40,7 +46,7 @@ std::pair<double, double> AravisController::get_gain_range() const {
 
 double AravisController::get_gain() const {
 	GError *error = nullptr;
-	gdouble gain = arv_camera_get_gain(aravis_camera, &error);
+	gdouble gain = arv_camera_get_gain(aravis_camera.get(), &error);
 
 	if(error != nullptr) {
 		spdlog::error("Error getting gain from camera: {}", error->message);
@@ -62,7 +68,7 @@ std::pair<double, double> AravisController::get_exposure_time_range() const {
 	double min_exposure, max_exposure;
 	GError *error = nullptr;
 	// Query the actual hardware exposure time limits
-	arv_camera_get_exposure_time_bounds(aravis_camera, &min_exposure, &max_exposure, &error);
+	arv_camera_get_exposure_time_bounds(aravis_camera.get(), &min_exposure, &max_exposure, &error);
 	if(error == nullptr) {
 		spdlog::info("Queried hardware exposure time range from camera: {:.1f} to {:.1f} us", min_exposure,
 		             max_exposure);
@@ -83,7 +89,7 @@ double AravisController::get_exposure_time() const {
 	spdlog::debug("Querying current exposure time from camera hardware via ArvCamera object");
 
 	GError *error = nullptr;
-	gint exposure_time = arv_camera_get_exposure_time(aravis_camera, &error);
+	gint exposure_time = arv_camera_get_exposure_time(aravis_camera.get(), &error);
 
 	if(error != nullptr) {
 		spdlog::error("Error getting exposure time from camera: {}", error->message);
@@ -96,7 +102,7 @@ double AravisController::get_exposure_time() const {
 }
 
 bool AravisController::supports_hardware_binning() const {
-	return arv_camera_is_binning_available(aravis_camera, nullptr);
+	return arv_camera_is_binning_available(aravis_camera.get(), nullptr);
 }
 
 std::tuple<int, int, int, int> AravisController::get_binning_bounds() const {
@@ -114,8 +120,8 @@ std::tuple<int, int, int, int> AravisController::get_binning_bounds() const {
 	GError *error_y = nullptr;
 
 	// Query the actual hardware binning limits
-	arv_camera_get_x_binning_bounds(aravis_camera, &min_x_binning, &max_x_binning, &error_x);
-	arv_camera_get_y_binning_bounds(aravis_camera, &min_y_binning, &max_y_binning, &error_y);
+	arv_camera_get_x_binning_bounds(aravis_camera.get(), &min_x_binning, &max_x_binning, &error_x);
+	arv_camera_get_y_binning_bounds(aravis_camera.get(), &min_y_binning, &max_y_binning, &error_y);
 
 	if(error_x == nullptr && error_y == nullptr) {
 		spdlog::info("Queried hardware binning factor range from camera: {} to {}", min_x_binning, max_x_binning);
@@ -132,15 +138,15 @@ std::tuple<int, int, int, int> AravisController::get_binning_bounds() const {
 std::vector<std::string> AravisController::get_supported_binning_modes() {
 	spdlog::info("Querying supported binning modes from camera hardware via ArvCamera object");
 	std::vector<std::string> modes;
-	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera, nullptr)) {
+	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera.get(), nullptr)) {
 		spdlog::warn("Binning mode query not supported");
 		return modes;
 	}
 
 	GError *error = nullptr;
 	guint n_values = 0;
-	auto mode_list =
-	    arv_camera_dup_available_enumerations_as_strings(aravis_camera, "BinningHorizontalMode", &n_values, &error);
+	auto mode_list = arv_camera_dup_available_enumerations_as_strings(aravis_camera.get(), "BinningHorizontalMode",
+	                                                                  &n_values, &error);
 	if(error != nullptr) {
 		spdlog::error("Error querying binning modes from camera: {}", error->message);
 		g_error_free(error);
@@ -167,15 +173,15 @@ std::vector<std::string> AravisController::get_supported_binning_modes() {
 
 std::pair<std::string, std::string> AravisController::get_binning_modes() const {
 	auto empty = std::make_pair(std::string(""), std::string(""));
-	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera, nullptr)) {
+	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera.get(), nullptr)) {
 		spdlog::warn("Binning mode query not supported");
 		return empty;
 	}
 
 	GError *h_error = nullptr;
 	GError *v_error = nullptr;
-	const char *h_mode = arv_camera_get_string(aravis_camera, "BinningHorizontalMode", &h_error);
-	const char *v_mode = arv_camera_get_string(aravis_camera, "BinningVerticalMode", &v_error);
+	const char *h_mode = arv_camera_get_string(aravis_camera.get(), "BinningHorizontalMode", &h_error);
+	const char *v_mode = arv_camera_get_string(aravis_camera.get(), "BinningVerticalMode", &v_error);
 
 	if(h_error != nullptr || v_error != nullptr) {
 		spdlog::warn("Error querying binning modes from camera: {} {}", h_error ? h_error->message : "no error",
@@ -191,7 +197,7 @@ std::pair<std::string, std::string> AravisController::get_binning_modes() const 
 
 std::pair<int, int> AravisController::get_binning_factors() const {
 	auto nan = std::numeric_limits<int>::quiet_NaN();
-	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera, nullptr)) {
+	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera.get(), nullptr)) {
 		spdlog::warn("Binning factor query not supported");
 		return {nan, nan};
 	}
@@ -200,7 +206,7 @@ std::pair<int, int> AravisController::get_binning_factors() const {
 
 	GError *error = nullptr;
 	int x_binning, y_binning;
-	arv_camera_get_binning(aravis_camera, &x_binning, &y_binning, &error);
+	arv_camera_get_binning(aravis_camera.get(), &x_binning, &y_binning, &error);
 
 	if(error != nullptr) {
 		spdlog::warn("Error querying binning factors from camera: {}", error->message);
@@ -214,7 +220,7 @@ std::pair<int, int> AravisController::get_binning_factors() const {
 
 std::pair<int, int> AravisController::get_binning_increments() const {
 	auto nan = std::numeric_limits<int>::quiet_NaN();
-	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera, nullptr)) {
+	if(aravis_camera == nullptr || !arv_camera_is_binning_available(aravis_camera.get(), nullptr)) {
 		spdlog::warn("Binning increment query not supported");
 		return {nan, nan};
 	}
@@ -224,8 +230,8 @@ std::pair<int, int> AravisController::get_binning_increments() const {
 	GError *error_x = nullptr;
 	GError *error_y = nullptr;
 	// Query the actual hardware binning increment steps
-	int x_increment = arv_camera_get_x_binning_increment(aravis_camera, &error_x);
-	int y_increment = arv_camera_get_y_binning_increment(aravis_camera, &error_y);
+	int x_increment = arv_camera_get_x_binning_increment(aravis_camera.get(), &error_x);
+	int y_increment = arv_camera_get_y_binning_increment(aravis_camera.get(), &error_y);
 
 	if(error_x != nullptr || error_y != nullptr) {
 		spdlog::warn("Error querying binning factor increment from camera: {} {}",
@@ -250,8 +256,8 @@ std::pair<int, int> AravisController::get_current_resolution() const {
 
 	GError *w_error = nullptr;
 	GError *h_error = nullptr;
-	gint width = arv_camera_get_integer(aravis_camera, "Width", &w_error);
-	gint height = arv_camera_get_integer(aravis_camera, "Height", &h_error);
+	gint width = arv_camera_get_integer(aravis_camera.get(), "Width", &w_error);
+	gint height = arv_camera_get_integer(aravis_camera.get(), "Height", &h_error);
 
 	if(w_error != nullptr || h_error != nullptr) {
 		spdlog::error("Error getting camera width: {}", w_error ? w_error->message : "no error");
@@ -269,7 +275,7 @@ std::pair<int, int> AravisController::get_current_resolution() const {
 std::vector<std::string> AravisController::get_available_pixel_formats() const {
 	// (unused, just logging and saving for when when we query the camera to set the combo_box dynamically)
 	guint num_formats;
-	auto pixel_formats = arv_camera_dup_available_pixel_formats_as_strings(aravis_camera, &num_formats, nullptr);
+	auto pixel_formats = arv_camera_dup_available_pixel_formats_as_strings(aravis_camera.get(), &num_formats, nullptr);
 
 	std::vector<std::string> formats;
 

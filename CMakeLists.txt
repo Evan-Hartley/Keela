@@ -36,6 +36,7 @@ add_subdirectory(vendor)
 add_subdirectory(keela-widgets)
 add_subdirectory(keela-pipeline)
 add_subdirectory(keela-exe)
+enable_testing() # reqired to be in top level CmakeLists
 add_subdirectory(keela-test)
 add_subdirectory(reference)
 

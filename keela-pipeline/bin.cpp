@@ -24,7 +24,7 @@ Keela::Bin::Bin() {
 	if(b == nullptr) {
 		throw std::runtime_error("Failed to create bin");
 	}
-	bin = std::shared_ptr<GstBin>(b, Keela::delete_bin);
+	bin = std::shared_ptr<GstBin>(b, Keela::delete_gobject<GstBin>);
 }
 
 Keela::Bin::~Bin() {
