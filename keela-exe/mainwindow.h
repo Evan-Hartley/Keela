@@ -19,8 +19,7 @@ class MainWindow final : public Gtk::Window {
 	~MainWindow() override;
 
    private:
-	Keela::Pipeline pipeline;
-	// GstPipeline *pipeline = nullptr;
+	Keela::Pipeline pipeline = Keela::Pipeline("keelapipeline");
 	Gtk::Button record_button;
 	Gtk::Button directory_button;
 	Gtk::Button restart_camera_button;

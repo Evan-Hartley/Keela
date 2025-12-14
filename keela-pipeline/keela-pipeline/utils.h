@@ -28,15 +28,7 @@ inline void element_link_many(First first, Second second, Rest... rest) {
 	Keela::element_link_many(second, rest...);
 }
 
-/// custom deleter to use for `GstBin*` managed by `std::shared_ptr`
-[[obsolete]]
-void delete_bin(GstBin *bin);
-
-/// custom deleter to use for `GstElement*` managed by `std::shared_ptr`
-[[obsolete]]
-void delete_element(GstElement *e);
-
-[[obsolete]]
+// TODO: make this generic over GstMiniObject* if needed
 void delete_caps(GstCaps *caps);
 
 template <typename T>

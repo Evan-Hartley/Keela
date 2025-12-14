@@ -12,6 +12,7 @@ namespace Keela {
 class Pipeline final : public Keela::Bin {
    public:
 	Pipeline();
+	Pipeline(const std::string &name);
 	~Pipeline() override = default;
 };
 }  // namespace Keela
