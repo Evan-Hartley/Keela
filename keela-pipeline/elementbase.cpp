@@ -34,6 +34,7 @@ void Keela::Element::set_state(GstState state, bool wait) {
 	}
 }
 Keela::Element *Keela::Element::get_parent() const {
+	assert(GST_ELEMENT_PARENT(static_cast<GstElement *>(*this)) == *m_parent);
 	return m_parent;
 }
 void Keela::Element::set_parent(Keela::Element *parent) {
