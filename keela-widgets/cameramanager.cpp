@@ -5,6 +5,8 @@
 #include "keela-widgets/cameramanager.h"
 
 #include <arv.h>
+#include <gtkmm/dialog.h>
+#include <gtkmm/messagedialog.h>
 #include <keela-pipeline/utils.h>
 #include <spdlog/spdlog.h>
 
@@ -162,11 +164,6 @@ void Keela::CameraManager::set_binning_factors(int binning_factor_x, int binning
 
 	set_pipeline_state(GST_STATE_NULL);
 	aravis_controller->set_binning_factors(binning_factor_x, binning_factor_y);
-	set_pipeline_state(GST_STATE_PLAYING);
-	// This is a hack to force the camera to re-negotiate its caps after the binning change.
-	// The aravissrc doesn't reflect width/height changes until the element is set to NULL and back to PLAYING.
-	// Without this, we end up with mismatched resolutions between the camera source and the rest of the pipeline.
-	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	restart_pipeline();
 }
 
@@ -310,18 +307,12 @@ void Keela::CameraManager::remove_frame_splitting_probes() {
 
 void Keela::CameraManager::set_pipeline_state(GstState state, bool wait) {
 	Keela::Element *parent = camera.get_parent();
-
-	// GstElement *pipeline = GST_ELEMENT(gst_element_get_parent(static_cast<GstElement *>(camera)));
-	// if(!pipeline) {
-	//	spdlog::error("Failed to get parent pipeline for camera {}", id);
-	//	return;
-	// }
-	parent->set_state(state, wait);
-	// GstStateChangeReturn ret = gst_element_set_state(pipeline, state);
-	// if(ret == GST_STATE_CHANGE_FAILURE) {
-	//	spdlog::error("Failed to set pipeline state");
-	// }
-	// g_object_unref(pipeline);
+	try {
+		parent->set_state(state, wait);
+	} catch(std::exception &e) {
+		Gtk::MessageDialog dialog = Gtk::MessageDialog(e.what());
+		dialog.run();
+	}
 }
 
 void Keela::CameraManager::restart_pipeline() {
