@@ -2,6 +2,10 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela)
 find_package(PkgConfig)
 
+include(KeelaCPackConfig.cmake)
+include(CPack)
+
+install(FILES "LICENSE" DESTINATION ./)
 # GoogleTest requires at least C++17
 # We need C++20 for jthreads
 # need c++23 for std::byteswap
@@ -13,6 +17,7 @@ set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wall)
 option(MAKE_REFERENCE "Build reference gstreamer gtk integration" false)
 option(ENABLE_KEELA_VIDEOTESTSRC "Enable custom Keela videotestsrc plugin for development/testing" false)
 option(USE_HSLUV "Use HSLuv color mapping instead of basic HSL" false)
+option(ENABLE_TEST "Enable testing" false)
 
 pkg_search_module(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0)
 pkg_search_module(GSTREAMER REQUIRED IMPORTED_TARGET gstreamer-1.0)
@@ -36,7 +41,9 @@ add_subdirectory(vendor)
 add_subdirectory(keela-widgets)
 add_subdirectory(keela-pipeline)
 add_subdirectory(keela-exe)
-add_subdirectory(keela-test)
+if (ENABLE_TEST)
+    add_subdirectory(keela-test)
+endif ()
 add_subdirectory(reference)
 
 # Add a target to clean configuration when switching video test source modes
