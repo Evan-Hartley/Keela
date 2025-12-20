@@ -289,6 +289,10 @@ std::vector<std::string> AravisController::get_available_pixel_formats() const {
 
 	return formats;
 }
+void AravisController::set_pixel_format(std::string format) {
+	feature_pix_fmt = format;
+	set_features();
+}
 
 void AravisController::set_gain(double gain) {
 	spdlog::info("Setting camera gain to {}", gain);
@@ -301,14 +305,10 @@ void AravisController::set_exposure_time(double exposure) {
 }
 
 void AravisController::set_binning_mode(const std::string &mode) {
-	// @todo: this needs a utility function to not override the other settings in the features string
-	//        currently this will override any other features every time
 	spdlog::info("Setting camera binning mode to {}", mode);
-
-	std::string bin_mode_feature = "BinningHorizontalMode=" + mode + " BinningVerticalMode=" + mode;
-	g_object_set(aravis_source, "features", bin_mode_feature.c_str(), nullptr);
-
+	feature_binning_mode = mode;
 	spdlog::info("Set binning mode to {}", mode);
+	set_features();
 }
 
 void AravisController::set_binning_factors(int binning_factor) {
@@ -319,6 +319,28 @@ void AravisController::set_binning_factors(int binning_factor_x, int binning_fac
 	spdlog::info("Setting camera binning factors to x:{}, y:{}", binning_factor_x, binning_factor_y);
 
 	g_object_set(aravis_source, "h-binning", binning_factor_x, "v-binning", binning_factor_y, nullptr);
+}
+void AravisController::set_features() {
+	// iteratively build up a single feature string
+	std::stringstream ss;
+	bool need_space = false;
+	if(feature_pix_fmt.length() > 0) {
+		if(need_space) {  // always false but keeping just in case a feature setter is placed above here
+			ss << " ";
+		}
+		ss << "PixelFormat='" << feature_pix_fmt << "'";
+		need_space = true;
+	}
+
+	if(feature_binning_mode.length() > 0) {
+		if(need_space) {
+			ss << " ";
+		}
+		ss << "BinningHorizontalMode=" << feature_binning_mode << " BinningVerticalMode=" << feature_binning_mode;
+		need_space = true;
+	}
+	spdlog::debug("Setting camera features to {}", ss.str());
+	g_object_set(aravis_source, "features", ss.str().c_str(), nullptr);
 }
 
 }  // namespace Keela

@@ -39,7 +39,7 @@ Keela::CameraManager::CameraManager(guint id, bool split_streams)
 
 		// Set up camera control via aravissrc and AravisCamera
 		GstElement *camera_element = static_cast<GstElement *>(camera);
-		
+
 		// Only initialize aravis_controller if the camera is an aravissrc
 		GstElementFactory *factory = gst_element_get_factory(camera_element);
 		const gchar *factory_name = gst_plugin_feature_get_name(factory);
@@ -47,7 +47,8 @@ Keela::CameraManager::CameraManager(guint id, bool split_streams)
 			aravis_controller = std::make_unique<AravisController>(camera_element);
 			spdlog::info("Initialized AravisController for camera {}", id);
 		} else {
-			spdlog::info("Camera {} is not an aravissrc ({}), skipping AravisController initialization", id, factory_name);
+			spdlog::info("Camera {} is not an aravissrc ({}), skipping AravisController initialization", id,
+			             factory_name);
 		}
 
 		// Set up frame splitting if enabled
@@ -71,14 +72,10 @@ Keela::CameraManager::~CameraManager() {
 	spdlog::debug(__func__);
 }
 
+[[obsolete]]
 void Keela::CameraManager::set_pix_fmt(const std::string &format) {
-	// @todo: switch this to hardware, no need for the caps anymore
-	spdlog::info("{}: Setting pixel format to {}", __func__, format);
-	// create copy of our caps
-	base_caps = Caps(static_cast<GstCaps *>(base_caps));
-	// apply pixel format
-	gst_caps_set_simple(base_caps, "format", G_TYPE_STRING, format.c_str(), nullptr);
-	g_object_set(caps_filter, "caps", static_cast<GstCaps *>(base_caps), nullptr);
+	spdlog::warn("{}: replace me", __func__);
+	return;
 }
 
 void Keela::CameraManager::set_framerate(double framerate) {
