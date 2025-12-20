@@ -339,7 +339,7 @@ void AravisController::set_features() {
 		ss << "BinningHorizontalMode=" << feature_binning_mode << " BinningVerticalMode=" << feature_binning_mode;
 		need_space = true;
 	}
-	spdlog::debug("Setting camera features to {}", ss.str());
+	spdlog::debug("Setting camera features to \"{}\"", ss.str());
 	g_object_set(aravis_source, "features", ss.str().c_str(), nullptr);
 }
 

@@ -6,7 +6,7 @@
 
 #include <spdlog/spdlog.h>
 Keela::PixFmtCombo::PixFmtCombo() : LabeledComboBoxText("Pixel Format") {
-	m_combo.signal_changed().connect(*this, &PixFmtCombo::on_combo_changed);
+	m_combo.signal_changed().connect(sigc::mem_fun(*this, &PixFmtCombo::on_combo_changed));
 }
 Keela::PixFmtCombo::~PixFmtCombo() {
 }
