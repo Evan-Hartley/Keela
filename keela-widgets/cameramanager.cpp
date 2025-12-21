@@ -72,10 +72,21 @@ Keela::CameraManager::~CameraManager() {
 	spdlog::debug(__func__);
 }
 
-[[obsolete]]
-void Keela::CameraManager::set_pix_fmt(const std::string &format) {
-	spdlog::warn("{}: replace me", __func__);
-	return;
+std::vector<std::string> Keela::CameraManager::get_available_pixel_formats() const {
+	if(aravis_controller) {
+		return aravis_controller->get_available_pixel_formats();
+	} else {
+		spdlog::warn("{}: araviscontroller not initialized. returning empty pixel format list", __func__);
+		return std::vector<std::string>();
+	}
+}
+
+void Keela::CameraManager::set_pix_fmt(const std::string &format) const {
+	if(aravis_controller) {
+		aravis_controller->set_pixel_format(format);
+	} else {
+		spdlog::warn("{}: no aravis_controller set", __func__);
+	}
 }
 
 void Keela::CameraManager::set_framerate(double framerate) {

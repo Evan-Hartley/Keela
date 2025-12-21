@@ -9,10 +9,12 @@
 
 #include "keela-pipeline/consts.h"
 
-Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_fmt, bool should_split_frames) {
+Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_fmt, bool should_split_frames)
+    : camera_manager(std::make_shared<CameraManager>(id, should_split_frames)), pix_fmt_combo(camera_manager) {
 	this->id = id;
 	spdlog::info("Creating {} for camera {}", __func__, id);
-	camera_manager = std::make_unique<Keela::CameraManager>(id, should_split_frames);
+	// camera_manager = std::make_shared<Keela::CameraManager>(id, should_split_frames);
+	// pix_fmt_combo = Keela::PixFmtCombo(camera_manager);
 	set_pix_fmt(pix_fmt);
 	set_title("Image control for Camera " + std::to_string(id));
 	set_resizable(false);
@@ -35,6 +37,9 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	range_frame->add(range_min_spin);
 	range_frame->add(range_max_spin);
 	v_container.add(*range_frame);
+
+	pix_fmt_combo.init();
+	v_container.add(pix_fmt_combo);
 
 	// Disable gain control until camera is ready and we can query for gain
 	// support and supported range
