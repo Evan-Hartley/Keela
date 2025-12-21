@@ -39,7 +39,7 @@ class CameraManager final : public Keela::Bin {
 
 	std::vector<std::string> get_available_pixel_formats() const;
 
-	void set_pix_fmt(const std::string &format) const;
+	void set_pix_fmt(const std::string &format);
 
 	void set_framerate(double framerate);
 

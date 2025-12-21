@@ -324,7 +324,7 @@ void AravisController::set_features() {
 	// iteratively build up a single feature string
 	std::stringstream ss;
 	bool need_space = false;
-	if(feature_pix_fmt.length() > 0) {
+	if(!feature_pix_fmt.empty()) {
 		if(need_space) {  // always false but keeping just in case a feature setter is placed above here
 			ss << " ";
 		}
@@ -332,7 +332,7 @@ void AravisController::set_features() {
 		need_space = true;
 	}
 
-	if(feature_binning_mode.length() > 0) {
+	if(!feature_binning_mode.empty()) {
 		if(need_space) {
 			ss << " ";
 		}

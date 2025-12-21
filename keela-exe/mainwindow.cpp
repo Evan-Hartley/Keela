@@ -37,12 +37,13 @@ MainWindow::MainWindow() : Gtk::Window() {
 	record_button.set_tooltip_text("Experiment Directory must be selected in order to begin recording");
 	container.add(record_button);
 
+	/*
 	pix_fmt_combo.m_combo.append(GRAY8, "8 Bit");
 	pix_fmt_combo.m_combo.append(GRAY16_LE, "16 Bit (Little Endian)");
 	pix_fmt_combo.m_combo.append(GRAY16_BE, "16 Bit (Big Endian)");
 	pix_fmt_combo.m_combo.set_active_id(GRAY8);
 	set_pix_fmt();
-	container.add(pix_fmt_combo);
+	container.add(pix_fmt_combo);*/
 	// Framerate controls
 	framerate_spin.m_spin.set_adjustment(Gtk::Adjustment::create(500, 1, 1000, 0.1));
 	framerate_spin.m_spin.set_digits(1);
@@ -192,7 +193,7 @@ void MainWindow::reset_cameras() {
 	set_state(GST_STATE_NULL);
 	// apply settings while the pipeline isn't actively playing
 	set_framerate();
-	set_pix_fmt();
+	// set_pix_fmt();
 	set_state(GST_STATE_PLAYING, false);
 }
 
@@ -224,14 +225,15 @@ void MainWindow::set_framerate(Keela::CameraManager *cm) const {
 	cm->set_framerate(fr);
 }
 
+/*
 void MainWindow::set_pix_fmt() {
-	spdlog::info("Updating pixel format of all cameras");
-	this->pix_fmt = pix_fmt_combo.m_combo.get_active_id().raw();
-	// inform all cameras of the pixel format change
-	for(const auto &c : cameras) {
-		c->set_pix_fmt(pix_fmt);
-	}
-}
+    spdlog::info("Updating pixel format of all cameras");
+    this->pix_fmt = pix_fmt_combo.m_combo.get_active_id().raw();
+    // inform all cameras of the pixel format change
+    for(const auto &c : cameras) {
+        c->set_pix_fmt(pix_fmt);
+    }
+}*/
 
 void MainWindow::on_trace_button_clicked() {
 	spdlog::info(__func__);

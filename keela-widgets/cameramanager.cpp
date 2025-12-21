@@ -81,9 +81,10 @@ std::vector<std::string> Keela::CameraManager::get_available_pixel_formats() con
 	}
 }
 
-void Keela::CameraManager::set_pix_fmt(const std::string &format) const {
+void Keela::CameraManager::set_pix_fmt(const std::string &format) {
 	if(aravis_controller) {
 		aravis_controller->set_pixel_format(format);
+		restart_pipeline();
 	} else {
 		spdlog::warn("{}: no aravis_controller set", __func__);
 	}
