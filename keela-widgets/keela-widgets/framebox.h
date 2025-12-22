@@ -6,7 +6,7 @@
 #define FRAMEBOX_H
 #include <gtkmm-3.0/gtkmm.h>
 namespace Keela {
-class FrameBox final : public Gtk::Frame {
+class FrameBox : public Gtk::Frame {
    public:
 	FrameBox();
 	explicit FrameBox(const std::string& title, Gtk::Orientation orientation = Gtk::ORIENTATION_HORIZONTAL);

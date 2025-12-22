@@ -36,14 +36,6 @@ MainWindow::MainWindow() : Gtk::Window() {
 	record_button.set_sensitive(false);
 	record_button.set_tooltip_text("Experiment Directory must be selected in order to begin recording");
 	container.add(record_button);
-
-	/*
-	pix_fmt_combo.m_combo.append(GRAY8, "8 Bit");
-	pix_fmt_combo.m_combo.append(GRAY16_LE, "16 Bit (Little Endian)");
-	pix_fmt_combo.m_combo.append(GRAY16_BE, "16 Bit (Big Endian)");
-	pix_fmt_combo.m_combo.set_active_id(GRAY8);
-	set_pix_fmt();
-	container.add(pix_fmt_combo);*/
 	// Framerate controls
 	framerate_spin.m_spin.set_adjustment(Gtk::Adjustment::create(500, 1, 1000, 0.1));
 	framerate_spin.m_spin.set_digits(1);

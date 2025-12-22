@@ -6,20 +6,25 @@
 #define PIXFMTCOMBO_H
 #include "AravisController.h"
 #include "cameramanager.h"
+#include "framebox.h"
 #include "labeledcomboboxtext.h"
+#include "labeledspinbutton.h"
 namespace Keela {
-class PixFmtCombo final : public Keela::LabeledComboBoxText {
+class PixFmtControl final : public Keela::FrameBox {
    public:
-	PixFmtCombo(std::shared_ptr<CameraManager> cameramanager);
-	~PixFmtCombo() override;
+	explicit PixFmtControl(std::shared_ptr<CameraManager> cameramanager);
+	~PixFmtControl() override;
 
 	/// use this function to trigger this control to query araviscontroller for updated pixel format list
-	void init();
+	// void init();
 
    private:
 	std::shared_ptr<CameraManager> m_camera_manager;
 
-	void on_combo_changed() const;
+	void on_params_changed();
+
+	Keela::LabeledComboBoxText m_format_combo;
+	Keela::LabeledSpinButton m_depth_spin;
 };
 }  // namespace Keela
 #endif  // PIXFMTCOMBO_H

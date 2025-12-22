@@ -38,7 +38,7 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	range_frame->add(range_max_spin);
 	v_container.add(*range_frame);
 
-	pix_fmt_combo.init();
+	// pix_fmt_combo.init();
 	v_container.add(pix_fmt_combo);
 
 	// Disable gain control until camera is ready and we can query for gain

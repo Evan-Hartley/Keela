@@ -41,8 +41,8 @@ add_library(keela-widgets labeledspinbutton.cpp keela-widgets/labeledspinbutton.
         cameratrace.cpp
         keela-widgets/AravisController.h
         AravisController.cpp
-        PixFmtCombo.cpp
-        keela-widgets/PixFmtCombo.h
+        PixFmtControl.cpp
+        keela-widgets/PixFmtControl.h
 )
 add_dependencies(keela-widgets shader_resources)
 target_link_libraries(keela-widgets PUBLIC keela-pipeline PkgConfig::GTKMM PkgConfig::GIO PkgConfig::SPDLOG PkgConfig::ARAVIS PkgConfig::GST_VIDEO vendor-glad)

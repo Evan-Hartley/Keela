@@ -12,7 +12,7 @@
 #include "../keela-widgets/keela-widgets/cameratrace.h"
 #include "keela-widgets/GLCameraRender.h"
 #include "keela-widgets/GLTraceRender.h"
-#include "keela-widgets/PixFmtCombo.h"
+#include "keela-widgets/PixFmtControl.h"
 #include "keela-widgets/tracegizmo.h"
 #include "keela-widgets/videopresentation.h"
 
@@ -58,7 +58,7 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_even;
 	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_odd;
 
-	Keela::PixFmtCombo pix_fmt_combo;
+	Keela::PixFmtControl pix_fmt_combo;
 
 	guint id;
 

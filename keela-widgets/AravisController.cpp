@@ -19,6 +19,16 @@ AravisController::AravisController(GstElement *camera) : aravis_source(camera) {
 	gst_element_set_state(aravis_source, GST_STATE_READY);
 	// blocks until state change completes
 	gst_element_get_state(aravis_source, nullptr, nullptr, GST_CLOCK_TIME_NONE);
+
+	auto pad = gst_element_get_static_pad(aravis_source, "src");
+
+	auto caps = gst_pad_get_allowed_caps(pad);
+
+	auto caps_str = gst_caps_to_string(caps);
+	gst_object_unref(pad);
+	gst_mini_object_unref(GST_MINI_OBJECT(caps));
+	spdlog::info("{}: caps string\n{}", __func__, caps_str);
+	g_free(caps_str);
 }
 
 std::pair<double, double> AravisController::get_gain_range() const {
