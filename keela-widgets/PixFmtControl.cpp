@@ -23,6 +23,11 @@ Keela::PixFmtControl::PixFmtControl(std::shared_ptr<CameraManager> cameramanager
 
 Keela::PixFmtControl::~PixFmtControl() {
 }
+void Keela::PixFmtControl::restart() {
+	m_camera_manager->set_pix_fmt(m_format_combo.m_combo.get_active_id());
+	// TODO: set bit depth
+}
+
 void Keela::PixFmtControl::on_params_changed() {
 	if(m_depth_spin.m_spin.get_value() == 8) {
 		// desired bit-depth is 8
@@ -42,4 +47,12 @@ void Keela::PixFmtControl::on_params_changed() {
 			m_format_combo.m_combo.set_active_id(GRAY16_LE);
 		}
 	}
+}
+void Keela::PixFmtControl::start_recording() {
+	this->set_sensitive(false);
+	IRecordable::start_recording();
+}
+void Keela::PixFmtControl::stop_recording() {
+	this->set_sensitive(true);
+	IRecordable::stop_recording();
 }

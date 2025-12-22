@@ -187,7 +187,7 @@ void Keela::CameraManager::set_binning_factors(int binning_factor_x, int binning
 
 void Keela::CameraManager::start_recording() {
 	std::string suffix = split_streams ? "even" : "";
-
+	IRecordable::start_recording();
 	camera_stream_even->start_recording(get_filename(experiment_directory, this->id, suffix));
 
 	if(split_streams) {
@@ -196,6 +196,7 @@ void Keela::CameraManager::start_recording() {
 }
 
 void Keela::CameraManager::stop_recording() {
+	IRecordable::stop_recording();
 	camera_stream_even->stop_recording();
 
 	if(split_streams) {

@@ -167,7 +167,7 @@ void MainWindow::on_record_button_clicked() {
 		directory_button.set_sensitive(false);
 		set_state(GST_STATE_NULL);
 		for(const auto &camera : cameras) {
-			camera->camera_manager->start_recording();
+			camera->start_recording();
 		}
 		// this resets the pipeline clock
 		set_state(GST_STATE_PLAYING);
@@ -175,7 +175,7 @@ void MainWindow::on_record_button_clicked() {
 		auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
 		message_dialog.run();
 		for(const auto &camera : cameras) {
-			camera->camera_manager->stop_recording();
+			camera->stop_recording();
 		}
 		directory_button.set_sensitive(true);
 	}
@@ -185,7 +185,9 @@ void MainWindow::reset_cameras() {
 	set_state(GST_STATE_NULL);
 	// apply settings while the pipeline isn't actively playing
 	set_framerate();
-	// set_pix_fmt();
+	for(auto camera : cameras) {
+		camera->restart();
+	}
 	set_state(GST_STATE_PLAYING, false);
 }
 
@@ -205,6 +207,7 @@ void MainWindow::set_state(GstState state, bool wait) {
 	}
 }
 
+[[obsolete]]
 void MainWindow::set_framerate() {
 	spdlog::info("Updating framerate of all cameras");
 	for(const auto &c : cameras) {
@@ -212,6 +215,7 @@ void MainWindow::set_framerate() {
 	}
 }
 
+[[obsolete]]
 void MainWindow::set_framerate(Keela::CameraManager *cm) const {
 	const auto fr = framerate_spin.m_spin.get_value();
 	cm->set_framerate(fr);

@@ -17,7 +17,10 @@
 #include "keela-widgets/videopresentation.h"
 
 namespace Keela {
-class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCameraRenderHeatmap {
+class CameraControlWindow final : public Gtk::Window,
+                                  public Keela::IControlGLCameraRenderHeatmap,
+                                  public IRestartable,
+                                  public IRecordable {
    public:
 	explicit CameraControlWindow(guint id, std::string pix_fmt, bool should_split_frames);
 
@@ -25,7 +28,10 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 
 	std::shared_ptr<Keela::CameraManager> camera_manager;
 
+	[[obsolete]]
 	void set_pix_fmt(std::string pix_fmt);
+
+	// void restart();
 
    private:
 	Gtk::Box h_container = Gtk::Box();
@@ -58,7 +64,7 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_even;
 	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_odd;
 
-	Keela::PixFmtControl pix_fmt_combo;
+	Keela::PixFmtControl pix_fmt_control;
 
 	guint id;
 
@@ -109,7 +115,20 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	float heatmap_min() override;
 
 	float heatmap_max() override;
+	std::vector<IRecordable> recordable_children() override {
+		std::vector<IRecordable> children{static_cast<IRecordable>(*camera_manager),
+		                                  static_cast<IRecordable>(pix_fmt_control)};
+		return children;
+	}
 
+   protected:
+	std::vector<IRestartable> restartable_children() override {
+		std::vector<IRestartable> children{static_cast<IRestartable>(*camera_manager),
+		                                   static_cast<IRestartable>(pix_fmt_control)};
+		return children;
+	}
+
+   private:
 	// scaling factor to apply to heatmap_max and heatmap_min to ensure they remain in the range [0,1]
 	float heatmap_scale;
 
