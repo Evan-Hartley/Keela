@@ -29,7 +29,10 @@ Keela::Caps::Caps(GstCaps *c) {
 }
 
 Keela::Caps::~Caps() {
-	spdlog::debug(__func__);
+	auto str = gst_caps_to_string(*this);
+
+	spdlog::debug("{}:\n{}", __func__, str);
+	g_free(str);
 }
 
 Keela::Caps::operator struct _GstCaps *() const {
@@ -45,4 +48,7 @@ void Keela::Caps::set_resolution(const int width, const int height) {
 }
 void Keela::Caps::set_format(const std::string &format) {
 	set_props("format", G_TYPE_STRING, format.c_str());
+}
+void Keela::Caps::set_depth(const guint depth) {
+	set_props("depth", G_TYPE_UINT, depth);
 }

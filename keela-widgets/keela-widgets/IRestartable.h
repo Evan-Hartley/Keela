@@ -4,6 +4,7 @@
 
 #ifndef IRESTARTABLE_H
 #define IRESTARTABLE_H
+#include <sigc++/signal.h>
 #include <spdlog/spdlog.h>
 
 #include <vector>
@@ -13,18 +14,12 @@ class IRestartable {
    public:
 	virtual ~IRestartable() = default;
 
-	virtual void restart() {
+	virtual auto restart() -> void {
 		spdlog::info("IRestartable::{} restarting all children", __func__);
-		for(auto restartable : restartable_children()) {
-			restartable.restart();
-		}
+		signal_restart.emit();
 	}
 
-   protected:
-	/// any sub-objects which also need to be restarted
-	virtual std::vector<IRestartable> restartable_children() {
-		return std::vector<IRestartable>();
-	};
+	sigc::signal<void> signal_restart;
 };
 }  // namespace Keela
 #endif  // IRESTARTABLE_H

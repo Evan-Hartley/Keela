@@ -27,6 +27,8 @@ class Caps {
 
 	void set_format(const std::string &format);
 
+	void set_depth(guint depth);
+
    private:
 	std::shared_ptr<GstCaps> m_caps;
 

@@ -81,13 +81,11 @@ std::vector<std::string> Keela::CameraManager::get_available_pixel_formats() con
 	}
 }
 
-void Keela::CameraManager::set_pix_fmt(const std::string &format) {
-	if(aravis_controller) {
-		aravis_controller->set_pixel_format(format);
-		restart_pipeline();
-	} else {
-		spdlog::warn("{}: no aravis_controller set", __func__);
-	}
+void Keela::CameraManager::set_pix_fmt(const std::string &format, guint depth) {
+	base_caps = Caps(static_cast<GstCaps *>(base_caps));
+	base_caps.set_format(format);
+	base_caps.set_depth(depth);
+	g_object_set(caps_filter, "caps", static_cast<GstCaps *>(base_caps), nullptr);
 }
 
 void Keela::CameraManager::set_framerate(double framerate) {
@@ -344,5 +342,6 @@ void Keela::CameraManager::restart_pipeline() {
 	spdlog::info("Restarting pipeline to apply camera settings");
 
 	set_pipeline_state(GST_STATE_NULL);
+	signal_restart.emit();
 	set_pipeline_state(GST_STATE_PLAYING);
 }

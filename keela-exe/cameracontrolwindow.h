@@ -29,6 +29,7 @@ class CameraControlWindow final : public Gtk::Window,
 	std::shared_ptr<Keela::CameraManager> camera_manager;
 
 	[[obsolete]]
+
 	void set_pix_fmt(std::string pix_fmt);
 
 	// void restart();
@@ -115,18 +116,6 @@ class CameraControlWindow final : public Gtk::Window,
 	float heatmap_min() override;
 
 	float heatmap_max() override;
-	std::vector<IRecordable> recordable_children() override {
-		std::vector<IRecordable> children{static_cast<IRecordable>(*camera_manager),
-		                                  static_cast<IRecordable>(pix_fmt_control)};
-		return children;
-	}
-
-   protected:
-	std::vector<IRestartable> restartable_children() override {
-		std::vector<IRestartable> children{static_cast<IRestartable>(*camera_manager),
-		                                   static_cast<IRestartable>(pix_fmt_control)};
-		return children;
-	}
 
    private:
 	// scaling factor to apply to heatmap_max and heatmap_min to ensure they remain in the range [0,1]

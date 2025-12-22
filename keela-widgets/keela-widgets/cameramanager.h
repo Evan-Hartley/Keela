@@ -42,7 +42,7 @@ class CameraManager final : public Keela::Bin, public IRestartable, public IReco
 
 	std::vector<std::string> get_available_pixel_formats() const;
 
-	void set_pix_fmt(const std::string &format);
+	void set_pix_fmt(const std::string &format, guint depth);
 
 	void set_framerate(double framerate);
 
@@ -121,8 +121,6 @@ class CameraManager final : public Keela::Bin, public IRestartable, public IReco
 	// Data structures for frame probes
 	FrameProbeData even_probe_data{EVEN_FRAME, &manual_frame_counter};
 	FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
-
-	void set_up_frame_splitting();
 
 	void install_frame_splitting_probes();
 

@@ -24,7 +24,11 @@ Keela::PixFmtControl::PixFmtControl(std::shared_ptr<CameraManager> cameramanager
 Keela::PixFmtControl::~PixFmtControl() {
 }
 void Keela::PixFmtControl::restart() {
-	m_camera_manager->set_pix_fmt(m_format_combo.m_combo.get_active_id());
+	auto depth = m_depth_spin.m_spin.get_value();
+	if(depth < 0) {
+		throw std::invalid_argument("depth must be positive");
+	}
+	m_camera_manager->set_pix_fmt(m_format_combo.m_combo.get_active_id(), static_cast<guint>(depth));
 	// TODO: set bit depth
 }
 

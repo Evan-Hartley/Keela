@@ -13,9 +13,7 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
     : camera_manager(std::make_shared<CameraManager>(id, should_split_frames)), pix_fmt_control(camera_manager) {
 	this->id = id;
 	spdlog::info("Creating {} for camera {}", __func__, id);
-	// camera_manager = std::make_shared<Keela::CameraManager>(id, should_split_frames);
-	// pix_fmt_combo = Keela::PixFmtCombo(camera_manager);
-	set_pix_fmt(pix_fmt);
+	// set_pix_fmt(pix_fmt);
 	set_title("Image control for Camera " + std::to_string(id));
 	set_resizable(false);
 	set_deletable(false);
@@ -115,6 +113,10 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	show_all_children();
 	show();
+
+	// propagate pipeline restarts to camera manager
+	signal_restart.connect(sigc::mem_fun(*camera_manager, &CameraManager::restart));
+	signal_restart.connect(sigc::mem_fun(pix_fmt_control, &PixFmtControl::restart));
 }
 
 Keela::CameraControlWindow::~CameraControlWindow() {
@@ -152,7 +154,7 @@ void Keela::CameraControlWindow::on_bin_spin_changed() const {
 }
 
 void Keela::CameraControlWindow::set_pix_fmt(std::string pix_fmt) {
-	camera_manager->set_pix_fmt(pix_fmt);
+	// camera_manager->set_pix_fmt(pix_fmt);
 	uint32_t max = std::numeric_limits<uint16_t>::max();
 	if(pix_fmt == GRAY8) {
 		max = std::numeric_limits<uint8_t>::max();
