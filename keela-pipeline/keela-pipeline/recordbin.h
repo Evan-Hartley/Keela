@@ -22,12 +22,7 @@ class RecordBin final : public QueueBin, public EjectableElement {
 	Keela::SimpleElement enc = SimpleElement("x264enc");
 	Keela::SimpleElement mux = SimpleElement("matroskamux");
 	Keela::SimpleElement sink = SimpleElement("filesink");
-
-	// these are used to control safe removal of this element from the pipeline
-
-	bool safe_to_remove = false;
-	std::mutex remove_mutex;
-	std::condition_variable remove_condition;
+	Keela::SimpleElement conv = SimpleElement("videoconvert");
 
    private:
 	void link() override;

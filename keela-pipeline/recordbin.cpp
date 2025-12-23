@@ -28,9 +28,11 @@ Keela::RecordBin::RecordBin(const std::string &name) : QueueBin(name) {
 }
 
 void Keela::RecordBin::link() {
-	add_elements(enc, mux, sink);
-	element_link_many(enc, mux, sink);
-	link_queue(enc);
+	// TODO: is there a way to prevent a narrowing color format conversion if avoidable?
+	// NOTE: if encoding using GRAY16_LE, conv seems to pick Y444; is this a narrowing conversion?
+	add_elements(enc, conv, mux, sink);
+	element_link_many(conv, enc, mux, sink);
+	link_queue(conv);
 }
 
 void Keela::RecordBin::init() {
