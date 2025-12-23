@@ -17,7 +17,15 @@ void Keela::EjectableElement::PrepareEject() {
 	 *      - wait for the EOS event
 	 *      - set synchronization variables to signal that the element is safe to remove from the pipeline
 	 */
-
+	spdlog::debug("{}: checking element state", __func__);
+	GstState state;
+	gst_element_get_state(*this, &state, nullptr, GST_CLOCK_TIME_NONE);
+	if(state != GST_STATE_PLAYING) {
+		auto name = gst_element_state_get_name(state);
+		spdlog::warn("{}: called while in {} state. Expected PLAYING", __func__, name);
+	} else {
+		spdlog::debug("{}: state check OK", __func__);
+	}
 	if(is_ejecting) {
 		throw std::runtime_error("EjectableElement::PrepareEject called more than once");
 	}
