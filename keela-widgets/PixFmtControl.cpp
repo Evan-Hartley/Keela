@@ -29,7 +29,7 @@ void Keela::PixFmtControl::restart() {
 		throw std::invalid_argument("depth must be positive");
 	}
 	m_camera_manager->set_pix_fmt(m_format_combo.m_combo.get_active_id(), static_cast<guint>(depth));
-	// TODO: set bit depth
+	signal_pix_fmt_changed.emit(m_format_combo.m_combo.get_active_id());
 }
 
 void Keela::PixFmtControl::on_params_changed() {

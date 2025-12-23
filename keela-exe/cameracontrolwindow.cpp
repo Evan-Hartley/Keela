@@ -21,21 +21,8 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	v_container.set_border_width(10);
 	h_container.pack_start(v_container, false, false, 10);
 	Window::add(h_container);
-	const auto range_frame = Gtk::make_managed<Keela::FrameBox>("Range", Gtk::ORIENTATION_VERTICAL);
-	range_check = Gtk::CheckButton("Range");
-	// TODO: connect to changed signal on range check to control sensitivity value
-	// of range min/max spin
-	range_check.signal_toggled().connect(sigc::mem_fun(*this, &CameraControlWindow::on_range_check_toggled));
-	range_frame->add(range_check);
 
-	range_min_spin.set_sensitive(false);
-	range_max_spin.set_sensitive(false);
-	range_min_spin.m_spin.set_digits(2);
-	range_max_spin.m_spin.set_digits(2);
-	range_frame->add(range_min_spin);
-	range_frame->add(range_max_spin);
-	v_container.add(*range_frame);
-
+	v_container.add(range_control);
 	// pix_fmt_combo.init();
 	v_container.add(pix_fmt_control);
 
@@ -90,7 +77,7 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	// Set up video presentations, video_presentation_even renders all frames unless split is enabled
 	video_presentation_even = std::make_unique<VideoPresentation>(
-	    "Camera " + std::to_string(id), camera_manager->camera_stream_even->presentation, *this);
+	    "Camera " + std::to_string(id), camera_manager->camera_stream_even->presentation, range_control);
 	video_presentation_even->add_overlay_widget(*trace_gizmo_even);
 	video_hbox.pack_start(*video_presentation_even, false, false, 10);
 
@@ -114,6 +101,7 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	show_all_children();
 	show();
 
+	pix_fmt_control.signal_pix_fmt_changed.connect(sigc::mem_fun(range_control,&RangeControl::on_pix_fmt_changed));
 	// Chain our signal handlers together
 	IRestartable::chain(*camera_manager);
 	IRestartable::chain(pix_fmt_control);
@@ -126,12 +114,6 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 Keela::CameraControlWindow::~CameraControlWindow() {
 	spdlog::info("Destroying camera control window {}", id);
-}
-
-void Keela::CameraControlWindow::on_range_check_toggled() {
-	const auto active = range_check.get_active();
-	range_min_spin.set_sensitive(active);
-	range_max_spin.set_sensitive(active);
 }
 
 void Keela::CameraControlWindow::on_gain_changed() const {
@@ -156,19 +138,6 @@ void Keela::CameraControlWindow::on_bin_spin_changed() const {
 	const auto binning_factor = static_cast<int>(bin_spin.m_spin.get_value());
 	spdlog::info("Binning factor changed to {}", binning_factor);
 	camera_manager->set_binning_factors(binning_factor);
-}
-
-void Keela::CameraControlWindow::set_pix_fmt(std::string pix_fmt) {
-	// camera_manager->set_pix_fmt(pix_fmt);
-	uint32_t max = std::numeric_limits<uint16_t>::max();
-	if(pix_fmt == GRAY8) {
-		max = std::numeric_limits<uint8_t>::max();
-	}
-	auto adj_max = Gtk::Adjustment::create(max, 0, max, 0.1);
-	this->range_max_spin.m_spin.set_adjustment(adj_max);
-	auto adj_min = Gtk::Adjustment::create(0.0, 0, max, 0.1);
-	this->range_min_spin.m_spin.set_adjustment(adj_min);
-	heatmap_scale = max;
 }
 
 void Keela::CameraControlWindow::on_rotation_changed() {
@@ -227,18 +196,6 @@ void Keela::CameraControlWindow::update_split_frame_state(bool should_split_fram
 	update_traces();
 }
 
-bool Keela::CameraControlWindow::is_heatmap_enabled() {
-	return range_check.get_active();
-}
-
-float Keela::CameraControlWindow::heatmap_min() {
-	return static_cast<float>(range_min_spin.m_spin.get_value()) / heatmap_scale;
-}
-
-float Keela::CameraControlWindow::heatmap_max() {
-	return static_cast<float>(range_max_spin.m_spin.get_value()) / heatmap_scale;
-}
-
 std::vector<std::shared_ptr<Keela::ITraceable>> Keela::CameraControlWindow::get_traces() {
 	// Lazily create traces if not already done
 	if(m_traces.empty()) {
@@ -294,7 +251,7 @@ void Keela::CameraControlWindow::add_split_frame_ui() {
 
 	const auto rotation = rotation_combo.m_combo.get_active_id();
 	video_presentation_odd =
-	    std::make_unique<VideoPresentation>("Odd Frames", camera_manager->camera_stream_odd->presentation, *this,
+	    std::make_unique<VideoPresentation>("Odd Frames", camera_manager->camera_stream_odd->presentation, range_control,
 	                                        DEFAULT_PRESENTATION_WIDTH, DEFAULT_PRESENTATION_HEIGHT);
 	if(rotation == ROTATION_90 || rotation == ROTATION_270) {
 		video_presentation_odd->swap_dimensions();

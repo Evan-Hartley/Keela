@@ -13,12 +13,12 @@
 #include "keela-widgets/GLCameraRender.h"
 #include "keela-widgets/GLTraceRender.h"
 #include "keela-widgets/PixFmtControl.h"
+#include "keela-widgets/RangeControl.h"
 #include "keela-widgets/tracegizmo.h"
 #include "keela-widgets/videopresentation.h"
 
 namespace Keela {
 class CameraControlWindow final : public Gtk::Window,
-                                  public Keela::IControlGLCameraRenderHeatmap,
                                   public IRestartable,
                                   public IRecordable {
    public:
@@ -27,10 +27,6 @@ class CameraControlWindow final : public Gtk::Window,
 	~CameraControlWindow() override;
 
 	std::shared_ptr<Keela::CameraManager> camera_manager;
-
-	[[obsolete]]
-
-	void set_pix_fmt(std::string pix_fmt);
 
 	// void restart();
 
@@ -42,9 +38,9 @@ class CameraControlWindow final : public Gtk::Window,
 	std::unique_ptr<VideoPresentation> video_presentation_even;
 	std::unique_ptr<VideoPresentation> video_presentation_odd;
 
-	Gtk::CheckButton range_check = Gtk::CheckButton("Range");
-	Keela::LabeledSpinButton range_min_spin = Keela::LabeledSpinButton("Minimum");
-	Keela::LabeledSpinButton range_max_spin = Keela::LabeledSpinButton("Maximum");
+	//Gtk::CheckButton range_check = Gtk::CheckButton("Range");
+	//Keela::LabeledSpinButton range_min_spin = Keela::LabeledSpinButton("Minimum");
+	//Keela::LabeledSpinButton range_max_spin = Keela::LabeledSpinButton("Maximum");
 
 	// TODO: histogram
 	Keela::LabeledSpinButton gain_spin = Keela::LabeledSpinButton("Gain (dB)");
@@ -67,9 +63,9 @@ class CameraControlWindow final : public Gtk::Window,
 
 	Keela::PixFmtControl pix_fmt_control;
 
-	guint id;
+	Keela::RangeControl range_control;
 
-	void on_range_check_toggled();
+	guint id;
 
 	void on_gain_changed() const;
 
@@ -111,15 +107,6 @@ class CameraControlWindow final : public Gtk::Window,
 	void update_binning_range();
 
    private:
-	bool is_heatmap_enabled() override;
-
-	float heatmap_min() override;
-
-	float heatmap_max() override;
-
-   private:
-	// scaling factor to apply to heatmap_max and heatmap_min to ensure they remain in the range [0,1]
-	float heatmap_scale;
 
 	std::vector<std::shared_ptr<CameraTrace>> m_traces;
 };

@@ -18,6 +18,8 @@ class PixFmtControl final : public Keela::FrameBox, public IRestartable, public 
 	explicit PixFmtControl(std::shared_ptr<CameraManager> cameramanager);
 	~PixFmtControl() override;
 
+	sigc::signal<void,std::string> signal_pix_fmt_changed;
+
    private:
 	std::shared_ptr<CameraManager> m_camera_manager;
 
