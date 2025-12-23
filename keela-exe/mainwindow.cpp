@@ -165,12 +165,10 @@ void MainWindow::on_record_button_clicked() {
 			throw std::runtime_error("Experiment directory not specified");
 		}
 		directory_button.set_sensitive(false);
-		set_state(GST_STATE_NULL);
 		for(const auto &camera : cameras) {
 			camera->start_recording();
 		}
-		// this resets the pipeline clock
-		set_state(GST_STATE_PLAYING);
+		// TODO: pipeline restart removed here to prevent application hangs when recording at GRAY16_LE/10bit
 	} else {
 		auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
 		message_dialog.run();
@@ -207,7 +205,7 @@ void MainWindow::set_state(GstState state, bool wait) {
 	}
 }
 
-[[obsolete]]
+[[obsolete("To be moved to CameraControlWindow")]]
 void MainWindow::set_framerate() {
 	spdlog::info("Updating framerate of all cameras");
 	for(const auto &c : cameras) {
@@ -215,21 +213,11 @@ void MainWindow::set_framerate() {
 	}
 }
 
-[[obsolete]]
+[[obsolete("To be moved to CameraControlWindow")]]
 void MainWindow::set_framerate(Keela::CameraManager *cm) const {
 	const auto fr = framerate_spin.m_spin.get_value();
 	cm->set_framerate(fr);
 }
-
-/*
-void MainWindow::set_pix_fmt() {
-    spdlog::info("Updating pixel format of all cameras");
-    this->pix_fmt = pix_fmt_combo.m_combo.get_active_id().raw();
-    // inform all cameras of the pixel format change
-    for(const auto &c : cameras) {
-        c->set_pix_fmt(pix_fmt);
-    }
-}*/
 
 void MainWindow::on_trace_button_clicked() {
 	spdlog::info(__func__);
