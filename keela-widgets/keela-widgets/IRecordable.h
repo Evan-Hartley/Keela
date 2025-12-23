@@ -28,6 +28,12 @@ class IRecordable {
 
 	sigc::signal<void> signal_stop_recording;
 	sigc::signal<void> signal_start_recording;
+
+	/// use to "chain" multiple IRecordable-s together
+	void chain(IRecordable &other) {
+		signal_stop_recording.connect(sigc::mem_fun(other, &IRecordable::stop_recording));
+		signal_start_recording.connect(sigc::mem_fun(other, &IRecordable::start_recording));
+	}
 };
 }  // namespace Keela
 #endif  // IRECORDABLE_H

@@ -9,7 +9,7 @@
 
 #include <vector>
 namespace Keela {
-/// any object which needs to perform some action upon a pipeline restart
+/// any object that needs to perform some action upon a pipeline restart
 class IRestartable {
    public:
 	virtual ~IRestartable() = default;
@@ -20,6 +20,11 @@ class IRestartable {
 	}
 
 	sigc::signal<void> signal_restart;
+
+	/// use to "chain" multiple IRestartable-s together
+	void chain(IRestartable &other) {
+		signal_restart.connect(sigc::mem_fun(other, &IRestartable::restart));
+	}
 };
 }  // namespace Keela
 #endif  // IRESTARTABLE_H
