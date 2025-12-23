@@ -23,7 +23,7 @@ Keela::SimpleElement::SimpleElement(const std::string &element) {
 }
 
 Keela::SimpleElement::~SimpleElement() {
-	spdlog::debug("{} {}", __func__, element_name);
+	spdlog::trace("{} {}", __func__, element_name);
 }
 
 Keela::SimpleElement::SimpleElement(const std::string &element, const std::string &name) : SimpleElement(element) {

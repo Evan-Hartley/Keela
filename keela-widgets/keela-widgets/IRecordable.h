@@ -4,6 +4,7 @@
 
 #ifndef IRECORDABLE_H
 #define IRECORDABLE_H
+#include <sigc++/signal.h>
 #include <spdlog/spdlog.h>
 
 #include <vector>
@@ -17,22 +18,16 @@ class IRecordable {
 
 	virtual void start_recording() {
 		spdlog::info("Starting recording...");
-		for(auto child : recordable_children()) {
-			child.start_recording();
-		}
+		signal_start_recording.emit();
 	}
 
 	virtual void stop_recording() {
 		spdlog::info("Stopping recording...");
-		for(auto child : recordable_children()) {
-			child.stop_recording();
-		}
+		signal_stop_recording.emit();
 	}
 
-   private:
-	virtual std::vector<IRecordable> recordable_children() {
-		return std::vector<IRecordable>();
-	}
+	sigc::signal<void> signal_stop_recording;
+	sigc::signal<void> signal_start_recording;
 };
 }  // namespace Keela
 #endif  // IRECORDABLE_H

@@ -117,6 +117,15 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	// propagate pipeline restarts to camera manager
 	signal_restart.connect(sigc::mem_fun(*camera_manager, &CameraManager::restart));
 	signal_restart.connect(sigc::mem_fun(pix_fmt_control, &PixFmtControl::restart));
+
+	// notify controls of recording start/stop
+	signal_start_recording.connect(sigc::mem_fun(pix_fmt_control, &PixFmtControl::start_recording));
+	signal_stop_recording.connect(sigc::mem_fun(pix_fmt_control, &PixFmtControl::stop_recording));
+
+	// instead of a signal connection, CameraControlWindow could override start/stop recording methods and chain these
+	// calls instead
+	signal_start_recording.connect(sigc::mem_fun(*camera_manager, &CameraManager::start_recording));
+	signal_stop_recording.connect(sigc::mem_fun(*camera_manager, &CameraManager::stop_recording));
 }
 
 Keela::CameraControlWindow::~CameraControlWindow() {

@@ -19,12 +19,17 @@ inline void element_link_many(First first, Second second, Rest... rest) {
 	auto fname = gst_element_get_name(f);
 	auto sname = gst_element_get_name(s);
 	spdlog::debug("{} linking {} to {}", __func__, fname, sname);
-	g_free(fname);
-	g_free(sname);
+
 	auto ret = gst_element_link(GST_ELEMENT(f), GST_ELEMENT(s));
 	if(!ret) {
-		throw std::runtime_error("failed to link elements");
+		std::stringstream ss;
+		ss << __func__ << ": failed to link " << fname << " to " << sname;
+		g_free(fname);
+		g_free(sname);
+		throw std::runtime_error(ss.str());
 	}
+	g_free(fname);
+	g_free(sname);
 	Keela::element_link_many(second, rest...);
 }
 
