@@ -118,3 +118,12 @@ TEST(KeelaPipeline, SetCapsFormat) {
 	auto caps1 = Keela::Caps();
 	caps1.set_format("GRAY8");
 }
+
+TEST(KeelaPipeline, SetCapsDepth) {
+	auto caps1 = Keela::Caps();
+	caps1.set_depth(10);
+	auto s = gst_caps_get_structure(caps1, 0);
+	gint depth;
+	gst_structure_get_int(s, "depth", &depth);
+	ASSERT_EQ(depth, 10);
+}

@@ -49,6 +49,6 @@ void Keela::Caps::set_resolution(const int width, const int height) {
 void Keela::Caps::set_format(const std::string &format) {
 	set_props("format", G_TYPE_STRING, format.c_str());
 }
-void Keela::Caps::set_depth(const guint depth) {
-	set_props("depth", G_TYPE_UINT, depth);
+void Keela::Caps::set_depth(const gint depth) {
+	set_props("depth", G_TYPE_INT, depth);
 }
