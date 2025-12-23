@@ -120,6 +120,8 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	IRecordable::chain(*camera_manager);
 	IRecordable::chain(pix_fmt_control);
+
+	signal_restart.emit();
 }
 
 Keela::CameraControlWindow::~CameraControlWindow() {

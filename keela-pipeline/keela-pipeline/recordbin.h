@@ -23,6 +23,7 @@ class RecordBin final : public QueueBin, public EjectableElement {
 	Keela::SimpleElement mux = SimpleElement("matroskamux");
 	Keela::SimpleElement sink = SimpleElement("filesink");
 	Keela::SimpleElement conv = SimpleElement("videoconvert");
+	Keela::SimpleElement caps_filter = SimpleElement("capsfilter");
 
    private:
 	void link() override;
@@ -40,6 +41,8 @@ class RecordBin final : public QueueBin, public EjectableElement {
 	}
 
 	std::string name;
+
+	static GstPadProbeReturn queue_caps_probe(GstPad *pad, GstPadProbeInfo *info, void *user_data);
 };
 }  // namespace Keela
 #endif  // RECORDBIN_H
