@@ -4,8 +4,6 @@
 
 #include "keela-pipeline/presentationbin.h"
 
-#include <keela-pipeline/gtkglsink.h>
-#include <keela-pipeline/gtksink.h>
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
