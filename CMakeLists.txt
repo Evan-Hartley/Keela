@@ -48,5 +48,5 @@ add_custom_target(clean-config
 )
 
 if (Doxygen_FOUND)
-    doxygen_add_docs(docs keela-exe keela-test keela-pipeline keela-videotestsrc)
+    doxygen_add_docs(docs keela-exe keela-widgets keela-pipeline keela-videotestsrc)
 endif ()
