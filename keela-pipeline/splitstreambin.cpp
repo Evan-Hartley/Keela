@@ -9,6 +9,18 @@ Keela::SplitStreamBin::SplitStreamBin() : even_stream("stream_even"), odd_stream
 }
 void Keela::SplitStreamBin::init() {
 	add_elements(tee, even_stream, odd_stream);
+	GstPad *p;
+	p = gst_element_get_static_pad(even_stream.internal_tee, "sink");
+	if(!p) {
+		throw std::runtime_error("Failed to get even stream sink pad");
+	}
+	gst_pad_add_probe(p, GST_PAD_PROBE_TYPE_BUFFER, frame_parity_probe_cb, &even_probe_data, nullptr);
+	g_object_unref(p);
+	p = gst_element_get_static_pad(odd_stream.internal_tee, "sink");
+	if(!p) {
+		throw std::runtime_error("Failed to get odd stream sink pad");
+	}
+	gst_pad_add_probe(p, GST_PAD_PROBE_TYPE_BUFFER, frame_parity_probe_cb, &odd_probe_data, nullptr);
 }
 void Keela::SplitStreamBin::link() {
 	element_link_many(tee, even_stream);

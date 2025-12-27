@@ -46,6 +46,10 @@ class Bin : public virtual Keela::Element {
 		if(!ret) {
 			throw std::runtime_error("Failed to add element to bin");
 		}
+		ret = gst_element_sync_state_with_parent(e);
+		if(!ret) {
+			throw std::runtime_error("Failed to sync state of element to bin");
+		}
 		add_elements(rest...);
 	}
 

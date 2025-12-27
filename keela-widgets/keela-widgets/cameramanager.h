@@ -18,8 +18,8 @@
 #include <atomic>
 #include <set>
 
-#define EVEN_FRAME 0
-#define ODD_FRAME 1
+#define EVEN_FRAME 0  // TODO: obsolete
+#define ODD_FRAME 1   // TODO: obsolete
 
 namespace Keela {
 // Structure to pass both parity and counter to frame probe callback

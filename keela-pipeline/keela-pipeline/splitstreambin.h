@@ -8,7 +8,7 @@
 #include "EjectableElement.h"
 #include "queuebin.h"
 namespace Keela {
-class SplitStreamBin : public EjectableElement, public QueueBin {
+class SplitStreamBin final : public EjectableElement, public QueueBin {
    public:
 	SplitStreamBin();
 	~SplitStreamBin() override = default;
@@ -26,6 +26,13 @@ class SplitStreamBin : public EjectableElement, public QueueBin {
 		int parity;
 		guint64 *counter;
 	};
+
+	enum FrameParity { EVEN, ODD };
+
+	FrameProbeData even_probe_data = FrameProbeData(FrameParity::EVEN, &backup_counter);
+	FrameProbeData odd_probe_data = FrameProbeData(FrameParity::ODD, &backup_counter);
+
+	guint64 backup_counter = 0;
 
 	/// frame filtering callback
 	static GstPadProbeReturn frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
