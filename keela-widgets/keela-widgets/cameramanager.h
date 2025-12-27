@@ -99,7 +99,9 @@ class CameraManager final : public Keela::Bin {
 
 	// Camera Streams manage presentation, recording, and tracing of their
 	// respective frame streams
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	std::shared_ptr<CameraStreamBin> camera_stream_even = std::make_shared<CameraStreamBin>("camera_stream_even");
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	std::shared_ptr<CameraStreamBin> camera_stream_odd = std::make_shared<CameraStreamBin>("camera_stream_odd");
 
 	SimpleElement camera;
@@ -107,25 +109,35 @@ class CameraManager final : public Keela::Bin {
 	TransformBin transform = TransformBin("transform");
 
    private:
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	gulong even_frame_probe_id = 0;
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	gulong odd_frame_probe_id = 0;
 
 	// Per-camera frame counter for sources that don't set buffer offset
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	guint64 manual_frame_counter = 0;
 
 	// Data structures for frame probes
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	FrameProbeData even_probe_data{EVEN_FRAME, &manual_frame_counter};
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
 
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	void set_up_frame_splitting();
 
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	void install_frame_splitting_probes();
 
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	void remove_frame_splitting_probes();
 
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	void remove_probe_by_id(gulong &probe_id, GstPad *pad, const std::string &probe_name);
 
 	// Frame filtering callback
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	static GstPadProbeReturn frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 
 	guint id;
@@ -147,6 +159,7 @@ class CameraManager final : public Keela::Bin {
 	 * NOTE: any elements that come after "tee" should probably inherit from
 	 * Keela::QueueBin
 	 */
+	[[obsolete("obsoleted by SplitStreamBin")]]
 	SimpleElement tee_main = SimpleElement("tee");
 
 	/* at any moment there may be many active record bins

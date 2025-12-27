@@ -15,8 +15,7 @@ namespace Keela {
 class CameraStreamBin final : public QueueBin, public EjectableElement {
    public:
 	explicit CameraStreamBin(const std::string &name);
-
-	~CameraStreamBin() override;
+	~CameraStreamBin() override = default;
 
 	SimpleElement internal_tee = SimpleElement("tee");
 

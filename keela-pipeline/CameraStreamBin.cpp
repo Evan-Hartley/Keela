@@ -17,10 +17,6 @@ Keela::CameraStreamBin::CameraStreamBin(const std::string &name) : QueueBin(name
 	CameraStreamBin::link();
 }
 
-Keela::CameraStreamBin::~CameraStreamBin() {
-	spdlog::debug(__func__);
-}
-
 void Keela::CameraStreamBin::link() {
 	spdlog::info("Linking CameraStreamBin {} internal structure", name);
 
