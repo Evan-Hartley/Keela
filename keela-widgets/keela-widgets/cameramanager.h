@@ -32,7 +32,7 @@ class CameraManager final : public Keela::Bin {
 	explicit CameraManager(guint id, bool split_streams);
 
 	~CameraManager() override;
-
+#pragma region Aravis Stuff
 	bool has_aravis_controller() const {
 		return aravis_controller != nullptr;
 	}
@@ -85,11 +85,15 @@ class CameraManager final : public Keela::Bin {
 
 	void set_binning_factors(int binning_factor_both);
 	void set_binning_factors(int binning_factor_x, int binning_factor_y);
+#pragma endregion Aravis Stuff
 
 	void start_recording();
 
 	void stop_recording();
 
+	SimpleElement camera;
+
+#pragma region Frame Splitting Stuff
 	// Control frame splitting
 	void set_frame_splitting(bool enabled);
 
@@ -104,7 +108,6 @@ class CameraManager final : public Keela::Bin {
 	[[obsolete("obsoleted by SplitStreamBin")]]
 	std::shared_ptr<CameraStreamBin> camera_stream_odd = std::make_shared<CameraStreamBin>("camera_stream_odd");
 
-	SimpleElement camera;
 	SimpleElement caps_filter = SimpleElement("capsfilter");
 	TransformBin transform = TransformBin("transform");
 
@@ -124,8 +127,8 @@ class CameraManager final : public Keela::Bin {
 	[[obsolete("obsoleted by SplitStreamBin")]]
 	FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
 
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	void set_up_frame_splitting();
+	//[[obsolete("obsoleted by SplitStreamBin")]]
+	// void set_up_frame_splitting();
 
 	[[obsolete("obsoleted by SplitStreamBin")]]
 	void install_frame_splitting_probes();
@@ -140,18 +143,7 @@ class CameraManager final : public Keela::Bin {
 	[[obsolete("obsoleted by SplitStreamBin")]]
 	static GstPadProbeReturn frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
 
-	guint id;
-	bool split_streams;
-
-	/// caps filter to apply to the entire stream
-	Caps base_caps;
-
-	/// caps filter determining the stream caps after scaling
-	Caps scaled_caps;
-
-	/// for now, experiment directory will be set to my temp directory until I
-	/// figure out gtk file dialogs
-	std::string experiment_directory = "C:\\temp";
+	void add_odd_camera_stream();
 
 	/**
 	 * use to split a stream into as many identical streams as we want.
@@ -161,13 +153,16 @@ class CameraManager final : public Keela::Bin {
 	 */
 	[[obsolete("obsoleted by SplitStreamBin")]]
 	SimpleElement tee_main = SimpleElement("tee");
+#pragma endregion Frame Splitting Stuff
+	guint id;
+	bool split_streams;
 
-	/* at any moment there may be many active record bins
-	 *
-	 * TODO: do these still need to be shared_ptr?
-	 *
-	 */
-	std::set<std::shared_ptr<RecordBin>> record_bins;
+	/// caps filter to apply to the entire stream
+	Caps base_caps;
+
+	/// for now, experiment directory will be set to my temp directory until I
+	/// figure out gtk file dialogs
+	std::string experiment_directory = "C:\\temp";
 
 	/*
 	 * prepends the filename with the current time to avoid overwriting files
@@ -176,8 +171,6 @@ class CameraManager final : public Keela::Bin {
 	 * enabled) supports cross-platform path joining
 	 */
 	static std::string get_filename(std::string directory, guint cam_id, std::string suffix = "");
-
-	void add_odd_camera_stream();
 
 	void set_pipeline_state(GstState state);
 
