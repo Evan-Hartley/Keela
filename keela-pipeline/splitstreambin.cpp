@@ -12,7 +12,7 @@ Keela::SplitStreamBin::SplitStreamBin() : QueueBin("SplitStreamBin") {
 	SplitStreamBin::link();
 }
 Keela::Element *Keela::SplitStreamBin::Head() {
-	return &tee;
+	return &queue;
 }
 std::vector<Keela::Element *> Keela::SplitStreamBin::Leaves() {
 	auto leaves = EjectableElement::GetLeaves(*even_stream);

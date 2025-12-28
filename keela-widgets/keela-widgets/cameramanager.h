@@ -23,11 +23,6 @@
 #define ODD_FRAME 1   // TODO: obsolete
 
 namespace Keela {
-// Structure to pass both parity and counter to frame probe callback
-struct FrameProbeData {
-	int parity;
-	guint64 *counter;
-};
 class CameraManager final : public Keela::Bin {
    public:
 	explicit CameraManager(guint id, bool split_streams);
@@ -112,8 +107,6 @@ class CameraManager final : public Keela::Bin {
 	}
 
 	std::vector<std::shared_ptr<Keela::CameraStreamBin>> get_streams() const;
-	SimpleElement caps_filter = SimpleElement("capsfilter");
-	TransformBin transform = TransformBin("transform");
 
    private:
 	// TODO: common interface for start/stop recording + ejectable
@@ -150,6 +143,13 @@ class CameraManager final : public Keela::Bin {
 	 * hardware capabilities and adjusting camera parameters.
 	 */
 	std::unique_ptr<AravisController> aravis_controller = nullptr;
+
+	SimpleElement caps_filter = SimpleElement("capsfilter");
+	SimpleElement tee = SimpleElement("tee");
+	SnapshotBin snapshot = SnapshotBin("snapshot");
+
+   public:
+	TransformBin transform = TransformBin("transform");
 };
 }  // namespace Keela
 #endif  // CAMERAMANAGER_H

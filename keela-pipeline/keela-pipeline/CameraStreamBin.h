@@ -20,7 +20,7 @@ class CameraStreamBin final : public QueueBin, public EjectableElement {
 	SimpleElement internal_tee = SimpleElement("tee");
 
 	std::shared_ptr<PresentationBin> presentation;
-	std::shared_ptr<SnapshotBin> snapshot;
+	// std::shared_ptr<SnapshotBin> snapshot;
 	std::shared_ptr<TraceBin> trace;
 
 	std::shared_ptr<RecordBin> record_bin = nullptr;

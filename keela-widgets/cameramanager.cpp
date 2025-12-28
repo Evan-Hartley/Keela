@@ -26,12 +26,12 @@ Keela::CameraManager::CameraManager(guint id, bool split_streams)
 		// Add all elements to the bin
 		// @todo: can we get rid of this caps_filter?
 		// I think we can just modify the source and the downstream elements will renegotiate
-		add_elements(camera, caps_filter, transform);
+		add_elements(camera, caps_filter, transform, tee, snapshot);
 
 		// Link main pipeline: camera -> capsfilter -> transform -> main_tee ->
 		// camera_stream_even
-		element_link_many(camera, caps_filter, transform);
-
+		element_link_many(camera, caps_filter, transform, tee);
+		element_link_many(tee, snapshot);
 		// Set up camera control via aravissrc and AravisCamera
 		GstElement *camera_element = static_cast<GstElement *>(camera);
 
@@ -191,7 +191,7 @@ void Keela::CameraManager::set_frame_splitting(bool split_enabled) {
 		stream = std::make_shared<Keela::CameraStreamBin>("Single Camera Stream");
 	}
 	add_elements(*stream);
-	element_link_many(transform, *stream);
+	element_link_many(tee, *stream);
 }
 std::vector<std::shared_ptr<Keela::CameraStreamBin>> Keela::CameraManager::get_streams() const {
 	std::vector<std::shared_ptr<Keela::CameraStreamBin>> streams;
