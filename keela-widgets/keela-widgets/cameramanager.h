@@ -12,6 +12,7 @@
 #include <keela-pipeline/recordbin.h>
 #include <keela-pipeline/simpleelement.h>
 #include <keela-pipeline/snapshotbin.h>
+#include <keela-pipeline/splitstreambin.h>
 #include <keela-pipeline/transformbin.h>
 #include <keela-widgets/AravisController.h>
 
@@ -95,64 +96,22 @@ class CameraManager final : public Keela::Bin {
 
 #pragma region Frame Splitting Stuff
 	// Control frame splitting
-	void set_frame_splitting(bool enabled);
+	void set_frame_splitting(bool split_enabled);
 
 	bool is_frame_splitting_enabled() const {
-		return split_streams;
+		auto maybe_split_stream = std::dynamic_pointer_cast<SplitStreamBin>(stream);
+		auto maybe_non_split_stream = std::dynamic_pointer_cast<CameraStreamBin>(stream);
+		return maybe_split_stream != nullptr && maybe_non_split_stream == nullptr;
+		// return split_streams;
 	}
-
-	// Camera Streams manage presentation, recording, and tracing of their
-	// respective frame streams
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	std::shared_ptr<CameraStreamBin> camera_stream_even = std::make_shared<CameraStreamBin>("camera_stream_even");
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	std::shared_ptr<CameraStreamBin> camera_stream_odd = std::make_shared<CameraStreamBin>("camera_stream_odd");
 
 	SimpleElement caps_filter = SimpleElement("capsfilter");
 	TransformBin transform = TransformBin("transform");
 
    private:
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	gulong even_frame_probe_id = 0;
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	gulong odd_frame_probe_id = 0;
+	// TODO: common interface for start/stop recording + ejectable
+	std::shared_ptr<Keela::EjectableElement> stream = nullptr;
 
-	// Per-camera frame counter for sources that don't set buffer offset
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	guint64 manual_frame_counter = 0;
-
-	// Data structures for frame probes
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	FrameProbeData even_probe_data{EVEN_FRAME, &manual_frame_counter};
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
-
-	//[[obsolete("obsoleted by SplitStreamBin")]]
-	// void set_up_frame_splitting();
-
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	void install_frame_splitting_probes();
-
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	void remove_frame_splitting_probes();
-
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	void remove_probe_by_id(gulong &probe_id, GstPad *pad, const std::string &probe_name);
-
-	// Frame filtering callback
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	static GstPadProbeReturn frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
-
-	void add_odd_camera_stream();
-
-	/**
-	 * use to split a stream into as many identical streams as we want.
-	 *
-	 * NOTE: any elements that come after "tee" should probably inherit from
-	 * Keela::QueueBin
-	 */
-	[[obsolete("obsoleted by SplitStreamBin")]]
-	SimpleElement tee_main = SimpleElement("tee");
 #pragma endregion Frame Splitting Stuff
 	guint id;
 	bool split_streams;

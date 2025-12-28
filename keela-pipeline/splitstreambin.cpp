@@ -7,6 +7,15 @@
 #include "keela-pipeline/utils.h"
 Keela::SplitStreamBin::SplitStreamBin() : even_stream("stream_even"), odd_stream("stream_odd") {
 }
+Keela::Element *Keela::SplitStreamBin::Head() {
+	return &tee;
+}
+std::vector<Keela::Element *> Keela::SplitStreamBin::Leaves() {
+	auto leaves = EjectableElement::GetLeaves(even_stream);
+	auto odd_leaves = EjectableElement::GetLeaves(odd_stream);
+	leaves.insert(leaves.end(), odd_leaves.begin(), odd_leaves.end());
+	return leaves;
+}
 void Keela::SplitStreamBin::init() {
 	add_elements(tee, even_stream, odd_stream);
 	GstPad *p;

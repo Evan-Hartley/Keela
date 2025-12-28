@@ -13,14 +13,15 @@ TEST(KeelaWidgets, ConstructGLCameraRender) {
     auto c = Keela::GLCameraRender(bin);
 }*/
 
-TEST(KeelaWidgets, ConstructCameraManagerGRAY8) {
+TEST(KeelaWidgets, ConstructCameraManager) {
 	auto cm = Keela::CameraManager(0, false);
 }
 
-TEST(KeelaWidgets, ConstructCameraManagerGRAY16LE) {
+TEST(KeelaWidgets, CameraManagerStreamSplit) {
 	auto cm = Keela::CameraManager(0, false);
-}
-
-TEST(KeelaWidgets, ConstructCameraManagerGRAY16BE) {
-	auto cm = Keela::CameraManager(0, false);
+	gst_element_set_state(cm, GST_STATE_PLAYING);
+	ASSERT_FALSE(cm.is_frame_splitting_enabled());
+	cm.set_frame_splitting(true);
+	ASSERT_TRUE(cm.is_frame_splitting_enabled());
+	gst_element_set_state(cm, GST_STATE_NULL);
 }
