@@ -99,12 +99,19 @@ class CameraManager final : public Keela::Bin {
 	void set_frame_splitting(bool split_enabled);
 
 	bool is_frame_splitting_enabled() const {
+		if(!stream) {
+			throw std::logic_error("stream is null");
+		}
 		auto maybe_split_stream = std::dynamic_pointer_cast<SplitStreamBin>(stream);
 		auto maybe_non_split_stream = std::dynamic_pointer_cast<CameraStreamBin>(stream);
+		if(!(maybe_non_split_stream != nullptr || maybe_split_stream != nullptr)) {
+			// this can only happen if stream is assigned to anything aside from CameraStreamBin or SplitStreamBin
+			throw std::logic_error("stream is an unknown subtype");
+		}
 		return maybe_split_stream != nullptr && maybe_non_split_stream == nullptr;
-		// return split_streams;
 	}
 
+	std::vector<std::shared_ptr<Keela::CameraStreamBin>> get_streams() const;
 	SimpleElement caps_filter = SimpleElement("capsfilter");
 	TransformBin transform = TransformBin("transform");
 

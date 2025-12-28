@@ -5,36 +5,38 @@
 #include "keela-pipeline/splitstreambin.h"
 
 #include "keela-pipeline/utils.h"
-Keela::SplitStreamBin::SplitStreamBin() : even_stream("stream_even"), odd_stream("stream_odd") {
+Keela::SplitStreamBin::SplitStreamBin() {
+	even_stream = std::make_shared<Keela::CameraStreamBin>("stream_even");
+	odd_stream = std::make_shared<Keela::CameraStreamBin>("stream_odd");
 }
 Keela::Element *Keela::SplitStreamBin::Head() {
 	return &tee;
 }
 std::vector<Keela::Element *> Keela::SplitStreamBin::Leaves() {
-	auto leaves = EjectableElement::GetLeaves(even_stream);
-	auto odd_leaves = EjectableElement::GetLeaves(odd_stream);
+	auto leaves = EjectableElement::GetLeaves(*even_stream);
+	auto odd_leaves = EjectableElement::GetLeaves(*odd_stream);
 	leaves.insert(leaves.end(), odd_leaves.begin(), odd_leaves.end());
 	return leaves;
 }
 void Keela::SplitStreamBin::init() {
-	add_elements(tee, even_stream, odd_stream);
+	add_elements(tee, *even_stream, *odd_stream);
 	GstPad *p;
-	p = gst_element_get_static_pad(even_stream.internal_tee, "sink");
+	p = gst_element_get_static_pad(even_stream->internal_tee, "sink");
 	if(!p) {
 		throw std::runtime_error("Failed to get even stream sink pad");
 	}
 	gst_pad_add_probe(p, GST_PAD_PROBE_TYPE_BUFFER, frame_parity_probe_cb, &even_probe_data, nullptr);
 	g_object_unref(p);
-	p = gst_element_get_static_pad(odd_stream.internal_tee, "sink");
+	p = gst_element_get_static_pad(odd_stream->internal_tee, "sink");
 	if(!p) {
 		throw std::runtime_error("Failed to get odd stream sink pad");
 	}
 	gst_pad_add_probe(p, GST_PAD_PROBE_TYPE_BUFFER, frame_parity_probe_cb, &odd_probe_data, nullptr);
 }
 void Keela::SplitStreamBin::link() {
-	element_link_many(tee, even_stream);
-	element_link_many(tee, odd_stream);
-	link_queue(even_stream);
+	element_link_many(tee, *even_stream);
+	element_link_many(tee, *odd_stream);
+	link_queue(*even_stream);
 }
 
 GstPadProbeReturn Keela::SplitStreamBin::frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {

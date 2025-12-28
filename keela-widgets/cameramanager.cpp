@@ -193,6 +193,17 @@ void Keela::CameraManager::set_frame_splitting(bool split_enabled) {
 	add_elements(*stream);
 	element_link_many(transform, *stream);
 }
+std::vector<std::shared_ptr<Keela::CameraStreamBin>> Keela::CameraManager::get_streams() const {
+	std::vector<std::shared_ptr<Keela::CameraStreamBin>> streams;
+	if(!is_frame_splitting_enabled()) {
+		streams.push_back(std::dynamic_pointer_cast<Keela::CameraStreamBin>(stream));
+	} else {
+		auto split_stream = std::dynamic_pointer_cast<Keela::SplitStreamBin>(stream);
+		streams.push_back(split_stream->even_stream);
+		streams.push_back(split_stream->odd_stream);
+	}
+	return streams;
+}
 
 std::string Keela::CameraManager::get_filename(std::string directory, guint cam_id, std::string suffix) {
 	time_t timestamp = std::time(nullptr);

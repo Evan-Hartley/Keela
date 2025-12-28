@@ -25,3 +25,12 @@ TEST(KeelaWidgets, CameraManagerStreamSplit) {
 	ASSERT_TRUE(cm.is_frame_splitting_enabled());
 	gst_element_set_state(cm, GST_STATE_NULL);
 }
+
+TEST(KeelaWidgets, CameraManagerGetStreams) {
+	auto cm = Keela::CameraManager(0, false);
+	gst_element_set_state(cm, GST_STATE_PLAYING);
+	ASSERT_EQ(cm.get_streams().size(), 1);
+	cm.set_frame_splitting(true);
+	ASSERT_EQ(cm.get_streams().size(), 2);
+	gst_element_set_state(cm, GST_STATE_NULL);
+}

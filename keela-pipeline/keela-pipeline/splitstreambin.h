@@ -13,9 +13,10 @@ class SplitStreamBin final : public EjectableElement, public QueueBin {
 	SplitStreamBin();
 	~SplitStreamBin() override = default;
 
+	std::shared_ptr<Keela::CameraStreamBin> even_stream;
+	std::shared_ptr<Keela::CameraStreamBin> odd_stream;
+
    private:
-	Keela::CameraStreamBin even_stream;
-	Keela::CameraStreamBin odd_stream;
 	Keela::SimpleElement tee = SimpleElement("tee");
 	Keela::Element *Head() override;
 	std::vector<Keela::Element *> Leaves() override;
