@@ -81,11 +81,6 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	set_vexpand(false);
 
-	/*
-	if(camera_manager->is_frame_splitting_enabled()) {
-	    add_split_frame_ui();
-	}*/
-
 	h_container.pack_start(video_hbox, false, false, 10);
 
 	auto gl_bin = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_VERTICAL);
@@ -260,20 +255,6 @@ void Keela::CameraControlWindow::update_traces() {
 	if(camera_manager->is_frame_splitting_enabled()) {
 		even_name += " (Even)";
 	}
-	// TODO: return a vec of CameraStreamBins from CameraManager and create a trace for each
-	// TODO TODO: uncomment this
-	// auto even_trace = std::make_shared<CameraTrace>(camera_manager->camera_stream_even->get_trace_bin(),
-	//                                                trace_gizmo_even, *video_presentation_even, even_name);
-	// m_traces.push_back(even_trace);
-
-	// Add odd trace if frame splitting is enabled
-	// TODO: uncomment this
-	// if(camera_manager->is_frame_splitting_enabled() && trace_gizmo_odd) {
-	// auto odd_trace =
-	//     std::make_shared<CameraTrace>(camera_manager->camera_stream_odd->get_trace_bin(), trace_gizmo_odd,
-	//                                   *video_presentation_odd, "Camera " + std::to_string(id) + " (Odd)");
-	// m_traces.push_back(odd_trace);
-	//}
 }
 
 void Keela::CameraControlWindow::set_trace_bin_framerate_caps(guint fps) {
