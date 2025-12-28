@@ -5,9 +5,11 @@
 #include "keela-pipeline/splitstreambin.h"
 
 #include "keela-pipeline/utils.h"
-Keela::SplitStreamBin::SplitStreamBin() {
+Keela::SplitStreamBin::SplitStreamBin() : QueueBin("SplitStreamBin") {
 	even_stream = std::make_shared<Keela::CameraStreamBin>("stream_even");
 	odd_stream = std::make_shared<Keela::CameraStreamBin>("stream_odd");
+	SplitStreamBin::init();
+	SplitStreamBin::link();
 }
 Keela::Element *Keela::SplitStreamBin::Head() {
 	return &tee;
@@ -36,7 +38,7 @@ void Keela::SplitStreamBin::init() {
 void Keela::SplitStreamBin::link() {
 	element_link_many(tee, *even_stream);
 	element_link_many(tee, *odd_stream);
-	link_queue(*even_stream);
+	link_queue(tee);
 }
 
 GstPadProbeReturn Keela::SplitStreamBin::frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data) {

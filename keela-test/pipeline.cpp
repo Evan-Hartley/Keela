@@ -8,6 +8,8 @@
 #include <keela-pipeline/transformbin.h>
 #include <spdlog/spdlog.h>
 
+#include "keela-pipeline/splitstreambin.h"
+
 TEST(KeelaPipeline, ConstructBin) {
 	auto bin = Keela::Bin();
 }
@@ -111,4 +113,8 @@ TEST(KeelaPipeline, CopyCaps) {
 	caps1.set_resolution(640, 480);
 	auto caps2 = Keela::Caps(static_cast<GstCaps *>(caps1));
 	ASSERT_TRUE(gst_caps_is_equal(caps1, caps2));
+}
+
+TEST(KeelaPipeline, SplitStreamBin) {
+	auto ssb = Keela::SplitStreamBin();
 }

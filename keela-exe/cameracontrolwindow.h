@@ -51,11 +51,11 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	Gtk::CheckButton flip_vert_check = Gtk::CheckButton("Flip Along Vertical Center");
 	Gtk::Button fetch_image_button = Gtk::Button("Fetch Image");
 
-	std::unique_ptr<VideoPresentation> video_presentation_even;
-	std::unique_ptr<VideoPresentation> video_presentation_odd;
+	// std::unique_ptr<VideoPresentation> video_presentation_even;
+	// std::unique_ptr<VideoPresentation> video_presentation_odd;
 
-	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_even;
-	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_odd;
+	// std::shared_ptr<Keela::TraceGizmo> trace_gizmo_even;
+	// std::shared_ptr<Keela::TraceGizmo> trace_gizmo_odd;
 
 	guint id;
 
@@ -75,9 +75,9 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 
 	void on_flip_vert_changed() const;
 
-	void add_split_frame_ui();
+	// void add_split_frame_ui();
 
-	void remove_split_frame_ui();
+	// void remove_split_frame_ui();
 
 	void update_traces();
 
@@ -111,6 +111,11 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	float heatmap_scale;
 
 	std::vector<std::shared_ptr<CameraTrace>> m_traces;
+
+	void setup_stream_ui();
+
+	std::vector<std::shared_ptr<VideoPresentation>> presentation_widgets;
+	std::vector<std::shared_ptr<TraceGizmo>> trace_gizmos;
 };
 }  // namespace Keela
 
