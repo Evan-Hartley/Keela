@@ -51,12 +51,6 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 	Gtk::CheckButton flip_vert_check = Gtk::CheckButton("Flip Along Vertical Center");
 	Gtk::Button fetch_image_button = Gtk::Button("Fetch Image");
 
-	// std::unique_ptr<VideoPresentation> video_presentation_even;
-	// std::unique_ptr<VideoPresentation> video_presentation_odd;
-
-	// std::shared_ptr<Keela::TraceGizmo> trace_gizmo_even;
-	// std::shared_ptr<Keela::TraceGizmo> trace_gizmo_odd;
-
 	guint id;
 
 	void on_range_check_toggled();

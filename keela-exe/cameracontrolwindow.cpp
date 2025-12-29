@@ -74,10 +74,9 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	flip_vert_check.signal_toggled().connect(sigc::mem_fun(*this, &CameraControlWindow::on_flip_vert_changed));
 	v_container.add(flip_vert_check);
 
-	// fetch_image_button.signal_clicked().connect(
-	//     sigc::mem_fun(*camera_manager->camera_stream_even->snapshot, &Keela::SnapshotBin::take_snapshot));
-	// TODO: this serves as a reminder to properly resolve where the snapshotbin is
-	// v_container.add(fetch_image_button);
+	fetch_image_button.signal_clicked().connect(
+	    sigc::mem_fun(camera_manager->snapshot, &Keela::SnapshotBin::take_snapshot));
+	v_container.add(fetch_image_button);
 
 	set_vexpand(false);
 
@@ -189,18 +188,8 @@ void Keela::CameraControlWindow::on_flip_vert_changed() const {
 
 void Keela::CameraControlWindow::update_split_frame_state(bool should_split_frames) {
 	camera_manager->set_frame_splitting(should_split_frames);
-	if(should_split_frames) {
-		spdlog::info("Adding split frame UI");
-		// add_split_frame_ui();
-	} else {
-		spdlog::info("Removing split frame UI");
-		// remove_split_frame_ui();
-	}
-	// Update traces whenever split frame state changes
-
 	setup_stream_ui();
-	// TODO: traces broken for now. uncomment when fixed
-	// update_traces();
+	update_traces();
 }
 
 bool Keela::CameraControlWindow::is_heatmap_enabled() {
@@ -217,17 +206,21 @@ float Keela::CameraControlWindow::heatmap_max() {
 void Keela::CameraControlWindow::setup_stream_ui() {
 	auto streams = camera_manager->get_streams();
 	auto n_streams = streams.size();
-	trace_gizmos.clear();
 	presentation_widgets.clear();
 
 	for(size_t i = 0; i < n_streams; i++) {
-		auto gizmo = std::make_shared<TraceGizmo>();
+		std::shared_ptr<TraceGizmo> gizmo;
+		if(i < trace_gizmos.size()) {
+			gizmo = trace_gizmos[i];
+		} else {
+			gizmo = std::make_shared<TraceGizmo>();
+			trace_gizmos.push_back(gizmo);
+		}
 		auto stream = streams[i];
 		std::string label = "Stream " + std::to_string(i);
 		auto presentation = std::make_shared<VideoPresentation>(label, stream->presentation, *this);
 		presentation->add_overlay_widget(*gizmo);
 		presentation_widgets.push_back(presentation);
-		trace_gizmos.push_back(gizmo);
 		video_hbox.pack_start(*presentation, false, false, 10);
 	}
 	show_all_children();
@@ -250,10 +243,15 @@ std::vector<std::shared_ptr<Keela::ITraceable>> Keela::CameraControlWindow::get_
 void Keela::CameraControlWindow::update_traces() {
 	m_traces.clear();
 
-	// Always add the even trace
-	std::string even_name = "Camera " + std::to_string(id);
-	if(camera_manager->is_frame_splitting_enabled()) {
-		even_name += " (Even)";
+	auto streams = camera_manager->get_streams();
+
+	for(size_t i = 0; i < streams.size(); i++) {
+		auto gizmo = trace_gizmos[i];
+		auto stream = streams[i];
+		auto presentation = presentation_widgets[i];
+		std::string name = "Stream " + std::to_string(i);
+		auto trace = std::make_shared<CameraTrace>(stream->get_trace_bin(), gizmo, *presentation, name);
+		m_traces.push_back(trace);
 	}
 }
 

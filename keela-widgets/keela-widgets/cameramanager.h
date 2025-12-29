@@ -146,10 +146,11 @@ class CameraManager final : public Keela::Bin {
 
 	SimpleElement caps_filter = SimpleElement("capsfilter");
 	SimpleElement tee = SimpleElement("tee");
-	SnapshotBin snapshot = SnapshotBin("snapshot");
 
    public:
 	TransformBin transform = TransformBin("transform");
+
+	SnapshotBin snapshot = SnapshotBin("snapshot");
 };
 }  // namespace Keela
 #endif  // CAMERAMANAGER_H
