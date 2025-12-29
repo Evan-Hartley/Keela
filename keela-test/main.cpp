@@ -7,7 +7,7 @@
 #include <spdlog/spdlog.h>
 
 int main(int argc, char **argv) {
-	spdlog::set_level(spdlog::level::trace);
+	spdlog::set_level(spdlog::level::debug);
 	testing::InitGoogleTest(&argc, argv);
 	gst_init(&argc, &argv);
 	return RUN_ALL_TESTS();

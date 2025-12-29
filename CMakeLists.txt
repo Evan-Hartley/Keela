@@ -31,7 +31,7 @@ endif ()
 if (USE_HSLUV)
     add_compile_definitions(KEELA_USE_HSLUV)
 endif ()
-
+enable_testing()
 add_subdirectory(vendor)
 add_subdirectory(keela-widgets)
 add_subdirectory(keela-pipeline)

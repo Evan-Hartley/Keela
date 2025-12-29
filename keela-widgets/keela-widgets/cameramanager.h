@@ -12,27 +12,23 @@
 #include <keela-pipeline/recordbin.h>
 #include <keela-pipeline/simpleelement.h>
 #include <keela-pipeline/snapshotbin.h>
+#include <keela-pipeline/splitstreambin.h>
 #include <keela-pipeline/transformbin.h>
 #include <keela-widgets/AravisController.h>
 
 #include <atomic>
 #include <set>
 
-#define EVEN_FRAME 0
-#define ODD_FRAME 1
+#define EVEN_FRAME 0  // TODO: obsolete
+#define ODD_FRAME 1   // TODO: obsolete
 
 namespace Keela {
-// Structure to pass both parity and counter to frame probe callback
-struct FrameProbeData {
-	int parity;
-	guint64 *counter;
-};
 class CameraManager final : public Keela::Bin {
    public:
 	explicit CameraManager(guint id, bool split_streams);
 
 	~CameraManager() override;
-
+#pragma region Aravis Stuff
 	bool has_aravis_controller() const {
 		return aravis_controller != nullptr;
 	}
@@ -85,76 +81,47 @@ class CameraManager final : public Keela::Bin {
 
 	void set_binning_factors(int binning_factor_both);
 	void set_binning_factors(int binning_factor_x, int binning_factor_y);
+#pragma endregion Aravis Stuff
 
 	void start_recording();
 
 	void stop_recording();
 
+	SimpleElement camera;
+
+#pragma region Frame Splitting Stuff
 	// Control frame splitting
-	void set_frame_splitting(bool enabled);
+	void set_frame_splitting(bool split_enabled);
 
 	bool is_frame_splitting_enabled() const {
-		return split_streams;
+		if(!stream) {
+			throw std::logic_error("stream is null");
+		}
+		auto maybe_split_stream = std::dynamic_pointer_cast<SplitStreamBin>(stream);
+		auto maybe_non_split_stream = std::dynamic_pointer_cast<CameraStreamBin>(stream);
+		if(!(maybe_non_split_stream != nullptr || maybe_split_stream != nullptr)) {
+			// this can only happen if stream is assigned to anything aside from CameraStreamBin or SplitStreamBin
+			throw std::logic_error("stream is an unknown subtype");
+		}
+		return maybe_split_stream != nullptr && maybe_non_split_stream == nullptr;
 	}
 
-	// Camera Streams manage presentation, recording, and tracing of their
-	// respective frame streams
-	std::shared_ptr<CameraStreamBin> camera_stream_even = std::make_shared<CameraStreamBin>("camera_stream_even");
-	std::shared_ptr<CameraStreamBin> camera_stream_odd = std::make_shared<CameraStreamBin>("camera_stream_odd");
-
-	SimpleElement camera;
-	SimpleElement caps_filter = SimpleElement("capsfilter");
-	TransformBin transform = TransformBin("transform");
+	std::vector<std::shared_ptr<Keela::CameraStreamBin>> get_streams() const;
 
    private:
-	gulong even_frame_probe_id = 0;
-	gulong odd_frame_probe_id = 0;
+	// TODO: common interface for start/stop recording + ejectable
+	std::shared_ptr<Keela::EjectableElement> stream = nullptr;
 
-	// Per-camera frame counter for sources that don't set buffer offset
-	guint64 manual_frame_counter = 0;
-
-	// Data structures for frame probes
-	FrameProbeData even_probe_data{EVEN_FRAME, &manual_frame_counter};
-	FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
-
-	void set_up_frame_splitting();
-
-	void install_frame_splitting_probes();
-
-	void remove_frame_splitting_probes();
-
-	void remove_probe_by_id(gulong &probe_id, GstPad *pad, const std::string &probe_name);
-
-	// Frame filtering callback
-	static GstPadProbeReturn frame_parity_probe_cb(GstPad *pad, GstPadProbeInfo *info, gpointer user_data);
-
+#pragma endregion Frame Splitting Stuff
 	guint id;
 	bool split_streams;
 
 	/// caps filter to apply to the entire stream
 	Caps base_caps;
 
-	/// caps filter determining the stream caps after scaling
-	Caps scaled_caps;
-
 	/// for now, experiment directory will be set to my temp directory until I
 	/// figure out gtk file dialogs
 	std::string experiment_directory = "C:\\temp";
-
-	/**
-	 * use to split a stream into as many identical streams as we want.
-	 *
-	 * NOTE: any elements that come after "tee" should probably inherit from
-	 * Keela::QueueBin
-	 */
-	SimpleElement tee_main = SimpleElement("tee");
-
-	/* at any moment there may be many active record bins
-	 *
-	 * TODO: do these still need to be shared_ptr?
-	 *
-	 */
-	std::set<std::shared_ptr<RecordBin>> record_bins;
 
 	/*
 	 * prepends the filename with the current time to avoid overwriting files
@@ -163,8 +130,6 @@ class CameraManager final : public Keela::Bin {
 	 * enabled) supports cross-platform path joining
 	 */
 	static std::string get_filename(std::string directory, guint cam_id, std::string suffix = "");
-
-	void add_odd_camera_stream();
 
 	void set_pipeline_state(GstState state);
 
@@ -178,6 +143,14 @@ class CameraManager final : public Keela::Bin {
 	 * hardware capabilities and adjusting camera parameters.
 	 */
 	std::unique_ptr<AravisController> aravis_controller = nullptr;
+
+	SimpleElement caps_filter = SimpleElement("capsfilter");
+	SimpleElement tee = SimpleElement("tee");
+
+   public:
+	TransformBin transform = TransformBin("transform");
+
+	SnapshotBin snapshot = SnapshotBin("snapshot");
 };
 }  // namespace Keela
 #endif  // CAMERAMANAGER_H

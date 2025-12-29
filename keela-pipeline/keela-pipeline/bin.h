@@ -37,7 +37,7 @@ class Bin : public virtual Keela::Element {
 	 * @tparam First any type which can convert to GstElement*
 	 */
 	template <typename First, typename... Rest>
-	void add_elements(First first, Rest... rest) {
+	void add_elements(First &first, Rest &...rest) {
 		GstElement *e = first;
 
 		gst_object_ref(e);
@@ -45,6 +45,10 @@ class Bin : public virtual Keela::Element {
 		auto ret = gst_bin_add(GST_BIN(b), GST_ELEMENT(e));
 		if(!ret) {
 			throw std::runtime_error("Failed to add element to bin");
+		}
+		ret = gst_element_sync_state_with_parent(e);
+		if(!ret) {
+			throw std::runtime_error("Failed to sync state of element to bin");
 		}
 		add_elements(rest...);
 	}

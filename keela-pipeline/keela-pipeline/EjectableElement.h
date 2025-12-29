@@ -13,7 +13,7 @@ namespace Keela {
  *
  * This class is only suitable for elements which lie at the end of the pipeline and have no downstream elements.
  */
-class EjectableElement : virtual private Keela::Element {
+class EjectableElement : virtual public Keela::Element {
    public:
 	/**
 	 * Prepare the element for ejection from the pipeline, but do not wait for the element to finish processing
@@ -30,6 +30,17 @@ class EjectableElement : virtual private Keela::Element {
 	 * @param prepare true if the element should prepare itself for ejection, false if not
 	 */
 	void Eject(bool prepare);
+
+   protected:
+	/**
+	 * Retrieve the leaf elements of another leaf element. Use this method to chain multiple EjectableElements together
+	 *
+	 * normally an object can not access the protected or private methods of another object even if they derive from the
+	 * same type. This method allows us to circumvent this accessibility rule a bit
+	 */
+	static std::vector<Keela::Element *> GetLeaves(Keela::EjectableElement &other_element) {
+		return other_element.Leaves();
+	}
 
    private:
 	/**
