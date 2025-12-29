@@ -192,6 +192,7 @@ void Keela::CameraManager::set_frame_splitting(bool split_enabled) {
 	}
 	add_elements(*stream);
 	element_link_many(tee, *stream);
+	set_pipeline_state(GST_STATE_PLAYING);
 }
 std::vector<std::shared_ptr<Keela::CameraStreamBin>> Keela::CameraManager::get_streams() const {
 	std::vector<std::shared_ptr<Keela::CameraStreamBin>> streams;

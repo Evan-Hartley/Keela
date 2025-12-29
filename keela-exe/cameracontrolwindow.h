@@ -69,10 +69,6 @@ class CameraControlWindow final : public Gtk::Window, public Keela::IControlGLCa
 
 	void on_flip_vert_changed() const;
 
-	// void add_split_frame_ui();
-
-	// void remove_split_frame_ui();
-
 	void update_traces();
 
 	void update_presentation_sizes(const std::string &rotation);
