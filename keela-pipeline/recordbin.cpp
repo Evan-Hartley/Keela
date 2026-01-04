@@ -14,7 +14,7 @@
 #include "keela-pipeline/utils.h"
 
 Keela::RecordBin::RecordBin(const std::string &name) : QueueBin(name) {
-	spdlog::info("{}", __func__);
+	SPDLOG_DEBUG("{}", __func__);
 	RecordBin::init();
 	gboolean ret = false;
 
@@ -50,21 +50,26 @@ GstPadProbeReturn Keela::RecordBin::queue_caps_probe(GstPad *pad, GstPadProbeInf
 		return GST_PAD_PROBE_PASS;
 	auto event = gst_pad_probe_info_get_event(info);
 	if(GST_EVENT_TYPE(event) == GST_EVENT_CAPS) {
-		spdlog::info("{}: got caps event", __func__);
-		GstCaps *caps;
-		gst_event_parse_caps(event, &caps);  // does this leak?
-		auto structure = gst_caps_get_structure(caps, 0);
+		SPDLOG_INFO("{}: got caps event", __func__);
+		/// wrap raw caps pointer into Keela::Caps
+		std::unique_ptr<Keela::Caps> caps = nullptr;
+		{
+			GstCaps *tmp;
+			gst_event_parse_caps(event, &tmp);
+			caps = std::make_unique<Keela::Caps>(tmp);
+		}
+		auto structure = gst_caps_get_structure(*caps, 0);
 		gint depth;
 		if(!gst_structure_get_int(structure, "depth", &depth)) {
-			spdlog::error("{}: Failed to get depth from caps", __func__);
+			SPDLOG_ERROR("{}: Failed to get depth from caps", __func__);
 			return GST_PAD_PROBE_REMOVE;
 		}
-		auto caps_str = gst_caps_to_string(caps);
+		auto caps_str = gst_caps_to_string(*caps);
 		spdlog::info("{}: caps: {}", __func__, caps_str);
 		g_free(caps_str);
 		GstVideoInfo src_video_info;
-		if(!gst_video_info_from_caps(&src_video_info, caps)) {
-			spdlog::error("{}: Failed to get video info from caps", __func__);
+		if(!gst_video_info_from_caps(&src_video_info, *caps)) {
+			SPDLOG_ERROR("{}: Failed to get video info from caps", __func__);
 			return GST_PAD_PROBE_REMOVE;
 		}
 		guint formats_len;
@@ -79,16 +84,16 @@ GstPadProbeReturn Keela::RecordBin::queue_caps_probe(GstPad *pad, GstPadProbeInf
 			bool has_subsampling = false;
 			// ALL components must match our depth
 			for(guint i = 0; i < out_video_info->n_components; i++) {
-				if(out_video_info->h_sub[i] > 1 || out_video_info->h_sub[i] > 1) {
-					spdlog::debug("{}: rejected. format {} has subsampling", __func__, out_video_info->name);
+				if(out_video_info->h_sub[i] > 1 || out_video_info->w_sub[i] > 1) {
+					SPDLOG_DEBUG("{}: rejected. format {} has subsampling", __func__, out_video_info->name);
 					has_subsampling = true;
 					break;
 				}
 				if(out_video_info->depth[i] == static_cast<guint>(depth)) {
 					depth_match = true;
 				} else {
-					spdlog::debug("{}: rejected. format {} has depth {}", __func__, out_video_info->name,
-					              out_video_info->depth[i]);
+					SPDLOG_DEBUG("{}: rejected. format {} has depth {}", __func__, out_video_info->name,
+					             out_video_info->depth[i]);
 					depth_match = false;
 					break;
 				}
@@ -97,7 +102,7 @@ GstPadProbeReturn Keela::RecordBin::queue_caps_probe(GstPad *pad, GstPadProbeInf
 			if(!depth_match || has_subsampling) {
 				continue;
 			}
-			spdlog::debug("{}: found format match: {}", __func__, out_video_info->name);
+			SPDLOG_DEBUG("{}: found format match: {}", __func__, out_video_info->name);
 
 			Keela::Caps tmp_caps = Keela::Caps();
 			tmp_caps.set_format(out_video_info->name);
@@ -109,7 +114,7 @@ GstPadProbeReturn Keela::RecordBin::queue_caps_probe(GstPad *pad, GstPadProbeInf
 		}
 
 		if(out_caps) {
-			spdlog::info("{}: setting caps filter caps", __func__);
+			SPDLOG_INFO("{}: setting caps filter caps", __func__);
 			auto *rb = static_cast<RecordBin *>(user_data);
 			g_object_set(rb->caps_filter, "caps", static_cast<GstCaps *>(*out_caps), nullptr);
 		}
@@ -119,7 +124,7 @@ GstPadProbeReturn Keela::RecordBin::queue_caps_probe(GstPad *pad, GstPadProbeInf
 }
 
 Keela::RecordBin::RecordBin() : QueueBin() {
-	spdlog::info("{}", __func__);
+	SPDLOG_INFO("{}", __func__);
 	RecordBin::init();
 	RecordBin::link();
 }
@@ -130,5 +135,5 @@ void Keela::RecordBin::set_directory(const std::string &full_filename) {
 }
 
 Keela::RecordBin::~RecordBin() {
-	spdlog::debug(__func__);
+	SPDLOG_DEBUG(__func__);
 }

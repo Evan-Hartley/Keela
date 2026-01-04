@@ -18,6 +18,7 @@ pkg_search_module(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0)
 pkg_search_module(GSTREAMER REQUIRED IMPORTED_TARGET gstreamer-1.0)
 pkg_search_module(GST_VIDEO REQUIRED IMPORTED_TARGET gstreamer-video-1.0)
 pkg_search_module(SPDLOG REQUIRED IMPORTED_TARGET spdlog)
+add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE) # generate SPDLOG_* logging macros for this logging level and above
 pkg_search_module(GIO REQUIRED IMPORTED_TARGET gio-2.0)
 pkg_search_module(ARAVIS REQUIRED IMPORTED_TARGET aravis-0.8)
 
