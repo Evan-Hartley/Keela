@@ -36,13 +36,6 @@ class TransformBin final : public QueueBin {
 
 	void rotate_270() const;
 
-	/**
-	 * scale video by 1/2 in each direction using the provided base resolution
-	 * @param width base width
-	 * @param height base height
-	 */
-	void scale(int width, int height);
-
    private:
 	const std::string IDENTITY = "identity";
 	const std::string FLIP_HORIZONTAL = "horiz";
@@ -74,10 +67,6 @@ class TransformBin final : public QueueBin {
 
 	void link() override;
 
-	[[obsolete("Not needed when using hardware binning")]]
-	Keela::SimpleElement video_scale = SimpleElement("videoscale");
-	[[obsolete("Not needed when using hardware binning")]]
-	Keela::SimpleElement caps_filter = SimpleElement("capsfilter");
 	Keela::Caps caps;
 	Keela::SimpleElement rotation = SimpleElement("videoflip");
 	Keela::SimpleElement flip_h = SimpleElement("videoflip");
