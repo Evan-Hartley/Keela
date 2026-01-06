@@ -8,6 +8,7 @@
 
 #include <stdexcept>
 
+#include "keela-pipeline/consts.h"
 #include "keela-pipeline/utils.h"
 
 Keela::PresentationBin::PresentationBin(const std::string &name) : QueueBin(name) {
@@ -36,7 +37,8 @@ void Keela::PresentationBin::set_presentation_framerate(const guint framerate) {
 	// we do not want to inherit the old caps
 	presentation_caps = Caps();
 	// TODO: can we accept a range of formats instead?
-	presentation_caps.set_format("GRAY8");
+
+	// presentation_caps.set_format("GRAY8");
 	presentation_caps.set_framerate(60, 1);
 	g_object_set(caps_filter, "caps", static_cast<GstCaps *>(presentation_caps), nullptr);
 }

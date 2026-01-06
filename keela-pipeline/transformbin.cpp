@@ -101,8 +101,8 @@ void Keela::TransformBin::init() {
 }
 
 void Keela::TransformBin::link() {
-	add_elements(video_scale, caps_filter, rotation, flip_h, flip_v);
-	element_link_many(video_scale, caps_filter, rotation, flip_h, flip_v);
+	add_elements(video_scale, caps_filter, rotation, flip_h, flip_v, left_shift);
+	element_link_many(video_scale, caps_filter, left_shift, rotation, flip_h, flip_v);
 	link_queue(video_scale);
 
 	add_ghost_pad(flip_v, "src");

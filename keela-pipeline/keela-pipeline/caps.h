@@ -15,7 +15,7 @@ class Caps {
    public:
 	Caps();
 
-	explicit Caps(GstCaps *c);
+	Caps(GstCaps *c, bool copy = true);
 
 	~Caps();
 

@@ -4,6 +4,7 @@
 
 #ifndef TRANSFORMBIN_H
 #define TRANSFORMBIN_H
+#include "LeftShiftBin.h"
 #include "bin.h"
 #include "caps.h"
 #include "queuebin.h"
@@ -73,12 +74,15 @@ class TransformBin final : public QueueBin {
 
 	void link() override;
 
+	[[obsolete("Not needed when using hardware binning")]]
 	Keela::SimpleElement video_scale = SimpleElement("videoscale");
+	[[obsolete("Not needed when using hardware binning")]]
 	Keela::SimpleElement caps_filter = SimpleElement("capsfilter");
 	Keela::Caps caps;
 	Keela::SimpleElement rotation = SimpleElement("videoflip");
 	Keela::SimpleElement flip_h = SimpleElement("videoflip");
 	Keela::SimpleElement flip_v = SimpleElement("videoflip");
+	Keela::LeftShiftBin left_shift = LeftShiftBin();
 };
 }  // namespace Keela
 #endif  // TRANSFORMBIN_H

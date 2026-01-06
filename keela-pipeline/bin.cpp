@@ -61,7 +61,8 @@ void Keela::Bin::dump_bin_graph() const {
 }
 
 void Keela::Bin::add_ghost_pad(GstElement *element, const std::string &pad_name) const {
-	spdlog::debug("{} {}", __func__, pad_name);
+	auto el_name = GST_ELEMENT_NAME(element);
+	SPDLOG_DEBUG("{} {}:{}", __func__, el_name, pad_name);
 	GstObject *parent = gst_object_get_parent(GST_OBJECT(element));
 	GstElement *bin = *this;
 	if(GST_BIN(parent) != GST_BIN(bin)) {
