@@ -93,7 +93,7 @@ GstPadProbeReturn Keela::LeftShiftBin::data_probe(GstPad *pad, GstPadProbeInfo *
 			auto index = (x * sizeof(guint16)) + (y * video_info.stride[0]);
 			/// does the endianness of the pixel format match the native endianness?
 			bool byteswap = format_is_le && std::endian::native != std::endian::little;
-			guint16 pixel = map_info.data[index];
+			guint16 pixel = *reinterpret_cast<guint16 *>(&map_info.data[index]);
 			if(byteswap) {
 				pixel = std::byteswap(pixel);
 			}
