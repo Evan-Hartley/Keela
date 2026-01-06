@@ -83,19 +83,20 @@ GstPadProbeReturn Keela::LeftShiftBin::data_probe(GstPad *pad, GstPadProbeInfo *
 	assert(map_info.flags == GST_MAP_READWRITE);
 	assert(format->n_components == 1);
 	assert(format->depth[0] == 16);
-	// check endianness of the format
-	auto shift = 16 - depth;
-	SPDLOG_TRACE("Shifting left by {} bits", std::to_string(shift));
+
+	/// number of bits to shift by
+	auto shift = 16 - depth - 1;
+	/// is the current pixel format little endian?
 	auto format_is_le = (format->flags & GST_VIDEO_FORMAT_FLAG_LE) == GST_VIDEO_FORMAT_FLAG_LE;
 	for(int y = 0; y < video_info.height; y++) {
 		for(int x = 0; x < video_info.width; x++) {
 			auto index = (x * sizeof(guint16)) + (y * video_info.stride[0]);
+			/// does the endianness of the pixel format match the native endianness?
 			bool byteswap = format_is_le && std::endian::native != std::endian::little;
 			guint16 pixel = map_info.data[index];
 			if(byteswap) {
 				pixel = std::byteswap(pixel);
 			}
-
 			pixel <<= shift;
 			if(byteswap) {
 				pixel = std::byteswap(pixel);
