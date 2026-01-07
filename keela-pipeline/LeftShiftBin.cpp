@@ -85,7 +85,7 @@ GstPadProbeReturn Keela::LeftShiftBin::data_probe(GstPad *pad, GstPadProbeInfo *
 	assert(format->depth[0] == 16);
 
 	/// number of bits to shift by
-	auto shift = 16 - depth - 1;
+	auto shift = 16 - depth;
 	/// is the current pixel format little endian?
 	auto format_is_le = (format->flags & GST_VIDEO_FORMAT_FLAG_LE) == GST_VIDEO_FORMAT_FLAG_LE;
 	for(int y = 0; y < video_info.height; y++) {
