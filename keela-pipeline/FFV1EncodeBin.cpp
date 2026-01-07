@@ -21,7 +21,7 @@ void Keela::FFV1EncodeBin::init() {
         tmp_caps.set_format(format);
         gst_caps_append(caps,tmp_caps);
     }
-    g_object_set(caps_filter,"caps",static_cast<GstCaps*>(caps));
+    g_object_set(caps_filter,"caps",static_cast<GstCaps*>(caps),nullptr);
 }
 
 void Keela::FFV1EncodeBin::link() {
