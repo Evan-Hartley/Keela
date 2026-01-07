@@ -10,6 +10,8 @@
 #include "keela-pipeline/utils.h"
 
 Keela::H264EncodeBin::H264EncodeBin(): Keela::Bin("H264EncodeBin") {
+	H264EncodeBin::init();
+	H264EncodeBin::link();
 }
 
 void Keela::H264EncodeBin::init() {
