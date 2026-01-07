@@ -29,6 +29,9 @@ add_library(keela-pipeline presentationbin.cpp keela-pipeline/presentationbin.h
         keela-pipeline/CameraStreamBin.h
         LeftShiftBin.cpp
         keela-pipeline/LeftShiftBin.h
+        keela-pipeline/VideoEncoder.h
+        h264EncodeBin.cpp
+        keela-pipeline/h264EncodeBin.h
 )
 target_link_libraries(keela-pipeline PUBLIC PkgConfig::GSTREAMER PkgConfig::SPDLOG)
 
