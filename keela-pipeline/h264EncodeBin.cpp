@@ -7,31 +7,34 @@
 #include <gst/video/video-info.h>
 
 #include "keela-pipeline/caps.h"
+#include "keela-pipeline/gst-helpers.h"
 #include "keela-pipeline/utils.h"
 
-Keela::H264EncodeBin::H264EncodeBin(): Keela::Bin("H264EncodeBin") {
+Keela::H264EncodeBin::H264EncodeBin() : Keela::Bin("H264EncodeBin") {
+	SPDLOG_DEBUG("{}", __func__);
 	H264EncodeBin::init();
 	H264EncodeBin::link();
 }
 
 void Keela::H264EncodeBin::init() {
-    g_object_set(enc,"quantizer",0,nullptr);
-    g_object_set(enc,"pass","quant",nullptr);
-    add_elements(video_convert,caps_filter,enc);
+	g_object_set(enc, "quantizer", 0, nullptr);
+	auto variant = gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(enc)), "pass", "quant");
+	g_object_set(enc, "pass", variant, nullptr);
+	add_elements(video_convert, caps_filter, enc);
 	auto pad = gst_element_get_static_pad(video_convert, "src");
 	gst_pad_add_probe(pad, static_cast<GstPadProbeType>(GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM | GST_PAD_PROBE_TYPE_BLOCK),
-					  caps_probe, this, nullptr);
+	                  caps_probe, this, nullptr);
 	gst_object_unref(pad);
 }
 
 void Keela::H264EncodeBin::link() {
-    element_link_many(video_convert,caps_filter,enc);
-    add_ghost_pad(video_convert,"sink");
-    add_ghost_pad(enc,"src");
+	element_link_many(video_convert, caps_filter, enc);
+	add_ghost_pad(video_convert, "sink");
+	add_ghost_pad(enc, "src");
 }
 
 GstPadProbeReturn Keela::H264EncodeBin::caps_probe(GstPad *pad, GstPadProbeInfo *info, void *user_data) {
-    	if(!(GST_PAD_PROBE_INFO_TYPE(info) & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM))
+	if(!(GST_PAD_PROBE_INFO_TYPE(info) & GST_PAD_PROBE_TYPE_EVENT_DOWNSTREAM))
 		return GST_PAD_PROBE_PASS;
 	auto event = gst_pad_probe_info_get_event(info);
 	if(GST_EVENT_TYPE(event) == GST_EVENT_CAPS) {

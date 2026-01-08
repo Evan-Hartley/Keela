@@ -4,7 +4,10 @@
 
 #ifndef RECORDBIN_H
 #define RECORDBIN_H
+#include "FFV1EncodeBin.h"
+#include "VideoEncoder.h"
 #include "bin.h"
+#include "h264EncodeBin.h"
 #include "queuebin.h"
 #include "simpleelement.h"
 
@@ -13,19 +16,21 @@ class RecordBin final : public QueueBin, public EjectableElement {
    public:
 	explicit RecordBin(const std::string &name);
 
-	RecordBin();
-
 	void set_directory(const std::string &full_filename);
 
 	~RecordBin() override;
 
-	Keela::SimpleElement enc = SimpleElement("x264enc");
-	Keela::SimpleElement mux = SimpleElement("matroskamux");
-	Keela::SimpleElement sink = SimpleElement("filesink");
-	Keela::SimpleElement conv = SimpleElement("videoconvert");
-	Keela::SimpleElement caps_filter = SimpleElement("capsfilter");
-
    private:
+#ifdef KEELA_USE_FFV1
+	Keela::FFV1EncodeBin enc;
+#endif
+#ifndef KEELA_USE_FFV1
+	Keela::H264EncodeBin enc;
+#endif
+
+	Keela::SimpleElement mux;
+	Keela::SimpleElement sink;
+
 	void link() override;
 
 	void init() override;
@@ -39,10 +44,6 @@ class RecordBin final : public QueueBin, public EjectableElement {
 		ret.push_back(&mux);
 		return ret;
 	}
-
-	std::string name;
-
-	static GstPadProbeReturn queue_caps_probe(GstPad *pad, GstPadProbeInfo *info, void *user_data);
 };
 }  // namespace Keela
 #endif  // RECORDBIN_H

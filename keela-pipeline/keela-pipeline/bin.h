@@ -36,8 +36,8 @@ class Bin : public virtual Keela::Element {
 	 * `GstElement` refcount.
 	 * @tparam First any type which can convert to GstElement*
 	 */
-	template <typename First, typename... Rest>
-	void add_elements(First first, Rest... rest) {
+	template <typename... Rest>
+	void add_elements(Keela::Element &first, Rest &...rest) {
 		GstElement *e = first;
 
 		gst_object_ref(e);
