@@ -33,7 +33,6 @@ class PresentationBin final : public QueueBin {
 	/// Used to skip frames for the purposes of presentation
 	Keela::SimpleElement video_rate = SimpleElement("videorate");
 	/// Controls the target presentation framerate
-	Keela::SimpleElement videoconvert = SimpleElement("videoconvert");
 	Keela::SimpleElement caps_filter = SimpleElement("capsfilter");
 	Keela::Caps presentation_caps = Caps();
 };

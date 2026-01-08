@@ -35,6 +35,7 @@ if (USE_HSLUV)
 endif ()
 
 if (USE_FFV1)
+    message("Enabling FFV1 codec")
     add_compile_definitions(KEELA_USE_FFV1)
 endif ()
 

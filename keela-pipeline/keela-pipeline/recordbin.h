@@ -25,6 +25,7 @@ class RecordBin final : public QueueBin, public EjectableElement {
 	Keela::FFV1EncodeBin enc;
 #endif
 #ifndef KEELA_USE_FFV1
+
 	Keela::H264EncodeBin enc;
 #endif
 

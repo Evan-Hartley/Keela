@@ -36,9 +36,6 @@ Keela::PresentationBin::~PresentationBin() {
 void Keela::PresentationBin::set_presentation_framerate(const guint framerate) {
 	// we do not want to inherit the old caps
 	presentation_caps = Caps();
-	// TODO: can we accept a range of formats instead?
-
-	// presentation_caps.set_format("GRAY8");
 	presentation_caps.set_framerate(60, 1);
 	g_object_set(caps_filter, "caps", static_cast<GstCaps *>(presentation_caps), nullptr);
 }
@@ -50,7 +47,7 @@ void Keela::PresentationBin::init() {
 
 void Keela::PresentationBin::link() {
 	set_presentation_framerate(60);
-	add_elements(video_rate, videoconvert, caps_filter, sink);
-	element_link_many(video_rate, videoconvert, caps_filter, sink);
+	add_elements(video_rate, caps_filter, sink);
+	element_link_many(video_rate, caps_filter, sink);
 	link_queue(video_rate);
 }
