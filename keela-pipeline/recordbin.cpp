@@ -31,6 +31,8 @@ void Keela::RecordBin::link() {
 
 void Keela::RecordBin::init() {
 	add_elements(enc, mux, sink);
+	// this will automatically offset incoming camera streams to start at offset 0
+	g_object_set(mux, "offset-to-zero", true, nullptr);
 }
 
 void Keela::RecordBin::set_directory(const std::string &full_filename) {
