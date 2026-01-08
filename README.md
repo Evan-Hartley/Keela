@@ -21,6 +21,7 @@ Based off of the game engine Hazel by The Cherno
     - mingw-w64-x86_64-gst-plugins-good
     - mingw-w64-x86_64-gst-plugins-bad
     - mingw-w64-x86_64-gst-plugins-ugly
+    - mingw-w64-x86_64-gst-libav
     - mingw-w64-x86_64-spdlog
     - mingw-w64-x86_64-aravis
     - mingw-w64-x86_64-aravis-gst
