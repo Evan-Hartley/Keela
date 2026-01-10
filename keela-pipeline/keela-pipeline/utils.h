@@ -25,7 +25,7 @@ inline void element_link_many(Last _) {
 }
 
 template <typename First, typename Second, typename... Rest>
-inline void element_link_many(First first, Second second, Rest... rest) {
+inline void element_link_many(First &first, Second &second, Rest &...rest) {
 	GstElement *f = to_gst_element(first);
 	GstElement *s = to_gst_element(second);
 	auto fname = gst_element_get_name(f);
