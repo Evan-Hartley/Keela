@@ -1,7 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela)
 find_package(PkgConfig)
-
+find_package(TBB REQUIRED)
 # GoogleTest requires at least C++17
 # We need C++20 for jthreads
 # need c++23 for std::byteswap
