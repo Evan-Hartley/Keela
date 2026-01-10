@@ -4,9 +4,21 @@
 
 #ifndef UTILS_H
 #define UTILS_H
-#include "bin.h"
+#include <gstreamer-1.0/gst/gst.h>
+#include <spdlog/spdlog.h>
+
+#include "elementbase.h"
 
 namespace Keela {
+
+inline GstElement *to_gst_element(Keela::Element &e) {
+	return e;
+}
+
+inline GstElement *to_gst_element(std::shared_ptr<Keela::Element> e) {
+	return e->operator GstElement *();
+}
+
 template <typename Last>
 inline void element_link_many(Last _) {
 	spdlog::info("{} no more elements left to link", __func__);
@@ -14,8 +26,8 @@ inline void element_link_many(Last _) {
 
 template <typename First, typename Second, typename... Rest>
 inline void element_link_many(First first, Second second, Rest... rest) {
-	GstElement *f = first;
-	GstElement *s = second;
+	GstElement *f = to_gst_element(first);
+	GstElement *s = to_gst_element(second);
 	auto fname = gst_element_get_name(f);
 	auto sname = gst_element_get_name(s);
 	spdlog::debug("{} linking {} to {}", __func__, fname, sname);

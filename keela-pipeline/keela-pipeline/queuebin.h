@@ -21,7 +21,16 @@ class QueueBin : public Bin {
 	Keela::SimpleElement queue = SimpleElement("queue");
 
    protected:
-	void link_queue(GstElement *sink) const;
+	template <typename T>
+	void link_queue(T t) const {
+		auto sink = to_gst_element(t);
+		auto name = gst_element_get_name(sink);
+		spdlog::info("Linking internal queue to {}", name);
+		g_free(name);
+		if(!gst_element_link(queue, sink)) {
+			throw std::runtime_error("Failed to link queue");
+		}
+	}
 
    private:
 	void init() override;

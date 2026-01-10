@@ -30,6 +30,13 @@ void Keela::RecordBin::link() {
 }
 
 void Keela::RecordBin::init() {
+#ifdef KEELA_USE_FFV1
+	enc = std::make_shared<FFV1EncodeBin>();
+#endif
+#ifndef KEELA_USE_FFV1
+	enc = std::make_shared<H264EncodeBin>();
+#endif
+
 	add_elements(enc, mux, sink);
 	// this will automatically offset incoming camera streams to start at offset 0
 	g_object_set(mux, "offset-to-zero", true, nullptr);

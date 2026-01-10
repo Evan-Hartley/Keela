@@ -21,13 +21,7 @@ class RecordBin final : public QueueBin, public EjectableElement {
 	~RecordBin() override;
 
    private:
-#ifdef KEELA_USE_FFV1
-	Keela::FFV1EncodeBin enc;
-#endif
-#ifndef KEELA_USE_FFV1
-
-	Keela::H264EncodeBin enc;
-#endif
+	std::shared_ptr<Keela::VideoEncoder> enc = nullptr;
 
 	Keela::SimpleElement mux;
 	Keela::SimpleElement sink;

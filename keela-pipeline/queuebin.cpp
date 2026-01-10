@@ -9,6 +9,8 @@
 
 #include <stdexcept>
 
+#include "keela-pipeline/FFV1EncodeBin.h"
+
 Keela::QueueBin::QueueBin() {
 	spdlog::info("{}", __func__);
 	QueueBin::init();
@@ -30,17 +32,7 @@ Keela::QueueBin::QueueBin(const std::string &name) : Bin(name) {
 	QueueBin::link();
 }
 
-void Keela::QueueBin::link_queue(GstElement *sink) const {
-	auto name = gst_element_get_name(sink);
-	spdlog::info("Linking internal queue to {}", name);
-	g_free(name);
-	if(!gst_element_link(queue, sink)) {
-		throw std::runtime_error("Failed to link queue");
-	}
-}
-
 void Keela::QueueBin::init() {
-	// queue = gst_element_factory_make("queue", nullptr);
 	if(!queue) {
 		throw std::runtime_error("Failed to create queue element");
 	}
