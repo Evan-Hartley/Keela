@@ -31,6 +31,7 @@ runs:
         gstreamer1.0-plugins-bad
         gstreamer1.0-plugins-ugly
         libtbb-dev
+        gstreamer1.0-libav
     - name: install dependencies
       if: inputs.os == 'windows-latest'
       uses: msys2/setup-msys2@v2
@@ -49,3 +50,4 @@ runs:
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-pkg-config
           mingw-w64-x86_64-tbb
+          mingw-w64-x86_64-gst-libav
