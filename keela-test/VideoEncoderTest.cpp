@@ -4,11 +4,11 @@
 
 #include <gtest/gtest.h>
 #include <keela-pipeline/FFV1EncodeBin.h>
+#include <keela-pipeline/VideoEncoder.h>
 #include <keela-pipeline/bin.h>
 #include <keela-pipeline/caps.h>
 #include <keela-pipeline/h264EncodeBin.h>
 #include <keela-pipeline/simpleelement.h>
-#include <keela-pipeline/videoencoder.h>
 template <typename T>
 class VideoEncoderTest : public ::testing::Test {
    protected:
