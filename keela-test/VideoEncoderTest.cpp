@@ -15,8 +15,8 @@ class VideoEncoderTest : public ::testing::Test {
 	void SetUp() override {
 		pipeline = gst_pipeline_new("VideoEncoderTest");
 		encoder = std::make_shared<T>();
-		bin.add_elements(testsrc, capsfilter, encoder, fakesink);
-		Keela::element_link_many(testsrc, capsfilter, encoder, fakesink);
+		bin.add_elements(testsrc, capsfilter, encoder, matroskamux, fakesink);
+		Keela::element_link_many(testsrc, capsfilter, encoder, matroskamux, fakesink);
 		gst_bin_add(GST_BIN(pipeline), bin);
 	}
 	void TearDown() override {
@@ -29,6 +29,7 @@ class VideoEncoderTest : public ::testing::Test {
 	Keela::SimpleElement testsrc = Keela::SimpleElement("videotestsrc");
 	Keela::SimpleElement capsfilter = Keela::SimpleElement("capsfilter");
 	std::shared_ptr<Keela::VideoEncoder> encoder;
+	Keela::SimpleElement matroskamux = Keela::SimpleElement("matroskamux");
 	Keela::SimpleElement fakesink = Keela::SimpleElement("fakesink");
 };
 
