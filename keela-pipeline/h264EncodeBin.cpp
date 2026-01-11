@@ -91,7 +91,7 @@ GstPadProbeReturn Keela::H264EncodeBin::caps_probe(GstPad *pad, GstPadProbeInfo 
 			if(!depth_match || has_subsampling) {
 				continue;
 			}
-			SPDLOG_DEBUG("{}: found format match: {}", __func__, out_video_info->name);
+			SPDLOG_INFO("{}: found format match: {}", __func__, out_video_info->name);
 
 			Keela::Caps tmp_caps = Keela::Caps();
 			tmp_caps.set_format(out_video_info->name);
