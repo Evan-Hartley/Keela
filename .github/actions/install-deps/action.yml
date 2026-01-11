@@ -48,3 +48,4 @@ runs:
           mingw-w64-x86_64-ninja
           mingw-w64-x86_64-toolchain
           mingw-w64-x86_64-pkg-config
+          mingw-w64-x86_64-tbb

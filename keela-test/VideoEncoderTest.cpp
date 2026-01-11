@@ -24,7 +24,7 @@ class VideoEncoderTest : public ::testing::Test {
 		gst_object_unref(pipeline);
 	}
 
-	GstElement *pipeline;
+	GstElement *pipeline = nullptr;
 	Keela::Bin bin = Keela::Bin();
 	Keela::SimpleElement testsrc = Keela::SimpleElement("videotestsrc");
 	Keela::SimpleElement capsfilter = Keela::SimpleElement("capsfilter");
