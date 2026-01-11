@@ -9,82 +9,40 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_ubuntu:
-    runs-on: ubuntu-latest
+  build:
+    strategy:
+      matrix:
+        environment:
+         - os: windows-latest
+           shell: msys2 {0}
+         - os: ubuntu-latest
+           shell: bash
+        build_type: [debug,release]
+    defaults:
+      run:
+        shell: ${{matrix.environment.shell}}
+    runs-on: ${{matrix.environment.os}}
     steps:
       - uses: actions/checkout@v6.0.1
-      - name: update apt repositories
-        run: >
-          sudo apt-get update -y
-      - name: install dependencies
-        run: >
-          sudo apt-get install
-          gstreamer-1.0
-          libgstreamer1.0-dev
-          libaravis-0.8-0
-          libaravis-dev
-          libgtkmm-3.0-dev
-          libspdlog-dev
-          libglib2.0-dev
-          pkgconf
-          libusb-1.0-0-dev
-      - name: verify-aravis-install
-        run: |
-          dpkg --print-architecture
-          dpkg -L libaravis-dev | grep '\.pc$'
-          which pkg-config
-          pkg-config --modversion aravis-0.8
-          pkg-config --cflags aravis-0.8
+      - name: Setup Environment
+        uses: ./.github/actions/install-deps
+        with:
+          os: ${{matrix.environment.os}}
       - name: configure cmake
         run: |
           mkdir build
           cd build
-          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=release
+          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
       - name: build
-        run: |
+        run: | 
           cd build
           ninja
+      - name: test
+        run: |
+            cd build
+            ctest --output-on-failure --stop-on-failure
       - name: upload_build_directory
         uses: actions/upload-artifact@v5.0.0
         with:
-          name: build-ubuntu
-          path: ./build/
-  build_windows:
-    runs-on: windows-latest
-
-    steps:
-      - uses: msys2/setup-msys2@v2
-        with:
-          install: >
-            mingw-w64-x86_64-cmake 
-            mingw-w64-x86_64-gtkmm3
-            mingw-w64-x86_64-gstreamer
-            mingw-w64-x86_64-gst-plugins-good
-            mingw-w64-x86_64-gst-plugins-bad
-            mingw-w64-x86_64-gst-plugins-ugly
-            mingw-w64-x86_64-gst-libav
-            mingw-w64-x86_64-spdlog
-            mingw-w64-x86_64-aravis
-            mingw-w64-x86_64-aravis-gst
-            mingw-w64-x86_64-ninja
-            mingw-w64-x86_64-toolchain
-            mingw-w64-x86_64-pkg-config
-            mingw-w64-x86_64-tbb
-      - name: checkout
-        uses: actions/checkout@v6.0.1
-      - name: configure cmake
-        shell: msys2 {0}
-        run: |
-          mkdir build
-          cd build
-          cmake .. -G "Ninja" -DCMAKE_BUILD_TYPE=release
-      - name: build
-        shell: msys2 {0}
-        run: |
-          cd build
-          ninja
-      - name: upload_build_directory
-        uses: actions/upload-artifact@v5.0.0
-        with:
-          name: build-windows
+          name: ${{matrix.environment.os}}-${{matrix.build_type}}
           path: ./build/

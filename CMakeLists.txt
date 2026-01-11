@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela)
 find_package(PkgConfig)
 find_package(TBB REQUIRED)
+find_package(Doxygen COMPONENTS dot)
 # GoogleTest requires at least C++17
 # We need C++20 for jthreads
 # need c++23 for std::byteswap
@@ -54,3 +55,7 @@ add_custom_target(clean-config
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Clean CMake configuration - use this when switching ENABLE_KEELA_VIDEOTESTSRC"
 )
+
+if (Doxygen_FOUND)
+    doxygen_add_docs(docs keela-exe keela-widgets keela-pipeline keela-videotestsrc)
+endif ()
