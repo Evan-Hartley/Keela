@@ -50,6 +50,7 @@ GstPadProbeReturn Keela::H264EncodeBin::caps_probe(GstPad *pad, GstPadProbeInfo 
 		gint depth;
 		if(!gst_structure_get_int(structure, "depth", &depth)) {
 			SPDLOG_ERROR("{}: Failed to get depth from caps", __func__);
+			assert(false);
 			return GST_PAD_PROBE_REMOVE;
 		}
 		auto caps_str = gst_caps_to_string(*caps);

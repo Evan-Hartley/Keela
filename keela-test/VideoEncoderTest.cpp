@@ -38,6 +38,7 @@ TYPED_TEST_SUITE(VideoEncoderTest, EncoderTypes);
 TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY8) {
 	auto caps = Keela::Caps();
 	caps.set_format("GRAY8");
+	caps.set_depth(8);
 	g_object_set(this->capsfilter, "caps", static_cast<GstCaps *>(caps), nullptr);
 	gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
 	GstState state;
@@ -48,6 +49,7 @@ TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY8) {
 TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY16_LE) {
 	auto caps = Keela::Caps();
 	caps.set_format("GRAY16_LE");
+	caps.set_depth(16);
 	g_object_set(this->capsfilter, "caps", static_cast<GstCaps *>(caps), nullptr);
 	gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
 	GstState state;
@@ -58,6 +60,7 @@ TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY16_LE) {
 TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY16_BE) {
 	auto caps = Keela::Caps();
 	caps.set_format("GRAY16_BE");
+	caps.set_depth(16);
 	g_object_set(this->capsfilter, "caps", static_cast<GstCaps *>(caps), nullptr);
 	gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
 	GstState state;
@@ -68,6 +71,7 @@ TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY16_BE) {
 /// this non-functional test ensures that the above functional tests are implemented correctly
 TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_break) {
 	auto caps = Keela::Caps();
+	caps.set_depth(10);
 	caps.set_format("FictionalPixelFormat");
 	g_object_set(this->capsfilter, "caps", static_cast<GstCaps *>(caps), nullptr);
 	gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
