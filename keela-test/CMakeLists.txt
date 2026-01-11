@@ -13,7 +13,8 @@ add_executable(keela-test main.cpp pipeline.cpp
         keela-exe.cpp
         reference.cpp
         widgets.cpp
-        gdk.cpp)
+        gdk.cpp
+        VideoEncoderTest.cpp)
 
 target_link_libraries(keela-test PRIVATE GTest::gtest keela-pipeline keela-widgets PkgConfig::GSTREAMER)
 
