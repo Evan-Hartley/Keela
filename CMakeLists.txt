@@ -39,6 +39,7 @@ if (USE_FFV1)
     add_compile_definitions(KEELA_USE_FFV1)
 endif ()
 
+enable_testing()
 add_subdirectory(vendor)
 add_subdirectory(keela-widgets)
 add_subdirectory(keela-pipeline)

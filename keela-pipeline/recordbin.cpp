@@ -13,6 +13,9 @@
 #include "keela-pipeline/gst-helpers.h"
 #include "keela-pipeline/h264EncodeBin.h"
 #include "keela-pipeline/utils.h"
+Keela::RecordBin::RecordBin() : RecordBin("RecordBin") {
+}
+
 Keela::RecordBin::RecordBin(const std::string &name)
     : QueueBin(name), mux("matroskamux", name + "_mux"), sink("filesink", name + "_sink") {
 	SPDLOG_DEBUG("{}", __func__);

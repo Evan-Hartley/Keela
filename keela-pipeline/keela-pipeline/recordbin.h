@@ -14,6 +14,7 @@
 namespace Keela {
 class RecordBin final : public QueueBin, public EjectableElement {
    public:
+	RecordBin();
 	explicit RecordBin(const std::string &name);
 
 	void set_directory(const std::string &full_filename);
