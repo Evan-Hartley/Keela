@@ -15,8 +15,8 @@ class VideoEncoderTest : public ::testing::Test {
 	void SetUp() override {
 		pipeline = gst_pipeline_new("VideoEncoderTest");
 		encoder = std::make_shared<T>();
-		bin.add_elements(testsrc, encoder, fakesink);
-		Keela::element_link_many(testsrc, encoder, fakesink);
+		bin.add_elements(testsrc, capsfilter, encoder, fakesink);
+		Keela::element_link_many(testsrc, capsfilter, encoder, fakesink);
 		gst_bin_add(GST_BIN(pipeline), bin);
 	}
 	void TearDown() override {
@@ -63,4 +63,15 @@ TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_GRAY16_BE) {
 	GstState state;
 	gst_element_get_state(this->pipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
 	ASSERT_EQ(state, GST_STATE_PLAYING);
+}
+
+/// this non-functional test ensures that the above functional tests are implemented correctly
+TYPED_TEST(VideoEncoderTest, Can_Negotiate_Caps_break) {
+	auto caps = Keela::Caps();
+	caps.set_format("FictionalPixelFormat");
+	g_object_set(this->capsfilter, "caps", static_cast<GstCaps *>(caps), nullptr);
+	gst_element_set_state(this->pipeline, GST_STATE_PLAYING);
+	GstState state;
+	gst_element_get_state(this->pipeline, &state, nullptr, GST_CLOCK_TIME_NONE);
+	ASSERT_NE(state, GST_STATE_PLAYING);
 }
