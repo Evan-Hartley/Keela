@@ -4,45 +4,45 @@
 
 #include "keela-pipeline/recordbin.h"
 
+#include <gst/video/video-info.h>
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
 
+#include "keela-pipeline/caps.h"
 #include "keela-pipeline/gst-helpers.h"
+#include "keela-pipeline/h264EncodeBin.h"
 #include "keela-pipeline/utils.h"
+Keela::RecordBin::RecordBin() : RecordBin("RecordBin") {
+}
 
-using namespace spdlog;
-
-Keela::RecordBin::RecordBin(const std::string &name) : QueueBin(name) {
-	spdlog::info("{}", __func__);
+Keela::RecordBin::RecordBin(const std::string &name)
+    : QueueBin(name), mux("matroskamux", name + "_mux"), sink("filesink", name + "_sink") {
+	SPDLOG_DEBUG("{}", __func__);
 	RecordBin::init();
-	gboolean ret = false;
 
-	ret = gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(this->enc)), (name + "_enc").c_str());
-	ret &= gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(mux)), (name + "_mux").c_str());
-	ret &= gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(sink)), (name + "_sink").c_str());
-	if(!ret) {
-		throw std::runtime_error("Failed to name Elements");
-	}
 	RecordBin::link();
 }
 
 void Keela::RecordBin::link() {
-	add_elements(enc, mux, sink);
+	// TODO: is there a way to prevent a narrowing color format conversion if avoidable?
+	// NOTE: if encoding using GRAY16_LE, conv seems to pick Y444; is this a narrowing conversion?
+
 	element_link_many(enc, mux, sink);
 	link_queue(enc);
 }
 
 void Keela::RecordBin::init() {
-	g_object_set(enc, "quantizer", 0, nullptr);
-	auto variant = gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(enc)), "pass", "quant");
-	g_object_set(enc, "pass", variant, nullptr);
-}
+#ifdef KEELA_USE_FFV1
+	enc = std::make_shared<FFV1EncodeBin>();
+#endif
+#ifndef KEELA_USE_FFV1
+	enc = std::make_shared<H264EncodeBin>();
+#endif
 
-Keela::RecordBin::RecordBin() : QueueBin() {
-	spdlog::info("{}", __func__);
-	RecordBin::init();
-	RecordBin::link();
+	add_elements(enc, mux, sink);
+	// this will automatically offset incoming camera streams to start at offset 0
+	g_object_set(mux, "offset-to-zero", true, nullptr);
 }
 
 void Keela::RecordBin::set_directory(const std::string &full_filename) {
@@ -51,5 +51,5 @@ void Keela::RecordBin::set_directory(const std::string &full_filename) {
 }
 
 Keela::RecordBin::~RecordBin() {
-	spdlog::debug(__func__);
+	SPDLOG_DEBUG(__func__);
 }

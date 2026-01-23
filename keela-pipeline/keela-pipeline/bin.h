@@ -12,6 +12,7 @@
 #include <string>
 
 #include "elementbase.h"
+#include "utils.h"
 
 namespace Keela {
 class Bin : public virtual Keela::Element {
@@ -37,8 +38,8 @@ class Bin : public virtual Keela::Element {
 	 * @tparam First any type which can convert to GstElement*
 	 */
 	template <typename First, typename... Rest>
-	void add_elements(First first, Rest... rest) {
-		GstElement *e = first;
+	void add_elements(First &first, Rest &...rest) {
+		GstElement *e = to_gst_element(first);
 
 		gst_object_ref(e);
 		GstElement *b = *this;

@@ -4,12 +4,11 @@
 
 #include "keela-pipeline/presentationbin.h"
 
-#include <keela-pipeline/gtkglsink.h>
-#include <keela-pipeline/gtksink.h>
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
 
+#include "keela-pipeline/consts.h"
 #include "keela-pipeline/utils.h"
 
 Keela::PresentationBin::PresentationBin(const std::string &name) : QueueBin(name) {
@@ -51,5 +50,4 @@ void Keela::PresentationBin::link() {
 	add_elements(video_rate, caps_filter, sink);
 	element_link_many(video_rate, caps_filter, sink);
 	link_queue(video_rate);
-	// add_ghost_pad(video_rate, "sink");
 }

@@ -15,21 +15,32 @@ Keela::Caps::Caps() {
 	m_caps = std::shared_ptr<GstCaps>(caps, delete_caps);
 }
 
-Keela::Caps::Caps(GstCaps *c) {
-	spdlog::debug("{} creating copy of caps", __func__);
+Keela::Caps::Caps(GstCaps *c, bool copy) {
 	assert(c != nullptr);
 	if(!GST_IS_CAPS(c)) {
-		throw std::invalid_argument("caps is not a GstCaps");
+		throw std::invalid_argument("Object is not a GstCaps");
 	}
-	auto copy = gst_caps_copy(c);
-	if(!copy) {
-		throw std::invalid_argument("failed to copy caps");
+	GstCaps *tmp_caps;
+	if(copy) {
+		SPDLOG_DEBUG("creating copy of caps");
+		auto caps_copy = gst_caps_copy(c);
+		if(!caps_copy) {
+			throw std::invalid_argument("failed to copy caps");
+		}
+		tmp_caps = caps_copy;
+	} else {
+		tmp_caps = c;
 	}
-	m_caps = std::shared_ptr<GstCaps>(copy, delete_caps);
+	m_caps = std::shared_ptr<GstCaps>(tmp_caps, delete_caps);
 }
 
 Keela::Caps::~Caps() {
-	spdlog::debug(__func__);
+	// if(m_caps) {
+	//	auto str = gst_caps_to_string(*this);
+
+	//		spdlog::debug("{}:\n{}", __func__, str);
+	//		g_free(str);
+	//	}
 }
 
 Keela::Caps::operator struct _GstCaps *() const {
@@ -42,4 +53,10 @@ void Keela::Caps::set_framerate(const int numerator, const int denominator) {
 
 void Keela::Caps::set_resolution(const int width, const int height) {
 	set_props("width", G_TYPE_INT, width, "height", G_TYPE_INT, height);
+}
+void Keela::Caps::set_format(const std::string &format) {
+	set_props("format", G_TYPE_STRING, format.c_str());
+}
+void Keela::Caps::set_depth(const gint depth) {
+	set_props("depth", G_TYPE_INT, depth);
 }

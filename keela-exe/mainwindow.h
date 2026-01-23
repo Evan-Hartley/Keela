@@ -23,7 +23,7 @@ class MainWindow final : public Gtk::Window {
 	Gtk::Button directory_button;
 	Gtk::Button restart_camera_button;
 
-	Keela::LabeledComboBoxText pix_fmt_combo = Keela::LabeledComboBoxText("Pixel Format");
+	// Keela::LabeledComboBoxText pix_fmt_combo = Keela::LabeledComboBoxText("Pixel Format");
 	Keela::LabeledSpinButton framerate_spin = Keela::LabeledSpinButton("Framerate (Hz)");
 
 	Gtk::CheckButton cv_recording_check;
@@ -80,7 +80,7 @@ class MainWindow final : public Gtk::Window {
 
 	void on_split_frames_changed();
 
-	void set_pix_fmt();
+	// void set_pix_fmt();
 };
 
 #endif  // MAINWINDOW_H

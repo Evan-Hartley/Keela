@@ -7,7 +7,7 @@
 #include <gtkmm-3.0/gtkmm.h>
 
 namespace Keela {
-class LabeledComboBoxText final : public Gtk::Box {
+class LabeledComboBoxText : public Gtk::Box {
    public:
 	explicit LabeledComboBoxText(const std::string &name);
 

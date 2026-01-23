@@ -74,7 +74,7 @@ void Keela::GLCameraRender::new_tex_sample(GstSample *sample) {
 	ret &= gst_structure_get_int(structure, "height", &height);
 	auto fmt = std::string(gst_structure_get_string(structure, "format"));
 	assert(ret);
-	spdlog::trace("New tex sample width: {} height: {} format: {}", width, height, fmt);
+	// spdlog::trace("New tex sample width: {} height: {} format: {}", width, height, fmt);
 	GstMapInfo mapInfo;
 	if(gst_buffer_map(buf, &mapInfo, GST_MAP_READ)) {
 		auto tex_fmt = fmt == GRAY8 ? GL_UNSIGNED_BYTE : GL_UNSIGNED_SHORT;

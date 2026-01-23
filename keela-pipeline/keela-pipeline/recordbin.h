@@ -4,32 +4,29 @@
 
 #ifndef RECORDBIN_H
 #define RECORDBIN_H
+#include "FFV1EncodeBin.h"
+#include "VideoEncoder.h"
 #include "bin.h"
+#include "h264EncodeBin.h"
 #include "queuebin.h"
 #include "simpleelement.h"
 
 namespace Keela {
 class RecordBin final : public QueueBin, public EjectableElement {
    public:
-	explicit RecordBin(const std::string &name);
-
 	RecordBin();
+	explicit RecordBin(const std::string &name);
 
 	void set_directory(const std::string &full_filename);
 
 	~RecordBin() override;
 
-	Keela::SimpleElement enc = SimpleElement("x264enc");
-	Keela::SimpleElement mux = SimpleElement("matroskamux");
-	Keela::SimpleElement sink = SimpleElement("filesink");
-
-	// these are used to control safe removal of this element from the pipeline
-
-	bool safe_to_remove = false;
-	std::mutex remove_mutex;
-	std::condition_variable remove_condition;
-
    private:
+	std::shared_ptr<Keela::VideoEncoder> enc = nullptr;
+
+	Keela::SimpleElement mux;
+	Keela::SimpleElement sink;
+
 	void link() override;
 
 	void init() override;
@@ -43,8 +40,6 @@ class RecordBin final : public QueueBin, public EjectableElement {
 		ret.push_back(&mux);
 		return ret;
 	}
-
-	std::string name;
 };
 }  // namespace Keela
 #endif  // RECORDBIN_H

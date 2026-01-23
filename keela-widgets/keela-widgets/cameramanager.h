@@ -18,6 +18,9 @@
 #include <atomic>
 #include <set>
 
+#include "IRecordable.h"
+#include "IRestartable.h"
+
 #define EVEN_FRAME 0
 #define ODD_FRAME 1
 
@@ -27,7 +30,7 @@ struct FrameProbeData {
 	int parity;
 	guint64 *counter;
 };
-class CameraManager final : public Keela::Bin {
+class CameraManager final : public Keela::Bin, public IRestartable, public IRecordable {
    public:
 	explicit CameraManager(guint id, bool split_streams);
 
@@ -39,7 +42,7 @@ class CameraManager final : public Keela::Bin {
 
 	std::vector<std::string> get_available_pixel_formats() const;
 
-	void set_pix_fmt(const std::string &format);
+	void set_pix_fmt(const std::string &format, guint depth);
 
 	void set_framerate(double framerate);
 
@@ -86,10 +89,12 @@ class CameraManager final : public Keela::Bin {
 	void set_binning_factors(int binning_factor_both);
 	void set_binning_factors(int binning_factor_x, int binning_factor_y);
 
-	void start_recording();
+#pragma region IRecordable
 
-	void stop_recording();
+	void start_recording() override;
 
+	void stop_recording() override;
+#pragma endregion
 	// Control frame splitting
 	void set_frame_splitting(bool enabled);
 
@@ -116,8 +121,6 @@ class CameraManager final : public Keela::Bin {
 	// Data structures for frame probes
 	FrameProbeData even_probe_data{EVEN_FRAME, &manual_frame_counter};
 	FrameProbeData odd_probe_data{ODD_FRAME, &manual_frame_counter};
-
-	void set_up_frame_splitting();
 
 	void install_frame_splitting_probes();
 

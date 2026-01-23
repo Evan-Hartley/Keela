@@ -85,6 +85,7 @@ class AravisController {
 	std::pair<int, int> get_current_resolution() const;
 
 	std::vector<std::string> get_available_pixel_formats() const;
+	void set_pixel_format(std::string format);
 
 	/** ^ Query hardware capabilities ^ */
 	/** |-----------------------------| */
@@ -115,6 +116,11 @@ class AravisController {
    private:
 	GstElement *aravis_source;
 	ArvCamera *aravis_camera;
+
+	// placeholders to "remember" our feature settings for generating feature strings
+	std::string feature_pix_fmt;
+	std::string feature_binning_mode;
+	void set_features();
 };
 }  // namespace Keela
 

@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        environment: 
+        environment:
          - os: windows-latest
            shell: msys2 {0}
          - os: ubuntu-latest

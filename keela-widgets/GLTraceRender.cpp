@@ -261,7 +261,6 @@ void Keela::GLTraceRender::process_video_data(const std::stop_token &token) {
 			throw std::runtime_error("GLTraceRender: unsupported format");
 		}
 
-		spdlog::trace("GLTraceRender::{}: {}", __func__, mean);
 		gst_sample_unref(sample);
 		sample = nullptr;
 		std::scoped_lock _(worker_mutex);
@@ -306,7 +305,6 @@ double Keela::GLTraceRender::calculate_roi_average(GstSample *sample, GstStructu
 	gst_video_info_init(&info);
 	gst_video_info_from_caps(&info, gst_sample_get_caps(sample));
 
-	// GStreamer's videoflip may add padding to align each row to memory boundaries
 	gsize stride = info.stride[0];  // bytes per row (w/ padding)
 
 	assert(static_cast<gsize>(stride * height) == mapInfo.size);
@@ -333,7 +331,7 @@ double Keela::GLTraceRender::calculate_roi_average(GstSample *sample, GstStructu
 		    // actual buffer index accounting for stride
 		    const auto byte_offset = video_y * stride + video_x * sizeof(T);
 
-	    	T tmp = mapInfo.data[byte_offset];
+		    T tmp = *reinterpret_cast<T *>(&mapInfo.data[byte_offset]);
 
 		    if(endianness != std::endian::native) {
 			    tmp = std::byteswap(tmp);

@@ -20,11 +20,6 @@ Keela::TransformBin::TransformBin() : QueueBin() {
 Keela::TransformBin::TransformBin(const std::string &name) : QueueBin(name) {
 	spdlog::info("{}", __func__);
 	TransformBin::init();
-	gboolean ret = false;
-	ret = gst_object_set_name(GST_OBJECT(static_cast<GstElement *>(video_scale)), (name + "_scale").c_str());
-	if(!ret) {
-		spdlog::warn("{} Failed to name elements", __func__);
-	}
 	TransformBin::link();
 }
 
@@ -74,14 +69,6 @@ void Keela::TransformBin::rotate_270() const {
 	rotate(ROTATE_270);
 }
 
-void Keela::TransformBin::scale(const int width, const int height) {
-	caps = Caps(static_cast<GstCaps *>(caps));
-	const int w = width / 2;
-	const int h = height / 2;
-	caps.set_resolution(w, h);
-	g_object_set(caps_filter, "caps", static_cast<GstCaps *>(caps), nullptr);
-}
-
 void Keela::TransformBin::rotate(const std::string &direction) const {
 	try {
 		const auto variant =
@@ -95,15 +82,12 @@ void Keela::TransformBin::rotate(const std::string &direction) const {
 }
 
 void Keela::TransformBin::init() {
-	auto variant =
-	    Keela::gst_enum_variant_by_nick(G_OBJECT(static_cast<GstElement *>(video_scale)), "method", "bilinear");
-	g_object_set(video_scale, "method", variant, nullptr);
+	add_elements(rotation, flip_h, flip_v, left_shift);
 }
 
 void Keela::TransformBin::link() {
-	add_elements(video_scale, caps_filter, rotation, flip_h, flip_v);
-	element_link_many(video_scale, caps_filter, rotation, flip_h, flip_v);
-	link_queue(video_scale);
+	element_link_many(left_shift, rotation, flip_h, flip_v);
+	link_queue(left_shift);
 
 	add_ghost_pad(flip_v, "src");
 }

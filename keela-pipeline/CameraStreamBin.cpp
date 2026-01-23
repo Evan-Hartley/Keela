@@ -1,7 +1,5 @@
 #include "keela-pipeline/CameraStreamBin.h"
 
-#include <keela-pipeline/gtkglsink.h>
-#include <keela-pipeline/gtksink.h>
 #include <spdlog/spdlog.h>
 
 #include <stdexcept>
@@ -25,26 +23,26 @@ void Keela::CameraStreamBin::link() {
 	spdlog::info("Linking CameraStreamBin {} internal structure", name);
 
 	// Add internal tee and all child bins to this bin
-	add_elements(internal_tee, *presentation, *snapshot, *trace);
+	add_elements(internal_tee, presentation, snapshot, trace);
 
 	// Link internal_tee -> all outputs
-	element_link_many(internal_tee, *presentation);
-	element_link_many(internal_tee, *snapshot);
-	element_link_many(internal_tee, *trace);
+	element_link_many(internal_tee, presentation);
+	element_link_many(internal_tee, snapshot);
+	element_link_many(internal_tee, trace);
 	link_queue(internal_tee);
 }
 
 void Keela::CameraStreamBin::start_recording(const std::string &filename) {
 	record_bin = std::make_shared<RecordBin>("recordbin_" + name);
 	record_bin->set_directory(filename);
-	add_elements(static_cast<Bin &>(*record_bin));
-	gboolean sync_result = gst_element_sync_state_with_parent(static_cast<Bin &>(*record_bin));
+	add_elements(record_bin);
+	gboolean sync_result = gst_element_sync_state_with_parent(*record_bin);
 
 	if(!sync_result) {
 		throw std::runtime_error("Failed to sync record_bin state with parent");
 	}
 
-	element_link_many(internal_tee, static_cast<Bin &>(*record_bin));
+	element_link_many(internal_tee, record_bin);
 	spdlog::info("Started recording in CameraStreamBin {} to file {}", name, filename);
 }
 

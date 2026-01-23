@@ -13,10 +13,6 @@ add_library(keela-pipeline presentationbin.cpp keela-pipeline/presentationbin.h
         keela-pipeline/simpleelement.h
         elementbase.cpp
         keela-pipeline/elementbase.h
-        gtkglsink.cpp
-        keela-pipeline/gtkglsink.h
-        gtksink.cpp
-        keela-pipeline/gtksink.h
         keela-pipeline/widgetelement.h
         keela-pipeline/utils.h
         utils.cpp
@@ -31,6 +27,13 @@ add_library(keela-pipeline presentationbin.cpp keela-pipeline/presentationbin.h
         keela-pipeline/consts.h
         CameraStreamBin.cpp
         keela-pipeline/CameraStreamBin.h
+        LeftShiftBin.cpp
+        keela-pipeline/LeftShiftBin.h
+        keela-pipeline/VideoEncoder.h
+        h264EncodeBin.cpp
+        keela-pipeline/h264EncodeBin.h
+        FFV1EncodeBin.cpp
+        keela-pipeline/FFV1EncodeBin.h
 )
 target_link_libraries(keela-pipeline PUBLIC PkgConfig::GSTREAMER PkgConfig::SPDLOG)
 
