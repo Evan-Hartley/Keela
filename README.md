@@ -13,7 +13,7 @@ Makers:<br>
 
 ### Windows
 
-- Download [Keela](https://github.com/Evan-Hartley/Keela), current recomended branch as of May 2026 is [presentationbin-videoconvert](https://github.com/Evan-Hartley/Keela/tree/presentationbin-videoconvert)
+- Download [Keela](https://github.com/Evan-Hartley/Keela)
 - Install [MSYS2 MinGW](https://www.msys2.org/)
 - Add mingw64 bin directory to PATH env variable (by default this will be C:\msys64\mingw64\bin)
 - Open a mingw64 terminal via the windows search bar
@@ -117,11 +117,10 @@ This is another process we are hoping to streamline in the future
     - All files are saved during the recording process, so if the cameras crash in the middle of a recordingin, no data is lost
     - Files are saved as .mkv files and can be viewed immediately after recording using [VLC Media Player](https://www.videolan.org/vlc/download-windows.html). The metadata of the file will also display the dimensions of the video and the achieved framerate
     - To double check the directory you are recording to, hover over the "Select Directory" button
-    - Developmental Bug Warning (May 2026): After each recording you will be reminded to take a calibration photo, this feature will be moved to a reminder prompt upon exiting the program, for now just click "OK" after each recording to dismiss the reminder and avoid crashing the program (update on its way)
 - To restart cameras (needed after some recordings), use the "Restart Cameras" button
 - **Visualization Option:** Providing a Minimum and Maximum in the data visualization window changes the displayed video into a rainbow colored mode to help visualize the live data (recorded data remains unaffected)
 
 # Developmental Bug Notes
-- After each recording you will be reminded to take a calibration photo, this feature will be moved to a reminder prompt upon exiting the program, for now just click "OK" after each recording to dismiss the reminder and avoid crashing the program (Update is on its way)
+- Upon exiting the main window there will be a prompt reminding the user to take calibration photos. Currently there is only the "OK" button option and no option to cancel the closing of the window, for now just click "OK" to dismiss the reminder and relaunch the program (double checking settings) if you need to take calibration photos (**Note:** - May 2026 - snapshot button currently not operational, take a short calibration video instead)
 - During fast framerates, the video display can ocassionally lag, but the recordings are run through a seperate pipeline which has a seperate update frequency and does not experience this lag, so though the live feed may lag slightly, your recording will have consistency in its framerate
 - The Calcium/Voltage Imaging Option does not currently have a way to be synchronized with a light source, so this option just cuts your frame rate in half at the moment, but the structure for this imaging technique is present and worth checking out. It splits both the video display and the traces. (Hardware schematics and software update in the works)
