@@ -99,6 +99,8 @@ MainWindow::MainWindow() : Gtk::Window() {
 }
 
 MainWindow::~MainWindow() {
+	auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
+	message_dialog.run();
 	g_object_unref(pipeline);
 }
 
@@ -170,8 +172,8 @@ void MainWindow::on_record_button_clicked() {
 		}
 		// TODO: pipeline restart removed here to prevent application hangs when recording at GRAY16_LE/10bit
 	} else {
-		auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
-		message_dialog.run();
+		// auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
+		// message_dialog.run();
 		for(const auto &camera : cameras) {
 			camera->stop_recording();
 		}
