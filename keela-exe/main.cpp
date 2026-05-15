@@ -21,17 +21,6 @@ int main(int argc, char **argv) {
 	spdlog::info("Initializing GStreamer plugins, if available");
 	Keela::initialize_plugins();
 
-	// Get the icon:
-	Gtk::IconTheme keela_theme = Gtk::IconTheme::get_default();
-	try {
-		Gdk::Pixbuf icon = keela_theme.load_icon("keela-icon", 256, 0);
-		button::image = new Gtk::Image::from_pixbuf(icon);
-		Gtk::IconTheme keela_theme = Gtk::IconTheme::get_default();
-		Gtk::IconTheme::gtk_window_set_default_icon_name("keela-icon")
-	} catch(Error e) {
-		warning(e.message);
-	}
-
 	MainWindow window;
 	spdlog::info("Starting application");
 	return app->run(window);
