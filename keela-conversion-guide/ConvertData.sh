@@ -17,7 +17,7 @@ set -euo pipefail
 path_to_files="${1}"
 date=${2}
 cam_num=${3}
-bit_num=${4}
+bit_num="${4}"
 
 
 file_type=".mkv"
