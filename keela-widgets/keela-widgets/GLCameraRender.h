@@ -72,7 +72,7 @@ class GLCameraRender final : public Gtk::GLArea {
 	unsigned int fragmentShader;
 	unsigned int shaderProgram;
 	unsigned int VAO;
-	unsigned int texture;
+	unsigned int texture[2];
 	std::shared_ptr<PresentationBin> bin;
 	float vertices[24] = {-1, -1, 0, 1, 1, 1, 1, 0, -1, 1, 0, 0, 1, -1, 1, 1, 1, 1, 1, 0, -1, -1, 0, 1};
 
