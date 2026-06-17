@@ -90,8 +90,10 @@ void Keela::GLCameraRender::new_tex_sample(GstSample *sample) {
 			glPixelStorei(GL_UNPACK_SWAP_BYTES, GL_FALSE);
 		}
 
-		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glBindTexture(GL_TEXTURE_2D, texture[0]);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RED, tex_fmt, mapInfo.data);
+		std::swap(texture[0], texture[1]);
 
 		gst_buffer_unmap(buf, &mapInfo);
 	} else {
@@ -171,8 +173,12 @@ void Keela::GLCameraRender::on_realize() {
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
 	glEnableVertexAttribArray(1);
 
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glGenTextures(2, texture);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
+	// set nearest neighbors interpolation
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, texture[1]);
 	// set nearest neighbors interpolation
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -192,7 +198,7 @@ bool Keela::GLCameraRender::on_render(const Glib::RefPtr<Gdk::GLContext> &contex
 
 	glUseProgram(shaderProgram);
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, texture[0]);
 
 	glUniform1i(glGetUniformLocation(shaderProgram, "videoTexture"), 0);
 	glUniform1i(glGetUniformLocation(shaderProgram, "heatmap_enabled"), m_controller.is_heatmap_enabled());
