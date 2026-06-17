@@ -13,6 +13,18 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
     : camera_manager(std::make_shared<CameraManager>(id, should_split_frames)), pix_fmt_control(camera_manager) {
 	this->id = id;
 	spdlog::info("Creating {} for camera {}", __func__, id);
+
+	// Frame Rate Listener
+	check_fr_button.set_label("Check Frame Rate");
+	check_fr_button.signal_clicked().connect(sigc::mem_fun(this, &CameraControlWindow::update_framerate));
+	v_container.add(check_fr_button)
+	double frame_rate_real = CameraControlWindow::get_framerate();
+	framerate_spin_real.m_spin.set_adjustment(Gtk::Adjustment::create(frame_rate_real, frame_rate_real,frame_rate_real,1.0));
+	framerate_spin_real.set_sensitive(false);
+	framerate_spin_real.m_spin.set_digits(1);
+	v_container.add(framerate_spin_real);
+
+
 	// set_pix_fmt(pix_fmt);
 	set_title("Image control for Camera " + std::to_string(id));
 	set_resizable(false);
@@ -114,6 +126,21 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 Keela::CameraControlWindow::~CameraControlWindow() {
 	spdlog::info("Destroying camera control window {}", id);
+}
+
+double Keela::CameraControlWindow::get_framerate() {
+	double fr_real = camera_manager->get_framerate();
+	return fr_real;
+}
+
+void Keela::CameraControlWindow::update_framerate() {
+	// Update the frame rate spin with the new range and current setting
+	fr_signal.block();
+	framerate_spin_real.set_sensitive(true);
+	double frame_rate_real = CameraControlWindow::get_framerate();
+	framerate_spin_real.m_spin.set_adjustment(Gtk::Adjustment::create(frame_rate_real,frame_rate_real,frame_rate_real,1.0));
+	framerate_spin_real.set_sensitive(false);
+	fr_signal.unblock();
 }
 
 void Keela::CameraControlWindow::on_gain_changed() const {

@@ -38,6 +38,9 @@ class CameraControlWindow final : public Gtk::Window,
 	std::unique_ptr<VideoPresentation> video_presentation_even;
 	std::unique_ptr<VideoPresentation> video_presentation_odd;
 
+	Gtk::Button check_fr_button;
+	Keela::LabeledSpinButton framerate_spin_real = Keela::LabeledSpinButton("Achieved Frame Rate (Hz)");
+	sigc::connect fr_signal;
 	//Gtk::CheckButton range_check = Gtk::CheckButton("Range");
 	//Keela::LabeledSpinButton range_min_spin = Keela::LabeledSpinButton("Minimum");
 	//Keela::LabeledSpinButton range_max_spin = Keela::LabeledSpinButton("Maximum");
@@ -66,6 +69,10 @@ class CameraControlWindow final : public Gtk::Window,
 	Keela::RangeControl range_control;
 
 	guint id;
+
+	double get_framerate();
+
+	void update_framerate();
 
 	void on_gain_changed() const;
 

@@ -31,6 +31,43 @@ AravisController::AravisController(GstElement *camera) : aravis_source(camera) {
 	g_free(caps_str);
 }
 
+std::pair<double, double> AravisController::get_framerate_range() const {
+	if(aravis_camera == nullptr) {
+		spdlog::warn("Frame Rate control not supported");
+
+		auto nan = std::numeric_limits<double>::quiet_NaN();
+		return {nan, nan};
+	}
+
+	spdlog::debug("Querying frame rate range from camera hardware via ArvCamera object");
+
+	double min_fr, max_fr;
+	GError *error = nullptr;
+	// Query the actual hardware frame rate limits
+	arv_camera_get_gain_bounds(aravis_camera, &min_fr, &max_fr, &error);
+	if(error == nullptr) {
+		spdlog::info("Queried hardware frame rate range from camera: {:.1f} to {:.1f} Hz", min_fr, max_fr);
+	} else {
+		spdlog::warn("Error querying frame rate range from camera: {}", error->message);
+		g_error_free(error);
+	}
+
+	return {min_fr, max_fr};
+}
+
+double AravisController::get_framerate() const {
+	GError *error = nullptr;
+	gdouble gain = arv_camera_get_frame_rate(aravis_camera, &error);
+
+	if(error != nullptr) {
+		spdlog::error("Error getting frame rate from camera: {}", error->message);
+		g_error_free(error);
+		return std::numeric_limits<double>::quiet_NaN();
+	}
+
+	return gain;
+}
+
 std::pair<double, double> AravisController::get_gain_range() const {
 	if(aravis_camera == nullptr) {
 		spdlog::warn("Gain control not supported");

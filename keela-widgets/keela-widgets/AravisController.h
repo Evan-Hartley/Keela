@@ -25,6 +25,15 @@ class AravisController {
 	/** v Query hardware capabilities v */
 
 	/**
+	 * Get the range of frame rate values supported by the camera hardware
+	 *
+	 * Returns {nan, nan} if no aravis camera is available
+	 */
+	std::pair<double, double> get_framerate_range() const;
+
+	double get_framerate() const;
+
+	/**
 	 * Get the range of gain values supported by the camera hardware
 	 *
 	 * Returns {nan, nan} if no aravis camera is available

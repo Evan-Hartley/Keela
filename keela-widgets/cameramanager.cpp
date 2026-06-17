@@ -105,6 +105,14 @@ void Keela::CameraManager::set_experiment_directory(const std::string &path) {
 	experiment_directory = path;
 }
 
+std::pair<double, double> Keela::CameraManager::get_framerate_range() const {
+	return aravis_controller->get_framerate_range();
+}
+
+double Keela::CameraManager::get_framerate() const {
+	return aravis_controller->get_framerate();
+}
+
 std::pair<double, double> Keela::CameraManager::get_gain_range() const {
 	return aravis_controller->get_gain_range();
 }

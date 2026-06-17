@@ -49,6 +49,10 @@ class CameraManager final : public Keela::Bin, public IRestartable, public IReco
 	void set_experiment_directory(const std::string &path);
 
 	// Query hardware capabilities
+	std::pair<double, double> get_framerate_range() const;
+
+	double get_framerate() const;
+
 	std::pair<double, double> get_gain_range() const;
 
 	double get_gain() const;
