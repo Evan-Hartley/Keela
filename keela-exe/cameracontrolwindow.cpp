@@ -17,7 +17,7 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	// Frame Rate Listener
 	check_fr_button.set_label("Check Frame Rate");
 	check_fr_button.signal_clicked().connect(sigc::mem_fun(this, &CameraControlWindow::update_framerate));
-	v_container.add(check_fr_button)
+	v_container.add(check_fr_button);
 	double frame_rate_real = CameraControlWindow::get_framerate();
 	framerate_spin_real.m_spin.set_adjustment(Gtk::Adjustment::create(frame_rate_real, frame_rate_real,frame_rate_real,1.0));
 	framerate_spin_real.set_sensitive(false);

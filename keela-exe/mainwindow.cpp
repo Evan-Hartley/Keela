@@ -223,7 +223,7 @@ void MainWindow::set_framerate(Keela::CameraManager *cm) const {
 
 void MainWindow::update_framerate_range(Keela::CameraManager *cm) {
 	// Get the range supported by the camera hardware
-	auto ft_range = cm->get_framerate_range();
+	auto fr_range = cm->get_framerate_range();
 	double min_fr = fr_range.first;
 	double max_fr = fr_range.second;
 
@@ -237,11 +237,11 @@ void MainWindow::update_framerate_range(Keela::CameraManager *cm) {
 	}
 
 	// Update the frame rate spin witth the new range and current setting
-	framerate_spin_m_spin.set_adjustable(Gtk::Adjustable::create(current_fr, min_fr, max_fr, 1.0));
+	framerate_spin.m_spin.set_adjustment(Gtk::Adjustment::create(current_fr, min_fr, max_fr, 1.0));
 	framerate_spin.m_spin.set_value(current_fr);
 	framerate_spin.m_spin.set_sensitive(true);
 
-	spdlog::info("Updated frame rate control range to {:.1f} - {.1f} Hz", min_fr, max_fr);
+	spdlog::info("Updated frame rate control range to {:.1f} - {:.1f} Hz", min_fr, max_fr);
 }
 
 void MainWindow::on_trace_button_clicked() {

@@ -40,7 +40,7 @@ class CameraControlWindow final : public Gtk::Window,
 
 	Gtk::Button check_fr_button;
 	Keela::LabeledSpinButton framerate_spin_real = Keela::LabeledSpinButton("Achieved Frame Rate (Hz)");
-	sigc::connect fr_signal;
+	sigc::connection fr_signal;
 	//Gtk::CheckButton range_check = Gtk::CheckButton("Range");
 	//Keela::LabeledSpinButton range_min_spin = Keela::LabeledSpinButton("Minimum");
 	//Keela::LabeledSpinButton range_max_spin = Keela::LabeledSpinButton("Maximum");
