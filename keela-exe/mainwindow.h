@@ -80,6 +80,9 @@ class MainWindow final : public Gtk::Window {
 
 	void on_split_frames_changed();
 
+   protected:
+	bool on_delete_event(GdkEventAny *any_event) override;
+
 	// void set_pix_fmt();
 };
 

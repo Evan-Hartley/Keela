@@ -99,8 +99,6 @@ MainWindow::MainWindow() : Gtk::Window() {
 }
 
 MainWindow::~MainWindow() {
-	auto message_dialog = Gtk::MessageDialog("Remember to take calibration photos");
-	message_dialog.run();
 	g_object_unref(pipeline);
 }
 
@@ -325,4 +323,15 @@ void MainWindow::on_split_frames_changed() {
 
 		trace_control_row_box.set_sensitive(true);
 	}
+}
+bool MainWindow::on_delete_event(GdkEventAny *any_event) {
+	Gtk::MessageDialog dialog(*this,"Remember to take calibration photos",false,Gtk::MESSAGE_QUESTION,Gtk::BUTTONS_NONE,false);
+	dialog.add_button("Cancel (Return to main window)",Gtk::RESPONSE_CANCEL);
+	auto exit = dialog.add_button("Exit program",Gtk::RESPONSE_CLOSE);
+	exit->override_color(Gdk::RGBA("red"));
+	auto response = dialog.run();
+	if(response == Gtk::RESPONSE_CANCEL) {
+		return true;
+	}
+	return Window::on_delete_event(any_event);
 }
