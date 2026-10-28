@@ -1,3 +1,5 @@
+add_dependencies(keela)
+
 # Create the library first
 add_library(gstkeelavideotestsrc SHARED
         gstkeelavideotestsrc.c
@@ -5,7 +7,7 @@ add_library(gstkeelavideotestsrc SHARED
 )
 
 # Link libraries and include directories
-target_link_libraries(gstkeelavideotestsrc PkgConfig::GSTREAMER PkgConfig::GST_BASE PkgConfig::GST_VIDEO)
+target_link_libraries(gstkeelavideotestsrc GStreamer::GStreamer GStreamer::Base GStreamer::Video)
 
 # Ensure filename matches GStreamer autoloader pattern: libgst*.so
 set_target_properties(gstkeelavideotestsrc PROPERTIES

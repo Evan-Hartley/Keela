@@ -1,3 +1,4 @@
+add_dependencies(keela)
 
 set(RESOURCE_XML "${CMAKE_CURRENT_SOURCE_DIR}/shader-resources.xml")
 set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
@@ -49,6 +50,6 @@ add_library(keela-widgets labeledspinbutton.cpp keela-widgets/labeledspinbutton.
         keela-widgets/RangeControl.h
 )
 add_dependencies(keela-widgets shader_resources)
-target_link_libraries(keela-widgets PUBLIC keela-pipeline PkgConfig::GTKMM PkgConfig::GIO PkgConfig::SPDLOG PkgConfig::ARAVIS PkgConfig::GST_VIDEO vendor-glad)
+target_link_libraries(keela-widgets PUBLIC keela-pipeline gtkmm::gtkmm GIO::gio spdlog::spdlog Aravis::Aravis GStreamer::Video vendor-glad)
 target_link_libraries(keela-widgets PRIVATE TBB::tbb)
 target_include_directories(keela-widgets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

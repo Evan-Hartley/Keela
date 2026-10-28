@@ -1,0 +1,39 @@
+[submodule "vendor/gstreamer"]
+	path = vendor/gstreamer
+	url = https://github.com/GStreamer/gstreamer.git
+[submodule "vendor/libwdi"]
+	path = vendor/libwdi
+	url = https://github.com/pbatard/libwdi.git
+[submodule "vendor/gtk"]
+	path = vendor/gtk
+	url = https://github.com/GNOME/gtk.git
+[submodule "vendor/glib"]
+	path = vendor/glib
+	url = https://github.com/GNOME/glib.git
+[submodule "vendor/doxygen"]
+	path = vendor/doxygen
+	url = https://github.com/doxygen/doxygen.git
+[submodule "vendor/gtkmm"]
+	path = vendor/gtkmm
+	url = https://github.com/GNOME/gtkmm.git
+[submodule "vendor/gst-plugins-base"]
+	path = vendor/gst-plugins-base
+	url = https://github.com/GStreamer/gst-plugins-base.git
+[submodule "vendor/gst-plugins-good"]
+	path = vendor/gst-plugins-good
+	url = https://github.com/GStreamer/gst-plugins-good.git
+[submodule "vendor/gst-plugins-bad"]
+	path = vendor/gst-plugins-bad
+	url = https://github.com/GStreamer/gst-plugins-bad.git
+[submodule "vendor/gst-plugins-ugly"]
+	path = vendor/gst-plugins-ugly
+	url = https://github.com/GStreamer/gst-plugins-ugly.git
+[submodule "vendor/spdlog"]
+	path = vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "vendor/aravis"]
+	path = vendor/aravis
+	url = https://github.com/AravisProject/aravis.git
+[submodule "vendor/tbb"]
+	path = vendor/tbb
+	url = https://github.com/uxlfoundation/oneTBB.git

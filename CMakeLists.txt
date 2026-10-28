@@ -1,61 +1,375 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
-project(Keela)
-find_package(PkgConfig)
-find_package(TBB REQUIRED)
-find_package(Doxygen COMPONENTS dot)
-# GoogleTest requires at least C++17
-# We need C++20 for jthreads
-# need c++23 for std::byteswap
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+project(Keela-Master)
 
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS} -Wall)
+include(ExternalProjects)
 
-option(MAKE_REFERENCE "Build reference gstreamer gtk integration" false)
-option(ENABLE_KEELA_VIDEOTESTSRC "Enable custom Keela videotestsrc plugin for development/testing" false)
-option(USE_HSLUV "Use HSLuv color mapping instead of basic HSL" false)
-option(USE_FFV1 "Use FFV1 codec to encode video. If disabled, keela will use h.264" true)
+set(DEPS_VENDOR_DIR ${CMAKE_SOURCE_DIR}/vendor)
+set(DEPS_INSTALL_DIR ${CMAKE_BINARY_DIR}/install)
+set(DEPS_DRIVER_DIR ${CMAKE_SOURCE_DIR}/DriverInstaller)
 
-pkg_search_module(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0)
-pkg_search_module(GSTREAMER REQUIRED IMPORTED_TARGET gstreamer-1.0)
-pkg_search_module(GST_VIDEO REQUIRED IMPORTED_TARGET gstreamer-video-1.0)
-pkg_search_module(SPDLOG REQUIRED IMPORTED_TARGET spdlog)
-add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE) # generate SPDLOG_* logging macros for this logging level and above
-pkg_search_module(GIO REQUIRED IMPORTED_TARGET gio-2.0)
-pkg_search_module(ARAVIS REQUIRED IMPORTED_TARGET aravis-0.8)
+#external libraries - build step
+ExternalProject_Add(
+    libwdi
 
-# compile the keela-videotestsrc plugin if enabled
-if (ENABLE_KEELA_VIDEOTESTSRC)
-    pkg_search_module(GST_BASE REQUIRED IMPORTED_TARGET gstreamer-base-1.0)
-    add_compile_definitions(KEELA_VIDEOTESTSRC_ENABLED)
-    add_subdirectory(keela-videotestsrc)
-endif ()
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/libwdi
 
-if (USE_HSLUV)
-    add_compile_definitions(KEELA_USE_HSLUV)
-endif ()
+    CONFIGURE_COMMAND
+        ""
 
-if (USE_FFV1)
-    message("Enabling FFV1 codec")
-    add_compile_definitions(KEELA_USE_FFV1)
-endif ()
+    BUILD_COMMAND
+        msbuild
+        <SOURCE_DIR>/libwdi.sln
+        /p:Configuration=Release
+        /p:Platform=x64
 
-enable_testing()
-add_subdirectory(vendor)
-add_subdirectory(keela-widgets)
-add_subdirectory(keela-pipeline)
-add_subdirectory(keela-exe)
-add_subdirectory(keela-test)
-add_subdirectory(reference)
+    INSTALL_COMMAND
+        ${CMAKE_COMMAND} -E make_directory
+        ${DEPS_INSTALL_DIR}/include
 
-# Add a target to clean configuration when switching video test source modes
-add_custom_target(clean-config
-        COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_BINARY_DIR}/CMakeFiles
-        COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_BINARY_DIR}/CMakeCache.txt
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMENT "Clean CMake configuration - use this when switching ENABLE_KEELA_VIDEOTESTSRC"
+    COMMAND
+        ${CMAKE_COMMAND} -E make_directory
+        ${DEPS_INSTALL_DIR}/lib
+
+    COMMAND
+        ${CMAKE_COMMAND} -E copy_directory
+        <SOURCE_DIR>/libwdi
+        ${DEPS_INSTALL_DIR}/include/libwdi
+
+    COMMAND
+        ${CMAKE_COMMAND} -E copy
+        <SOURCE_DIR>/msvc/x64/Release/libwdi.lib
+        ${DEPS_INSTALL_DIR}/lib
 )
 
-if (Doxygen_FOUND)
-    doxygen_add_docs(docs readme.md keela-exe keela-widgets keela-pipeline keela-videotestsrc)
-endif ()
+ExternalProject_Add(
+    gtkmm
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gtkmm
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gtk
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gtk
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gstreamer
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gstreamer
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gst-plugins-base
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gst-plugins-base
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gst-plugins-good
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gst-plugins-good
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gst-plugins-bad
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gst-plugins-bad
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gst-plugins-ugly
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gst-plugins-ugly
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    gst-libav
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/gst-libav
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    aravis
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/aravis
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    aravis-gst
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/aravis/gst
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    glib
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/glib
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    doxygen
+
+    SOURCE_DIR
+        ${CMAKE_VENDOR_DIR}/doxygen
+
+    CONFIGURE_COMMAND
+        meson setup
+        <BINARY_DIR>
+        <SOURCE_DIR>
+        --prefix=${DEPS_INSTALL_DIR}
+
+    BUILD_COMMAND
+        meson compile -C <BINARY_DIR>
+
+    INSTALL_COMMAND
+        meson install -C <BINARY_DIR>
+)
+
+ExternalProject_Add(
+    keela_exe
+
+    SOURCE_DIR
+        ${CMAKE_SOUCE_DIR}/keela
+
+    CMAKE_ARGS
+        -DCMAKE_PREFIX_PATH=${DEPS_INSTALL_DIR}
+)
+
+#cmake supported libraries - fetch step
+add_subdirectory(vendor/spdlog)
+add_subdirectory(vendor/tbb)
+
+#create a third-party bundle
+add_custom_target(third_party)
+add_dependencies(
+    third_party
+    gtkmm
+    gtk
+    gstreamer
+    gst-plugins-base
+    gst-plugins-good
+    gst-plugins-bad
+    gst-plugins-ugly
+    gst-libav
+    glib
+    aravis
+    aravis-gst
+    doxygen
+)
+
+#  Add the application subfolder
+add_subdirectory(install)
+add_subdirectory(DriverInstaller)
+add_subdirectory(keela-exe)
+
+# Install required camera driver
+install(CODE [[
+    message(STATUS "Running DriverInstaller)
+
+    execute_process(
+        COMMAND "${DEPS_DRIVER_DIR}/DriverInstaller.exe"
+        RESULT_VARIABLE DRIVER_RESULT
+    )
+
+    if(NOT DRIVER_RESULT EQUAL 0)
+        message(FATAL_ERROR
+            "Driver installation failed with code ${DRIVER_RESULT}"
+        )
+    endif()
+]])
+
+# Install dependecies in the installation-setup folder
+install(
+    DIRECTORY
+        ${DEPS_INSTALL_DIR}/bin/
+    DESTINATION
+        ${CMAKE_SOURCE_DIR}/KeelaSetup/bin
+)
+
+install(
+    DIRECTORY
+        ${DEPS_INSTALL_DIR}/lib/
+    DESTINATION
+        ${CMAKE_SOURCE_DIR}/KeelaSetup/lib
+)
+
+install(
+    DIRECTORY
+        ${DEPS_INSTALL_DIR}/include/
+    DESTINATION
+        ${CMAKE_SOURCE_DIR}/KeelaSetup/include
+)
+
+install(
+    DIRECTORY
+        ${DEPS_INSTALL_DIR}/share/
+    DESTINATION
+        ${CMAKE_SOURCE_DIR}/KeelaSetup/share
+)
+
+install(
+    DIRECTORY
+        ${DEPS_INSTALL_DIR}/etc/
+    DESTINATION
+        ${CMAKE_SOURCE_DIR}/KeelaSetup/etc
+)
+
+#setup a installer file
+set(CPACK_PACKAGE_NAME "Keela")
+set(CPACK_PACKAGE_VENDOR "Georgia Institute of Techology - CHAOS Lab")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Keela")
+
+set(CPACK_GENORATOR "NSIS")
+
+set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '$DESKTOP\\Keela.lnk' '$INSTDIR\\keela.exe'")
+
+set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$DESKTOP\\Keela.lnk'")
+
+include(CPACK)
