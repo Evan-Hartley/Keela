@@ -1,5 +1,3 @@
-add_dependencies(keela)
-
 set(RESOURCE_XML "${CMAKE_CURRENT_SOURCE_DIR}/shader-resources.xml")
 set(SHADER_DIR "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 set(SHADER_C "${CMAKE_CURRENT_SOURCE_DIR}/shader-resources.c")
@@ -14,7 +12,6 @@ add_custom_command(
         COMMAND glib-compile-resources ${RESOURCE_XML} --generate-header --sourcedir ${SHADER_DIR} --target ${SHADER_H} --c-name=shader_resources
         DEPFILE ${SHADER_DEPFILE}
 )
-
 
 add_library(keela-widgets labeledspinbutton.cpp keela-widgets/labeledspinbutton.h
         framebox.cpp
@@ -49,7 +46,8 @@ add_library(keela-widgets labeledspinbutton.cpp keela-widgets/labeledspinbutton.
         RangeControl.cpp
         keela-widgets/RangeControl.h
 )
+add_dependencies(keela-widgets Keela)
 add_dependencies(keela-widgets shader_resources)
-target_link_libraries(keela-widgets PUBLIC keela-pipeline gtkmm::gtkmm GIO::gio spdlog::spdlog Aravis::Aravis GStreamer::Video vendor-glad)
+target_link_libraries(keela-widgets PUBLIC GTKMM GIO spdlog::spdlog Aravis GStreamerVideo vendor-glad)
 target_link_libraries(keela-widgets PRIVATE TBB::tbb)
 target_include_directories(keela-widgets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

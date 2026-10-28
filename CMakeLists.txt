@@ -1,18 +1,18 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela-Master)
 
-include(ExternalProjects)
+include(ExternalProject)
 
-set(DEPS_VENDOR_DIR ${CMAKE_SOURCE_DIR}/vendor)
-set(DEPS_INSTALL_DIR ${CMAKE_BINARY_DIR}/install)
-set(DEPS_DRIVER_DIR ${CMAKE_SOURCE_DIR}/DriverInstaller)
+set(DEPS_VENDOR_DIR ${PROJECT_SOURCE_DIR}/vendor)
+set(DEPS_INSTALL_DIR ${PROJECT_SOURCE_DIR}/install)
+set(DEPS_DRIVER_DIR ${PROJECT_SOURCE_DIR}/DriverInstaller)
 
 #external libraries - build step
 ExternalProject_Add(
     libwdi
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/libwdi
+        ${DEPS_VENDOR_DIR}/libwdi
 
     CONFIGURE_COMMAND
         ""
@@ -46,7 +46,7 @@ ExternalProject_Add(
     gtkmm
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gtkmm
+        ${DEPS_VENDOR_DIR}/gtkmm
 
     CONFIGURE_COMMAND
         meson setup
@@ -65,7 +65,7 @@ ExternalProject_Add(
     gtk
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gtk
+        ${DEPS_VENDOR_DIR}/gtk
 
     CONFIGURE_COMMAND
         meson setup
@@ -84,7 +84,7 @@ ExternalProject_Add(
     gstreamer
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gstreamer
+        ${DEPS_VENDOR_DIR}/gstreamer
 
     CONFIGURE_COMMAND
         meson setup
@@ -100,10 +100,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    gst-plugins-base
+    gst_plugins_base
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gst-plugins-base
+        ${DEPS_VENDOR_DIR}/gst-plugins-base
 
     CONFIGURE_COMMAND
         meson setup
@@ -119,10 +119,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    gst-plugins-good
+    gst_plugins_good
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gst-plugins-good
+        ${DEPS_VENDOR_DIR}/gst-plugins-good
 
     CONFIGURE_COMMAND
         meson setup
@@ -138,10 +138,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    gst-plugins-bad
+    gst_plugins_bad
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gst-plugins-bad
+        ${DEPS_VENDOR_DIR}/gst-plugins-bad
 
     CONFIGURE_COMMAND
         meson setup
@@ -157,10 +157,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    gst-plugins-ugly
+    gst_plugins_ugly
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gst-plugins-ugly
+        ${DEPS_VENDOR_DIR}/gst-plugins-ugly
 
     CONFIGURE_COMMAND
         meson setup
@@ -176,10 +176,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    gst-libav
+    gst_libav
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/gst-libav
+        ${DEPS_VENDOR_DIR}/gst-libav
 
     CONFIGURE_COMMAND
         meson setup
@@ -198,7 +198,7 @@ ExternalProject_Add(
     aravis
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/aravis
+        ${DEPS_VENDOR_DIR}/aravis
 
     CONFIGURE_COMMAND
         meson setup
@@ -214,10 +214,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    aravis-gst
+    aravis_gst
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/aravis/gst
+        ${DEPS_VENDOR_DIR}/aravis/gst
 
     CONFIGURE_COMMAND
         meson setup
@@ -236,7 +236,7 @@ ExternalProject_Add(
     glib
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/glib
+        ${DEPS_VENDOR_DIR}/glib
 
     CONFIGURE_COMMAND
         meson setup
@@ -255,7 +255,7 @@ ExternalProject_Add(
     doxygen
 
     SOURCE_DIR
-        ${CMAKE_VENDOR_DIR}/doxygen
+        ${DEPS_VENDOR_DIR}/doxygen
 
     CONFIGURE_COMMAND
         meson setup
@@ -270,35 +270,26 @@ ExternalProject_Add(
         meson install -C <BINARY_DIR>
 )
 
-ExternalProject_Add(
-    keela_exe
-
-    SOURCE_DIR
-        ${CMAKE_SOUCE_DIR}/keela
-
-    CMAKE_ARGS
-        -DCMAKE_PREFIX_PATH=${DEPS_INSTALL_DIR}
-)
-
-#cmake supported libraries - fetch step
+# cmake supported libraries - fetch step
 add_subdirectory(vendor/spdlog)
 add_subdirectory(vendor/tbb)
+add_subdirectory(vendor/glad)
 
-#create a third-party bundle
+# create a third-party bundle
 add_custom_target(third_party)
 add_dependencies(
     third_party
     gtkmm
     gtk
     gstreamer
-    gst-plugins-base
-    gst-plugins-good
-    gst-plugins-bad
-    gst-plugins-ugly
-    gst-libav
+    gst_plugins_base
+    gst_plugins_good
+    gst_plugins_bad
+    gst_plugins_ugly
+    gst_libav
     glib
     aravis
-    aravis-gst
+    aravis_gst
     doxygen
 )
 
@@ -328,38 +319,38 @@ install(
     DIRECTORY
         ${DEPS_INSTALL_DIR}/bin/
     DESTINATION
-        ${CMAKE_SOURCE_DIR}/KeelaSetup/bin
+        ${PROJECT_SOURCE_DIR}/KeelaSetup/bin
 )
 
 install(
     DIRECTORY
         ${DEPS_INSTALL_DIR}/lib/
     DESTINATION
-        ${CMAKE_SOURCE_DIR}/KeelaSetup/lib
+        ${PROJECT_SOURCE_DIR}/KeelaSetup/lib
 )
 
 install(
     DIRECTORY
         ${DEPS_INSTALL_DIR}/include/
     DESTINATION
-        ${CMAKE_SOURCE_DIR}/KeelaSetup/include
+        ${PROJECT_SOURCE_DIR}/KeelaSetup/include
 )
 
 install(
     DIRECTORY
         ${DEPS_INSTALL_DIR}/share/
     DESTINATION
-        ${CMAKE_SOURCE_DIR}/KeelaSetup/share
+        ${PROJECT_SOURCE_DIR}/KeelaSetup/share
 )
 
 install(
     DIRECTORY
         ${DEPS_INSTALL_DIR}/etc/
     DESTINATION
-        ${CMAKE_SOURCE_DIR}/KeelaSetup/etc
+        ${PROJECT_SOURCE_DIR}/KeelaSetup/etc
 )
 
-#setup a installer file
+# setup a installer file
 set(CPACK_PACKAGE_NAME "Keela")
 set(CPACK_PACKAGE_VENDOR "Georgia Institute of Techology - CHAOS Lab")
 set(CPACK_PACKAGE_VERSION "1.0.0")
@@ -368,8 +359,8 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Keela")
 
 set(CPACK_GENORATOR "NSIS")
 
-set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '$DESKTOP\\Keela.lnk' '$INSTDIR\\keela.exe'")
+set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '$DESKTOP\\Keela.lnk' '$INSTDIR\\Keela.exe'")
 
 set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete '$DESKTOP\\Keela.lnk'")
 
-include(CPACK)
+include(CPack)

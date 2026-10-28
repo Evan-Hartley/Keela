@@ -1,5 +1,3 @@
-add_dependencies(keela)
-
 include(FetchContent)
 FetchContent_Declare(
         googletest
@@ -16,7 +14,9 @@ add_executable(keela-test main.cpp pipeline.cpp
         gdk.cpp
         VideoEncoderTest.cpp)
 
-target_link_libraries(keela-test PRIVATE GTest::gtest keela-pipeline keela-widgets GStreamer::GStreamer)
+add_dependencies(keela-test Keela)
+
+target_link_libraries(keela-test PRIVATE GTest::gtest GStreamer)
 
 include(GoogleTest)
 gtest_discover_tests(keela-test)

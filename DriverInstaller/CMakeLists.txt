@@ -3,10 +3,12 @@ add_executable(
     DriverInstaller.cpp
 )
 
+add_dependencies(DriverInstaller libwdi)
+
 target_link_libraries(
     DriverInstaller
     PRIVATE
-        libwdi::libwdi
+        Libwdi
 )
 
 install(

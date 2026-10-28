@@ -1,9 +1,26 @@
 project(Keela)
 
+# Set up executable
+IF (WIN32)
+  add_executable(Keela main.cpp mainwindow.cpp mainwindow.h
+        cameracontrolwindow.cpp
+        cameracontrolwindow.h
+        tracewindow.cpp
+        tracewindow.h
+        keela-icon.o)
+ELSE()
+   add_executable(Keela main.cpp mainwindow.cpp mainwindow.h
+        cameracontrolwindow.cpp
+        cameracontrolwindow.h
+        tracewindow.cpp
+        tracewindow.h)
+ENDIF()
+
 # add dependencies incase of non-installation step
 if(TARGET third_party)
     #build all dependencies before the executable
     add_dependencies(
+        Keela
         third_party
     )
 endif()
@@ -21,39 +38,21 @@ option(ENABLE_KEELA_VIDEOTESTSRC "Enable custom Keela videotestsrc plugin for de
 option(USE_HSLUV "Use HSLuv color mapping instead of basic HSL" false)
 option(USE_FFV1 "Use FFV1 codec to encode video. If disabled, keela will use h.264" true)
 
-# Set up executable
-IF (WIN32)
-  add_executable(keela main.cpp mainwindow.cpp mainwindow.h
-        cameracontrolwindow.cpp
-        cameracontrolwindow.h
-        tracewindow.cpp
-        tracewindow.h
-        keela-icon.o)
-ELSE()
-   add_executable(keela main.cpp mainwindow.cpp mainwindow.h
-        cameracontrolwindow.cpp
-        cameracontrolwindow.h
-        tracewindow.cpp
-        tracewindow.h)
-ENDIF()
-
 #all libraries - linking steps
 target_link_libraries(
-    keela
+    Keela
     PRIVATE
-        keela-widgets
-        keela-pipeline
-        gtkmm::gtkmm
-        gtk::gtk
-        GStreamer::GStreamer
-        GStreamer::Base
-        GStreamer::Video
-        GStreamer::Audio
-        GStreamer::App
-        Aravis::Aravis
-        Aravis::Gst
-        glib::glib
-        GIO::gio
+        GTKMM
+        GTK3
+        GStreamer
+        GStreamerBase
+        GStreamerVideo
+        GStreamerAudio
+        GStreamerApp
+        Aravis
+        AravisGst
+        GLib
+        GIO
         spdlog::spdlog
         TBB::tbb
 )
@@ -97,6 +96,6 @@ if (Doxygen_FOUND)
 endif ()
 
 install(
-    TARGETS keela
+    TARGETS Keela
     RUNTIME DESTINATION ../KeelaSetup/
 )

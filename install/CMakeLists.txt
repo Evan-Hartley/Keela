@@ -1,8 +1,8 @@
 #include libwdi
-add_library(libwdi::libwdi SHARED IMPORTED)
+add_library(Libwdi SHARED IMPORTED)
 
 set_target_properties(
-    libwdi::libwdi
+    Libwdi
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/bin/libwdi.dll"
@@ -15,10 +15,10 @@ set_target_properties(
 )
 
 #include gtkmm
-add_library(gtkmm::gtkmm SHARED IMPORTED)
+add_library(GTKMM SHARED IMPORTED)
 
 set_target_properties(
-    gtkmm::gtkmm
+    GTKMM
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgtkmm-3.0.dll.a"
@@ -28,10 +28,10 @@ set_target_properties(
 )
 
 #include gtk
-add_library(gtk::gtk UNKOWN IMPORTED)
+add_library(GTK3 SHARED IMPORTED)
 
 set_target_properties(
-    gtk::gtk
+    GTK3
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgtk-3.dll.a"
@@ -41,10 +41,10 @@ set_target_properties(
 )
 
 #include gstreamer
-add_library(GStreamer::GStreamer SHARED IMPORTED)
+add_library(GStreamer SHARED IMPORTED)
 
 set_target_properties(
-    GStreamer::GStreamer
+    GStreamer
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgstreamer-1.0.dll.a"
@@ -54,10 +54,10 @@ set_target_properties(
 )
 
 #include gstreamer-base
-add_library(GStreamer::Base SHARED IMPORTED)
+add_library(GStreamerBase SHARED IMPORTED)
 
 set_target_properties(
-    GStreamer::Base
+    GStreamerBase
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgstbase-1.0.dll.a"
@@ -67,10 +67,10 @@ set_target_properties(
 )
 
 #include gstreamer-video
-add_library(GStreamer::Video SHARED IMPORTED)
+add_library(GStreamerVideo SHARED IMPORTED)
 
 set_target_properties(
-    GStreamer::Video
+    GStreamerVideo
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgstvideo-1.0.dll.a"
@@ -80,10 +80,10 @@ set_target_properties(
 )
 
 #include gstreamer-audio
-add_library(GStreamer::Audio SHARED IMPORTED)
+add_library(GStreamerAudio SHARED IMPORTED)
 
 set_target_properties(
-    GStreamer::Audio
+    GStreamerAudio
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgstaudio-1.0.dll.a"
@@ -93,10 +93,10 @@ set_target_properties(
 )
 
 #include gstreamer-app
-add_library(GStreamer::App SHARED IMPORTED)
+add_library(GStreamerApp SHARED IMPORTED)
 
 set_target_properties(
-    GStreamer::App
+    GStreamerApp
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgstapp-1.0.dll.a"
@@ -106,10 +106,10 @@ set_target_properties(
 )
 
 #include aravis
-add_library(Aravis::Aravis SHARED IMPORTED)
+add_library(Aravis SHARED IMPORTED)
 
 set_target_properties(
-    Aravis::Aravis
+    Aravis
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libaravis-0.8.dll.a"
@@ -119,10 +119,10 @@ set_target_properties(
 )
 
 #include aravis-gst
-add_library(Aravis::Gst UNKOWN IMPORT)
+add_library(AravisGst SHARED IMPORTED)
 
 set_target_properties(
-    Aravis::Gst
+    AravisGst
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libaravisgsst-0.8.dll.a"
@@ -135,10 +135,10 @@ set_target_properties(
 )
 
 #include glib
-add_library(GLib::glib SHARED IMPORTED)
+add_library(GLib SHARED IMPORTED)
 
 set_target_properties(
-    glib::glib
+    GLib
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/glib-2.0.dll.a"
@@ -148,10 +148,10 @@ set_target_properties(
 )
 
 #include gio
-add_library(GIO::gio SHARED IMPORTED)
+add_library(GIO SHARED IMPORTED)
 
 set_target_properties(
-    GIO::gio
+    GIO
     PROPERTIES
         IMPORTED_LOCATION
             "${DEPS_INSTALL_DIR}/lib/libgio-2.0.dll.a"

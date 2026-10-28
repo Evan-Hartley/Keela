@@ -39,7 +39,7 @@ Keela may make cameras not plug-and-play compatible with maufactorer software, s
 - Open a mingw64 terminal via the windows search bar
 - Update the terminal using: `$pacman -Syu` (restart and reopen the mingw64 terminal if prompted)
 - Install the following dependencies via pacman: `$pacman -S <package-name>`
-    - `mingw-w64-x86_64-toolchain`
+    - `--needed base-devel mingw-w64-x86_64-toolchain`
     - `mingw-w64-x86_64-cmake`
     - `mingw-w64-x86_64-hwloc`
     - `mingw-w64-x86_64-meson`
@@ -47,7 +47,7 @@ Keela may make cameras not plug-and-play compatible with maufactorer software, s
     - `git`
 - Run `git clone https://github.com/Evan-Hartley/Keela.git <target-location>`
 - Use the `cd "C:\<file-path-from-root>"` command to navigate into the main Keela directory
-- Run the following commands in the repository directory using mingw64 terminal
+- Run the following command in the repository directory using mingw64 terminal:
     - `bash build-Keela.sh`
 - After the build is complete, navigate to the Keela-Setup.exe file
 - Double-click on `Keela-Setup.exe` to run installer

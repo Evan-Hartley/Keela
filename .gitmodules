@@ -37,3 +37,6 @@
 [submodule "vendor/tbb"]
 	path = vendor/tbb
 	url = https://github.com/uxlfoundation/oneTBB.git
+[submodule "vendor/gst-libav"]
+	path = vendor/gst-libav
+	url = https://github.com/GStreamer/gst-libav.git
