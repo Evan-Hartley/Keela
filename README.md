@@ -14,7 +14,8 @@ Makers:<br>
 
 ### Installation
 
-Download [Keela](https://github.com/Evan-Hartley/Keela)
+Download [Keela](https://github.com/Evan-Hartley/Keela) using the git command:
+`git clone --recurse-submodules -j8 https://github.com/Evan-Hartley/Keela.git <target-location>`
 
 Plug camera (one of each camera product type intended to be used) into target computer.
 
@@ -45,7 +46,7 @@ Keela may make cameras not plug-and-play compatible with maufactorer software, s
     - `mingw-w64-x86_64-meson`
     - `mingw-w64-x86_64-nsis`
     - `git`
-- Run `git clone https://github.com/Evan-Hartley/Keela.git <target-location>`
+- Run `git clone --recurse-submodules -j8 https://github.com/Evan-Hartley/Keela.git <target-location>`
 - Use the `cd "C:\<file-path-from-root>"` command to navigate into the main Keela directory
 - Run the following command in the repository directory using mingw64 terminal:
     - `bash build-Keela.sh`
