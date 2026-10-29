@@ -6,7 +6,6 @@ bin/
 bin-int/
 build/
 cmake-build-debug/
-KeelaSetup/
 
 # os Files
 TODO.md
