@@ -13,9 +13,6 @@
 [submodule "vendor/doxygen"]
 	path = vendor/doxygen
 	url = https://github.com/doxygen/doxygen.git
-[submodule "vendor/gtkmm"]
-	path = vendor/gtkmm
-	url = https://github.com/GNOME/gtkmm.git
 [submodule "vendor/gst-plugins-base"]
 	path = vendor/gst-plugins-base
 	url = https://github.com/GStreamer/gst-plugins-base.git
@@ -40,3 +37,10 @@
 [submodule "vendor/gst-libav"]
 	path = vendor/gst-libav
 	url = https://github.com/GStreamer/gst-libav.git
+[submodule "vendor/gtkmm-3-24"]
+	path = vendor/gtkmm-3-24
+	url = https://github.com/GNOME/gtkmm.git
+	branch = gtkmm-3-24
+[submodule "vendor/ffmpeg"]
+	path = vendor/ffmpeg
+	url = https://github.com/FFmpeg/FFmpeg.git

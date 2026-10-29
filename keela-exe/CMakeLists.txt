@@ -42,8 +42,16 @@ option(USE_FFV1 "Use FFV1 codec to encode video. If disabled, keela will use h.2
 target_link_libraries(
     Keela
     PRIVATE
+        GIO
+        GLib
         GTKMM
         GTK3
+        FFmpegAvutil
+        FFmpegAvfilter
+        FFmpegAvcodec
+        FFmpegAvformat
+        FFmpegSwscale
+        FFmpegSwresample
         GStreamer
         GStreamerBase
         GStreamerVideo
@@ -51,8 +59,7 @@ target_link_libraries(
         GStreamerApp
         Aravis
         AravisGst
-        GLib
-        GIO
+        GTKMM
         spdlog::spdlog
         TBB::tbb
 )

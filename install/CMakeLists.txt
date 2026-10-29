@@ -14,17 +14,52 @@ set_target_properties(
             "${DEPS_INSTALL_DIR}/include"
 )
 
-#include gtkmm
-add_library(GTKMM SHARED IMPORTED)
+#include gio
+add_library(GIO SHARED IMPORTED)
 
 set_target_properties(
-    GTKMM
+    GIO
     PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/libgio-2.0.dll.a"
+
         IMPORTED_LOCATION
-            "${DEPS_INSTALL_DIR}/lib/libgtkmm-3.0.dll.a"
+            "${DEPS_INSTALL_DIR}/lib/libgio-2.0.dll"
         
         INTERFACE_INCLUDE_DIRECTORIES
-            "${DEPS_INSTALL_DIR}/include"
+            "${DEPS_INSTALL_DIR}/include/glib-2.0"
+)
+
+#include gobject
+add_library(GObject SHARED IMPORTED)
+
+set_target_properties(
+    GObject
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/gobject-2.0.dll.a"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/gobject-2.0.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/glib-2.0"
+)
+
+#include glib
+add_library(GLib SHARED IMPORTED)
+
+set_target_properties(
+    GLib
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/glib-2.0.dll.a"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/glib-2.0.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/glib-2.0"
 )
 
 #include gtk
@@ -38,6 +73,97 @@ set_target_properties(
         
         INTERFACE_INCLUDE_DIRECTORIES
             "${DEPS_INSTALL_DIR}/include/gtk-3.0"
+)
+
+#include ffmpeg
+add_library(FFmpegAvutil SHARED IMPORTED)
+
+set_target_properties(
+    FFmpegAvutil
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/avutil.lib"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/avutil.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/ffmpeg"
+)
+
+add_library(FFmpegAvfilter SHARED IMPORTED)
+
+set_target_properties(
+    FFmpegAvfilter
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/avfilter.lib"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/avfilter.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/ffmpeg"
+)
+
+add_library(FFmpegAvcodec SHARED IMPORTED)
+
+set_target_properties(
+    FFmpegAvcodec
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/avcodec.lib"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/avcodec.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/ffmpeg"
+)
+
+add_library(FFmpegAvformat SHARED IMPORTED)
+
+set_target_properties(
+    FFmpegAvformat
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/avformat.lib"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/avformat.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/ffmpeg"
+)
+
+add_library(FFmpegSwscale SHARED IMPORTED)
+
+set_target_properties(
+    FFmpegSwscale
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/swscale.lib"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/swscale.dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/ffmpeg"
+)
+
+add_library(FFmpegSwresample SHARED IMPORTED)
+
+set_target_properties(
+    FFmpegSwresample
+    PROPERTIES
+        IMPORTED_IMPLIB
+            "${DEPS_INSTALL_DIR}/lib/swresample .lib"
+
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/swresample .dll"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/ffmpeg"
 )
 
 #include gstreamer
@@ -134,30 +260,17 @@ set_target_properties(
             Aravis::Aravis
 )
 
-#include glib
-add_library(GLib SHARED IMPORTED)
+#include gtkmm
+add_library(GTKMM SHARED IMPORTED)
 
 set_target_properties(
-    GLib
+    GTKMM
     PROPERTIES
         IMPORTED_LOCATION
-            "${DEPS_INSTALL_DIR}/lib/glib-2.0.dll.a"
+            "${DEPS_INSTALL_DIR}/lib/libgtkmm-3.0.dll.a"
         
         INTERFACE_INCLUDE_DIRECTORIES
-            "${DEPS_INSTALL_DIR}/include/glib-2.0"
-)
-
-#include gio
-add_library(GIO SHARED IMPORTED)
-
-set_target_properties(
-    GIO
-    PROPERTIES
-        IMPORTED_LOCATION
-            "${DEPS_INSTALL_DIR}/lib/libgio-2.0.dll.a"
-        
-        INTERFACE_INCLUDE_DIRECTORIES
-            "${DEPS_INSTALL_DIR}/include/glib-2.0"
+            "${DEPS_INSTALL_DIR}/include"
 )
 
 set(DOXYGEN_EXECUTABLE

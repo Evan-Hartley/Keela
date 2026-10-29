@@ -43,10 +43,10 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    gtkmm
+    glib
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gtkmm
+        ${DEPS_VENDOR_DIR}/glib
 
     CONFIGURE_COMMAND
         meson setup
@@ -81,10 +81,35 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
+    ffmpeg
+
+    SOURCE_DIR
+        ${DEPS_VENDOR_DIR}/ffmpeg
+
+    CONFIGURE_COMMAND
+        bash -c
+        "cd <SOURCE_DIR> &&
+        ./configure
+        --prefix=${DEPS_INSTALL_DIR}
+        --enable-shared
+        --disable-static"
+
+    BUILD_COMMAND
+        make -j${NPROC}
+
+    INSTALL_COMMAND
+        make install
+)
+
+ExternalProject_Add(
     gstreamer
 
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/gstreamer
+    
+    DEPENDS
+        glib
+        ffmpeg
 
     CONFIGURE_COMMAND
         meson setup
@@ -105,6 +130,11 @@ ExternalProject_Add(
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/gst-plugins-base
 
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+
     CONFIGURE_COMMAND
         meson setup
         <BINARY_DIR>
@@ -123,6 +153,12 @@ ExternalProject_Add(
 
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/gst-plugins-good
+
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+        gst_plugins-base
 
     CONFIGURE_COMMAND
         meson setup
@@ -143,6 +179,13 @@ ExternalProject_Add(
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/gst-plugins-bad
 
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+        gst-plugins-base
+        gst-plugins-good
+
     CONFIGURE_COMMAND
         meson setup
         <BINARY_DIR>
@@ -161,6 +204,14 @@ ExternalProject_Add(
 
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/gst-plugins-ugly
+
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+        gst-plugins-base
+        gst-plugins-good
+        gst-plugins-bad
 
     CONFIGURE_COMMAND
         meson setup
@@ -181,6 +232,15 @@ ExternalProject_Add(
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/gst-libav
 
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+        gst-plugins-base
+        gst-plugins-good
+        gst-plugins-bad
+        gst-plugins-ugly
+
     CONFIGURE_COMMAND
         meson setup
         <BINARY_DIR>
@@ -200,11 +260,17 @@ ExternalProject_Add(
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/aravis
 
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+
     CONFIGURE_COMMAND
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
         --prefix=${DEPS_INSTALL_DIR}
+        -Dgst-plugin=enable
 
     BUILD_COMMAND
         meson compile -C <BINARY_DIR>
@@ -214,29 +280,16 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    aravis_gst
+    gtkmm
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/aravis/gst
+        ${DEPS_VENDOR_DIR}/gtkmm-3-24
 
-    CONFIGURE_COMMAND
-        meson setup
-        <BINARY_DIR>
-        <SOURCE_DIR>
-        --prefix=${DEPS_INSTALL_DIR}
-
-    BUILD_COMMAND
-        meson compile -C <BINARY_DIR>
-
-    INSTALL_COMMAND
-        meson install -C <BINARY_DIR>
-)
-
-ExternalProject_Add(
-    glib
-
-    SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/glib
+    DEPENDS
+        glib
+        ffmpeg
+        gstreamer
+        aravis
 
     CONFIGURE_COMMAND
         meson setup
@@ -257,17 +310,26 @@ ExternalProject_Add(
     SOURCE_DIR
         ${DEPS_VENDOR_DIR}/doxygen
 
-    CONFIGURE_COMMAND
-        meson setup
-        <BINARY_DIR>
-        <SOURCE_DIR>
-        --prefix=${DEPS_INSTALL_DIR}
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR}
+        -Dbuild_doc=OFF
+        -Dbuild_wizard=OFF
 
-    BUILD_COMMAND
-        meson compile -C <BINARY_DIR>
+    INSTALL_DIR ${DEPS_INSTALL_DIR}
+)
 
-    INSTALL_COMMAND
-        meson install -C <BINARY_DIR>
+ExternalProject_Add(
+    tbb
+
+    SOURCE_DIR
+        ${DEPS_VENDOR_DIR}/tbb
+
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR}
+        -DTBB_TEST=OFF
+        -DTBB_STRICT=OFF
+
+    INSTALL_DIR ${DEPS_INSTALL_DIR}
 )
 
 # cmake supported libraries - fetch step
@@ -327,6 +389,13 @@ install(
         ${DEPS_INSTALL_DIR}/lib/
     DESTINATION
         ${PROJECT_SOURCE_DIR}/KeelaSetup/lib
+)
+
+install(
+    DIRECTORY
+        ${DEPS_INSTALL_DIR}/lib/pkgconfig
+    DESTINATION
+        ${PROJECT_SOURCE_DIR}/KeelaSetup/lib/pkgconfig
 )
 
 install(
