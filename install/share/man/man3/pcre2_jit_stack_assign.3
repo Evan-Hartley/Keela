@@ -1,0 +1,98 @@
+'\" t
+.\"     Title: pcre2_jit_stack_assign
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 13 August 2018
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2_JIT_STACK_ASSIGN" "3" "13 August 2018" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2_jit_stack_assign \- assign stack for JIT matching
+.SH "SYNOPSIS"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CR\&#include <pcre2.h>
+
+void\fP \f(CBpcre2_jit_stack_assign\fP\f(CR(pcre2_match_context *\fP\f(CImcontext\fP\f(CR,
+                            pcre2_jit_callback\fP \f(CIcallback\fP\f(CR,
+                            void *\fP\f(CIcallback_data\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.SH "DESCRIPTION"
+.sp
+This function provides control over the memory used by JIT as a run\-time stack
+when \f(CBpcre2_match()\fP or \f(CBpcre2_jit_match()\fP is called with a pattern
+that has been successfully processed by the JIT compiler. The information that
+determines which stack is used is put into a match context that is subsequently
+passed to a matching function. The arguments of this function are:
+.sp
+.RS 4
+.PD 0
+.TP 14
+\f(CImcontext\fP
+.ad l
+a pointer to a match context
+.TP 14
+\f(CIcallback\fP
+.ad l
+a callback function
+.TP 14
+\f(CIcallback_data\fP
+.ad l
+a JIT stack or a value to be passed to the callback
+.PD
+.RE
+.PP
+.ad l
+.sp
+If \f(CImcontext\fP is \f(CBNULL\fP, the function returns immediately, without doing
+anything.
+.sp
+If \f(CIcallback\fP is \f(CBNULL\fP and \f(CIcallback_data\fP is \f(CBNULL\fP, an internal block of 32KiB
+on the machine stack is used.
+.sp
+If \f(CIcallback\fP is \f(CBNULL\fP and \f(CIcallback_data\fP is not \f(CBNULL\fP,
+\f(CIcallback_data\fP must be a valid JIT stack, the result of calling
+\f(CBpcre2_jit_stack_create()\fP.
+.sp
+If \f(CIcallback\fP not \f(CBNULL\fP, it is called with \f(CIcallback_data\fP as an
+argument at the start of matching, in order to set up a JIT stack. If the
+result is \f(CBNULL\fP, the internal stack of 32KiB is used; otherwise the return value
+must be a valid JIT stack, the result of calling
+\f(CBpcre2_jit_stack_create()\fP.
+.sp
+You may safely use the same JIT stack for multiple patterns, as long as they
+are all matched in the same thread. In a multithread application, each thread
+must use its own JIT stack. For more details, see the
+\f(CRpcre2jit\fP
+page.
+.sp
+There is a complete description of the PCRE2 native API in the
+\f(CRpcre2api\fP
+page and a description of the POSIX API in the
+\f(CRpcre2posix\fP
+page.

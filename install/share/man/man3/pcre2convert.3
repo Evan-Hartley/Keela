@@ -1,0 +1,212 @@
+'\" t
+.\"     Title: pcre2convert
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 14 November 2023
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2CONVERT" "3" "14 November 2023" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2convert \- PCRE2 pattern conversion
+.SH "EXPERIMENTAL PATTERN CONVERSION FUNCTIONS"
+.sp
+This document describes a set of functions that can be used to convert
+"foreign" patterns into PCRE2 regular expressions. This facility is currently
+experimental, and may be changed in future releases. Two kinds of pattern,
+globs and POSIX patterns, are supported.
+.SH "THE CONVERT CONTEXT"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CRpcre2_convert_context *\fP\f(CBpcre2_convert_context_create\fP\f(CR(
+      pcre2_general_context *\fP\f(CIgcontext\fP\f(CR);
+
+pcre2_convert_context *\fP\f(CBpcre2_convert_context_copy\fP\f(CR(
+      pcre2_convert_context *\fP\f(CIccontext\fP\f(CR);
+
+void\fP \f(CBpcre2_convert_context_free\fP\f(CR(pcre2_convert_context *\fP\f(CIccontext\fP\f(CR);
+
+int\fP \f(CBpcre2_set_glob_escape\fP\f(CR(pcre2_convert_context *\fP\f(CIccontext\fP\f(CR,
+                          uint32_t\fP \f(CIescape_char\fP\f(CR);
+
+int\fP \f(CBpcre2_set_glob_separator\fP\f(CR(pcre2_convert_context *\fP\f(CIccontext\fP\f(CR,
+                             uint32_t\fP \f(CIseparator_char\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.sp
+A convert context is used to hold parameters that affect the way that pattern
+conversion works. Like all PCRE2 contexts, you need to use a context only if
+you want to override the defaults. There are the usual create, copy, and free
+functions. If custom memory management functions are set in a general context
+that is passed to \f(CBpcre2_convert_context_create()\fP, they are used for all
+memory management within the conversion functions.
+.sp
+There are only two parameters in the convert context at present. Both apply
+only to glob conversions. The escape character defaults to grave accent under
+Windows, otherwise backslash. It can be set to zero, meaning no escape
+character, or to an ASCII punctuation character (or its EBCDIC equivalent),
+except \f(CR!\fP, \f(CR*\fP, \f(CR\-\fP, \f(CR:\fP, \f(CR?\fP, \f(CR[\fP, \f(CR]\fP, and \f(CR^\fP. These characters are reserved
+for glob wildcard or character\-class syntax and cannot be used as escapes.
+The separator character defaults to backslash under Windows, otherwise forward
+slash. It can be set to forward slash, backslash, or dot.
+.sp
+The two setting functions return zero on success, or \f(CBPCRE2_ERROR_BADDATA\fP if
+their second argument is invalid.
+.SH "THE CONVERSION FUNCTION"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CRint\fP \f(CBpcre2_pattern_convert\fP\f(CR(PCRE2_SPTR\fP \f(CIpattern\fP\f(CR, PCRE2_SIZE\fP \f(CIplength\fP\f(CR,
+                          uint32_t\fP \f(CIoptions\fP\f(CR, PCRE2_UCHAR **\fP\f(CIbuffptr\fP\f(CR,
+                          PCRE2_SIZE *\fP\f(CIbufflenptr\fP\f(CR,
+                          pcre2_convert_context *\fP\f(CIccontext\fP\f(CR);
+
+void\fP \f(CBpcre2_converted_pattern_free\fP\f(CR(PCRE2_UCHAR *\fP\f(CIconverted\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.sp
+The first two arguments of \f(CBpcre2_pattern_convert()\fP define the foreign
+pattern that is to be converted. The length may be given as
+\f(CBPCRE2_ZERO_TERMINATED\fP. The \f(CIoptions\fP argument defines how the pattern is to
+be processed. If the input is UTF, the \f(CBPCRE2_CONVERT_UTF\fP option should be set.
+\f(CBPCRE2_CONVERT_NO_UTF_CHECK\fP may also be set if you are sure the input is valid.
+One or more of the glob options, or one of the following POSIX options must be
+set to define the type of conversion that is required:
+.sp
+.RS 4
+.PD
+.TP 7
+\f(CBPCRE2_CONVERT_GLOB\fP
+.PD 0
+.TP 7
+\f(CBPCRE2_CONVERT_GLOB_NO_WILD_SEPARATOR\fP
+.PD 0
+.TP 7
+\f(CBPCRE2_CONVERT_GLOB_NO_STARSTAR\fP
+.PD 0
+.TP 7
+\f(CBPCRE2_CONVERT_POSIX_BASIC\fP
+.PD 0
+.TP 7
+\f(CBPCRE2_CONVERT_POSIX_EXTENDED\fP
+.ad l
+.PD
+.PD
+.RE
+.PP
+.ad l
+.sp
+Details of the conversions are given below. The \f(CIbuffer\fP and \f(CIblength\fP
+arguments define how the output is handled:
+.sp
+If \f(CIbuffer\fP is \f(CBNULL\fP, the function just returns the length of the converted
+pattern via \f(CIblength\fP. This is one less than the length of buffer needed,
+because a terminating zero is always added to the output.
+.sp
+If \f(CIbuffer\fP points to a \f(CBNULL\fP pointer, an output buffer is obtained using
+the allocator in the context or \f(CBmalloc\fP\f(CR()\fP if no context is supplied. A
+pointer to this buffer is placed in the variable to which \f(CIbuffer\fP points.
+When no longer needed the output buffer must be freed by calling
+\f(CBpcre2_converted_pattern_free()\fP. If this function is called with a \f(CBNULL\fP
+argument, it returns immediately without doing anything.
+.sp
+If \f(CIbuffer\fP points to a non\-\f(CBNULL\fP pointer, \f(CIblength\fP must be set to the
+actual length of the buffer provided (in code units).
+.sp
+In all cases, after successful conversion, the variable pointed to by
+\f(CIblength\fP is updated to the length actually used (in code units), excluding
+the terminating zero that is always added.
+.sp
+If an error occurs, the length (via \f(CIblength\fP) is set to the offset
+within the input pattern where the error was detected. Only gross syntax errors
+are caught; there are plenty of errors that will get passed on for
+\f(CBpcre2_compile()\fP to discover.
+.sp
+The return from \f(CBpcre2_pattern_convert()\fP is zero on success or a non\-zero
+PCRE2 error code. Note that PCRE2 error codes may be positive or negative:
+\f(CBpcre2_compile()\fP uses mostly positive codes and \f(CBpcre2_match()\fP
+negative ones; \f(CBpcre2_convert()\fP uses existing codes of both kinds. A
+textual error message can be obtained by calling
+\f(CBpcre2_get_error_message()\fP.
+.SH "CONVERTING GLOBS"
+.sp
+Globs are used to match file names, and consequently have the concept of a
+"path separator", which defaults to backslash under Windows and forward slash
+otherwise. If \f(CBPCRE2_CONVERT_GLOB\fP is set, the wildcards \f(CI*\fP and \f(CI?\fP are not
+permitted to match separator characters, but the double\-star (\f(CI**\fP) feature
+(which does match separators) is supported.
+.sp
+\f(CBPCRE2_CONVERT_GLOB_NO_WILD_SEPARATOR\fP matches globs with wildcards allowed to
+match separator characters. \f(CBPCRE2_CONVERT_GLOB_NO_STARSTAR\fP matches globs with
+the double\-star feature disabled. These options may be given together.
+.SH "CONVERTING POSIX PATTERNS"
+.sp
+POSIX defines two kinds of regular expression pattern: basic and extended.
+These can be processed by setting \f(CBPCRE2_CONVERT_POSIX_BASIC\fP or
+\f(CBPCRE2_CONVERT_POSIX_EXTENDED\fP, respectively.
+.sp
+In POSIX patterns, backslash is not special in a character class. Unmatched
+closing parentheses are treated as literals.
+.sp
+In basic patterns, \f(CI?\fP, \f(CI+\fP, \f(CI|\fP, \f(CI{}\fP, and \f(CI()\fP must be escaped to be recognized
+as metacharacters outside a character class. If the first character in the
+pattern is \f(CI*\fP it is treated as a literal. \f(CI^\fP is a metacharacter only at the start
+of a branch.
+.sp
+In extended patterns, a backslash not in a character class always
+makes the next character literal, whatever it is. There are no backreferences.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Note
+.ps -1
+.br
+.sp
+POSIX mandates that the longest possible match at the first matching
+position must be found. This is not what \f(CBpcre2_match()\fP does; it yields
+the first match that is found. An application can use \f(CBpcre2_dfa_match()\fP
+to find the longest match, but that does not support backreferences (but then
+neither do POSIX extended patterns).
+.sp .5v
+.RE
+.SS "Author"
+.sp
+Philip Hazel
+.br
+Retired from University Computing Service
+.br
+Cambridge, England.
+.SS "Revision"
+.sp
+Last updated: 14 November 2023
+.br
+Copyright \(co 1997\-2018 University of Cambridge.

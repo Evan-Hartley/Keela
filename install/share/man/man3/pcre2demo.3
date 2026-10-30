@@ -1,0 +1,500 @@
+'\" t
+.\"     Title: pcre2demo
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 03 October 2026
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2DEMO" "3" "03 October 2026" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2demo \- a demonstration C program for PCRE2
+.SH "SOURCE CODE"
+.nr pI \n(.i
+.in 0
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CI/*************************************************
+*\&           PCRE2 DEMONSTRATION PROGRAM\&          *
+*************************************************/\fP
+
+\f(CI/* This is a demonstration program to illustrate a straightforward way of
+using the PCRE2 regular expression library from a C program. See the
+pcre2sample documentation for a short discussion ("man pcre2sample" if you
+have the PCRE2 man pages installed). PCRE2 is a revised API for the library,
+and is incompatible with the original PCRE API.
+
+There are actually three libraries, each supporting a different code unit
+width. This demonstration program uses the 8\-bit library. The default is to
+process each code unit as a separate character, but if the pattern begins with
+"(*UTF)", both it and the subject are treated as UTF\-8 strings, where
+characters may occupy multiple code units.
+
+In Unix\-like environments, if PCRE2 is installed in your standard system
+libraries, you should be able to compile this program using this command:
+
+cc \-Wall pcre2demo.c \-lpcre2\-8 \-o pcre2demo
+
+If PCRE2 is not installed in a standard place, it is likely to be installed
+with support for the pkg\-config mechanism. If you have pkg\-config, you can
+compile this program using this command:
+
+cc \-Wall pcre2demo.c `pkg\-config \-\-cflags \-\-libs libpcre2\-8` \-o pcre2demo
+
+If you do not have pkg\-config, you may have to use something like this:
+
+cc \-Wall pcre2demo.c \-I/usr/local/include \-L/usr/local/lib \(rs
+  \-R/usr/local/lib \-lpcre2\-8 \-o pcre2demo
+
+Replace "/usr/local/include" and "/usr/local/lib" with wherever the include
+and library files for PCRE2 are installed on your system. Only some operating
+systems (Solaris is one) use the \-R option.
+
+Building under Windows:
+
+If you want to statically link this program against a non\-dll .a file, you
+must define PCRE2_STATIC before including pcre2.h, so in this environment,
+uncomment the following line. */\fP
+
+\f(CI/* #define PCRE2_STATIC */\fP
+
+\f(CI/* The PCRE2_CODE_UNIT_WIDTH macro must be defined before including pcre2.h.
+For a program that uses only one code unit width, setting it to 8, 16, or 32
+makes it possible to use generic function names such as pcre2_compile(). Note
+that just changing 8 to 16 (for example) is not sufficient to convert this
+program to process 16\-bit characters. Even in a fully 16\-bit environment,
+where string\-handling functions such as strcmp() and printf() work with 16\-bit
+characters, the code for handling the table of named substrings will still
+need to be modified. */\fP
+
+\f(CR\&#define PCRE2_CODE_UNIT_WIDTH 8
+
+#include <stdio.h>
+#include <string.h>
+#include <pcre2.h>\fP
+
+
+\f(CI/***************************************************************************
+* Here is the program. The API includes the concept of "contexts" for\&      *
+* setting up unusual interface requirements for compiling and matching,\&    *
+* such as custom memory managers and non\-standard newline definitions.\&     *
+* This program does not do any of this, so it makes no use of contexts,\&    *
+* always passing NULL where a context could be given.\&                      *
+***************************************************************************/\fP
+
+\f(CRint\fP
+\f(CBmain\fP\f(CR(int\fP \f(CIargc\fP\f(CR, char **\fP\f(CIargv\fP\f(CR)
+{\fP
+  \f(CI/*************************************************************************
+  * First, sort out the command line. Options:\&                             *
+  * \- "\-g" to request repeated matching to find all occurrences,\&           *
+  *\&   like Perl\*(Aqs /g option. We set the variable find_all to a non\-zero\&    *
+  *\&   value if the \-g option is present.\&                                   *
+  * \- "\-i" to request caseless matching, like Perl\*(Aqs /i option.\&  We set\&    *
+  *\&   the variable caseless_match to PCRE2_CASELESS if the \-i option is\&    *
+  *\&   present.\&                                                             *
+  *************************************************************************/\fP
+
+  \f(CRint\fP \f(CIfind_all\fP \f(CR= 0;
+  int\fP \f(CIcaseless_match\fP \f(CR= 0;
+  int\fP \f(CIargi\fP\f(CR;
+  for (\fP\f(CIargi\fP \f(CR= 1;\fP \f(CIargi\fP \f(CR<\fP \f(CIargc\fP\f(CR;\fP \f(CIargi\fP\f(CR++)
+  {
+    if (\fP\f(CBstrcmp\fP\f(CR(\fP\f(CIargv\fP\f(CR[\fP\f(CIargi\fP\f(CR], "\-g") == 0)
+    {\fP
+      \f(CIfind_all\fP \f(CR= 1;
+    }
+    else if (\fP\f(CBstrcmp\fP\f(CR(\fP\f(CIargv\fP\f(CR[\fP\f(CIargi\fP\f(CR], "\-i") == 0)
+    {\fP
+      \f(CIcaseless_match\fP \f(CR=\fP \f(CBPCRE2_CASELESS\fP\f(CR;
+    }
+    else if (\fP\f(CIargv\fP\f(CR[\fP\f(CIargi\fP\f(CR][0] == \*(Aq\-\*(Aq)
+    {\fP
+      \f(CBprintf\fP\f(CR("Unrecognised option %s\(rsn",\fP \f(CIargv\fP\f(CR[\fP\f(CIargi\fP\f(CR]);
+      return 1;
+    }
+    else
+    {
+      break;
+    }
+  }\fP
+
+  \f(CI/* After the options, we require exactly two arguments, which are the
+  pattern, and the subject string. */\fP
+
+  \f(CRif (\fP\f(CIargc\fP \f(CR\-\fP \f(CIargi\fP \f(CR!= 2)
+  {\fP
+    \f(CBprintf\fP\f(CR("Exactly two arguments required: a regex and a subject string\(rsn");
+    return 1;
+  }\fP
+
+  \f(CI/* Pattern and subject are char arguments, so they can be straightforwardly
+  cast to PCRE2_SPTR because we are working in 8\-bit code units. The subject
+  length is cast to PCRE2_SIZE for completeness, though PCRE2_SIZE is in fact
+  defined to be size_t. PCRE2_SPTR is a pointer to unsigned code units of the
+  appropriate width (in this case, 8 bits).*/\fP
+
+  \f(CRPCRE2_SPTR\fP \f(CIpattern\fP \f(CR= (PCRE2_SPTR)\fP\f(CIargv\fP\f(CR[\fP\f(CIargi\fP\f(CR];
+  PCRE2_SPTR\fP \f(CIsubject\fP \f(CR= (PCRE2_SPTR)\fP\f(CIargv\fP\f(CR[\fP\f(CIargi\fP \f(CR+ 1];
+  PCRE2_SIZE\fP \f(CIsubject_length\fP \f(CR= (PCRE2_SIZE)\fP\f(CBstrlen\fP\f(CR((char *)\fP\f(CIsubject\fP\f(CR);\fP
+
+
+  \f(CI/*************************************************************************
+  * Now we are going to compile the regular expression pattern, and handle *
+  * any errors that are detected.\&                                          *
+  *************************************************************************/\fP
+
+  \f(CRint\fP \f(CIerrornumber\fP\f(CR;
+  PCRE2_SIZE\fP \f(CIerroroffset\fP\f(CR;
+  pcre2_code *\fP\f(CIre\fP \f(CR=\fP
+      \f(CBpcre2_compile\fP\f(CR(\fP\f(CIpattern\fP\f(CR,\fP\&               \f(CI// the pattern\fP
+                    \f(CBPCRE2_ZERO_TERMINATED\fP\f(CR,\fP \f(CI// the pattern is null\-terminated\fP
+                    \f(CIcaseless_match\fP\f(CR,\fP\&        \f(CI// possibly enable caseless\fP
+                    \f(CR&\fP\f(CIerrornumber\fP\f(CR,\fP\&          \f(CI// for error number\fP
+                    \f(CR&\fP\f(CIerroroffset\fP\f(CR,\fP\&          \f(CI// for error offset\fP
+                    \f(CBNULL\fP\f(CR);\fP\&                 \f(CI// use default compile context\fP
+
+  \f(CI/* Compilation failed: print the error message and exit. */\fP
+
+  \f(CRif (\fP\f(CIre\fP \f(CR==\fP \f(CBNULL\fP\f(CR)
+  {
+    PCRE2_UCHAR\fP \f(CIbuffer\fP\f(CR[256];\fP
+    \f(CBpcre2_get_error_message\fP\f(CR(\fP\f(CIerrornumber\fP\f(CR,\fP \f(CIbuffer\fP\f(CR, sizeof(\fP\f(CIbuffer\fP\f(CR));\fP
+    \f(CBprintf\fP\f(CR("PCRE2 compilation failed at offset %d: %s\(rsn", (int)\fP\f(CIerroroffset\fP\f(CR,\fP
+           \f(CIbuffer\fP\f(CR);
+    return 1;
+  }\fP
+
+
+  \f(CI/*************************************************************************
+  * If the compilation succeeded, we call PCRE2 again, in order to do a\&    *
+  * pattern match against the subject string. This does just ONE match. If *
+  * further matching is needed, it will be done below. Before running the\&  *
+  * match we must set up a match_data block for holding the result. Using\&  *
+  * pcre2_match_data_create_from_pattern() ensures that the block is\&       *
+  * exactly the right size for the number of capturing parentheses in the\&  *
+  * pattern. If you need to know the actual size of a match_data block as\&  *
+  * a number of bytes, you can find it like this:\&                          *
+  *\&                                                                        *
+  * PCRE2_SIZE match_data_size = pcre2_get_match_data_size(match_data);\&    *
+  *************************************************************************/\fP
+
+  \f(CRpcre2_match_data *\fP\f(CImatch_data\fP \f(CR=\fP
+      \f(CBpcre2_match_data_create_from_pattern\fP\f(CR(\fP\f(CIre\fP\f(CR,\fP \f(CBNULL\fP\f(CR);\fP
+
+  \f(CI/* Now run the match. */\fP
+
+  \f(CRint\fP \f(CIrc\fP \f(CR=\fP \f(CBpcre2_match\fP\f(CR(\fP\f(CIre\fP\f(CR,\fP\&             \f(CI// the compiled pattern\fP
+                       \f(CIsubject\fP\f(CR,\fP\&        \f(CI// the subject string\fP
+                       \f(CIsubject_length\fP\f(CR,\fP \f(CI// the length of the subject\fP
+                       \f(CR0,\fP\&              \f(CI// start at offset 0 in the subject\fP
+                       \f(CR0,\fP\&              \f(CI// default options\fP
+                       \f(CImatch_data\fP\f(CR,\fP\&     \f(CI// block for storing the result\fP
+                       \f(CBNULL\fP\f(CR);\fP\&          \f(CI// use default match context\fP
+
+  \f(CI/* Matching failed: handle error cases */\fP
+
+  \f(CRif (\fP\f(CIrc\fP \f(CR< 0)
+  {
+    switch (\fP\f(CIrc\fP\f(CR)
+    {
+    case\fP \f(CBPCRE2_ERROR_NOMATCH\fP\f(CR:\fP
+      \f(CBprintf\fP\f(CR("No match\(rsn");
+      break;\fP
+      \f(CI/*
+      Handle other special cases if you like
+      */\fP
+    \f(CIdefault:\fP
+      \f(CBprintf\fP\f(CR("Matching error %d\(rsn",\fP \f(CIrc\fP\f(CR);
+      break;
+    }\fP
+    \f(CI/* Release memory used for the match data and the compiled pattern. */\fP
+    \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+    \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+    return 1;
+  }\fP
+
+  \f(CI/* Match succeeded. Get a pointer to the output vector, where string offsets
+  are stored. */\fP
+
+  \f(CRPCRE2_SIZE *\fP\f(CIovector\fP \f(CR=\fP \f(CBpcre2_get_ovector_pointer\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+  \f(CBprintf\fP\f(CR("Match succeeded at offset %d\(rsn", (int)\fP\f(CIovector\fP\f(CR[0]);\fP
+
+
+  \f(CI/*************************************************************************
+  * We have found the first match within the subject string. If the output *
+  * vector wasn\*(Aqt big enough, say so. Then output any substrings that were *
+  * captured.\&                                                              *
+  *************************************************************************/\fP
+
+  \f(CI/* The output vector wasn\*(Aqt big enough. This should not happen, because we
+  used pcre2_match_data_create_from_pattern() above. */\fP
+
+  \f(CRif (\fP\f(CIrc\fP \f(CR== 0)\fP
+    \f(CBprintf\fP\f(CR("ovector was not big enough for all the captured substrings\(rsn");\fP
+
+  \f(CI/* Since release 10.38 PCRE2 has locked out the use of \(rsK in lookaround
+  assertions. This is the recommended behaviour. However, the option
+  PCRE2_EXTRA_ALLOW_LOOKAROUND_BSK allows applications to re\-enable the old
+  behaviour. If that is set, it is possible to run patterns such as /(?=.\(rsK)/
+  that use \(rsK in an assertion to set the start of a match later than its end.
+  In this demonstration program, we show how to detect this case, although it
+  cannot arise because the option is never set. */\fP
+
+  \f(CRif (\fP\f(CIovector\fP\f(CR[0] >\fP \f(CIovector\fP\f(CR[1])
+  {\fP
+    \f(CBprintf\fP\f(CR(
+        "\(rs\(rsK was used in an assertion to set the match start after its end.\(rsn"
+        "From end to start the match was: %.*s\(rsn",
+        (int)(\fP\f(CIovector\fP\f(CR[0] \-\fP \f(CIovector\fP\f(CR[1]), (char *)(\fP\f(CIsubject\fP \f(CR+\fP \f(CIovector\fP\f(CR[1]));\fP
+    \f(CBprintf\fP\f(CR("Run abandoned\(rsn");\fP
+    \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+    \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+    return 1;
+  }\fP
+
+  \f(CI/* Show substrings stored in the output vector by number. Obviously, in a
+  real application you might want to do things other than print them. */\fP
+
+  \f(CRfor (int\fP \f(CIi\fP \f(CR= 0;\fP \f(CIi\fP \f(CR<\fP \f(CIrc\fP\f(CR;\fP \f(CIi\fP\f(CR++)
+  {
+    PCRE2_SPTR\fP \f(CIsubstring_start\fP \f(CR=\fP \f(CIsubject\fP \f(CR+\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIi\fP\f(CR];
+    PCRE2_SIZE\fP \f(CIsubstring_length\fP \f(CR=\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIi\fP \f(CR+ 1] \-\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIi\fP\f(CR];\fP
+    \f(CBprintf\fP\f(CR("%2d: %.*s\(rsn",\fP \f(CIi\fP\f(CR, (int)\fP\f(CIsubstring_length\fP\f(CR, (char *)\fP\f(CIsubstring_start\fP\f(CR);
+  }\fP
+
+
+  \f(CI/**************************************************************************
+  * That concludes the basic part of this demonstration program. We have\&    *
+  * compiled a pattern, and performed a single match. The code that follows *
+  * shows first how to access named substrings, and then how to code for\&    *
+  * repeated matches on the same subject.\&                                   *
+  **************************************************************************/\fP
+
+  \f(CI/* See if there are any named substrings, and if so, show them by name.
+  First we have to extract the count of named parentheses from the pattern. */\fP
+
+  \f(CRuint32_t\fP \f(CInamecount\fP\f(CR;
+  PCRE2_SPTR\fP \f(CIname_table\fP\f(CR;
+  uint32_t\fP \f(CIname_entry_size\fP\f(CR;
+  (void)\fP\f(CBpcre2_pattern_info\fP\f(CR(\fP
+      \f(CIre\fP\f(CR,\fP\&                   \f(CI// the compiled pattern\fP
+      \f(CBPCRE2_INFO_NAMECOUNT\fP\f(CR,\fP \f(CI// get the number of named substrings\fP
+      \f(CR&\fP\f(CInamecount\fP\f(CR);\fP\&          \f(CI// where to put the answer\fP
+
+  \f(CRif (\fP\f(CInamecount\fP \f(CR== 0)
+  {\fP
+    \f(CBprintf\fP\f(CR("No named substrings\(rsn");
+  }
+  else
+  {\fP
+    \f(CBprintf\fP\f(CR("Named substrings\(rsn");\fP
+
+    \f(CI/* Before we can access the substrings, we must extract the table for
+    translating names to numbers, and the size of each entry in the table. */\fP
+
+    \f(CR(void)\fP\f(CBpcre2_pattern_info\fP\f(CR(\fP\f(CIre\fP\f(CR,\fP\&                   \f(CI// the compiled pattern\fP
+                             \f(CBPCRE2_INFO_NAMETABLE\fP\f(CR,\fP \f(CI// address of the table\fP
+                             \f(CR&\fP\f(CIname_table\fP\f(CR);\fP\&         \f(CI// where to put the answer\fP
+
+    \f(CR(void)\fP\f(CBpcre2_pattern_info\fP\f(CR(\fP
+        \f(CIre\fP\f(CR,\fP\&                       \f(CI// the compiled pattern\fP
+        \f(CBPCRE2_INFO_NAMEENTRYSIZE\fP\f(CR,\fP \f(CI// size of each entry in the table\fP
+        \f(CR&\fP\f(CIname_entry_size\fP\f(CR);\fP\&        \f(CI// where to put the answer\fP
+
+    \f(CI/* Now we can scan the table and, for each entry, print the number, the
+    name, and the substring itself. In the 8\-bit library the number is held in
+    two bytes, most significant first. */\fP
+
+    \f(CRPCRE2_SPTR\fP \f(CItabptr\fP \f(CR=\fP \f(CIname_table\fP\f(CR;
+    for (uint32_t\fP \f(CIi\fP \f(CR= 0;\fP \f(CIi\fP \f(CR<\fP \f(CInamecount\fP\f(CR;\fP \f(CIi\fP\f(CR++)
+    {
+      int\fP \f(CIn\fP \f(CR= (\fP\f(CItabptr\fP\f(CR[0] << 8) |\fP \f(CItabptr\fP\f(CR[1];\fP
+      \f(CBprintf\fP\f(CR("(%d) %*s: %.*s\(rsn",\fP \f(CIn\fP\f(CR,\fP \f(CIname_entry_size\fP \f(CR\- 3,\fP \f(CItabptr\fP \f(CR+ 2,
+             (int)(\fP\f(CIovector\fP\f(CR[2 *\fP \f(CIn\fP \f(CR+ 1] \-\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIn\fP\f(CR]),\fP
+             \f(CIsubject\fP \f(CR+\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIn\fP\f(CR]);\fP
+      \f(CItabptr\fP \f(CR+=\fP \f(CIname_entry_size\fP\f(CR;
+    }
+  }\fP
+
+
+  \f(CI/*************************************************************************
+  * If the "\-g" option was given on the command line, we want to continue\&  *
+  * to search for additional matches in the subject string, in a similar\&   *
+  * way to the /g option in Perl. This turns out to be trickier than you\&   *
+  * might think because of the possibility of matching an empty string.\&    *
+  *\&                                                                        *
+  * To help with this task, PCRE2 provides the pcre2_next_match() helper.\&  *
+  *************************************************************************/\fP
+
+  \f(CRif (!\fP\f(CIfind_all\fP\f(CR)\fP \f(CI// Check for \-g\fP
+  \f(CR{\fP
+    \f(CI/* Release the memory that was used for the match data and the pattern. */\fP
+    \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+    \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+    return 0;\fP \f(CI// Exit the program.\fP
+  \f(CR}\fP
+
+  \f(CI/* Loop for second and subsequent matches */\fP
+
+  \f(CRPCRE2_SIZE\fP \f(CIovector_last\fP\f(CR[2];\fP
+  \f(CIovector_last\fP\f(CR[0] =\fP \f(CIovector\fP\f(CR[0];\fP
+  \f(CIovector_last\fP\f(CR[1] =\fP \f(CIovector\fP\f(CR[1];
+
+  for (;;)
+  {
+    PCRE2_SIZE\fP \f(CIstart_offset\fP\f(CR;
+    uint32_t\fP \f(CIoptions\fP\f(CR;\fP
+
+    \f(CI/* After each successful match, we use pcre2_next_match() to obtain the
+    match parameters for subsequent match attempts. */\fP
+
+    \f(CRif (!\fP\f(CBpcre2_next_match\fP\f(CR(\fP\f(CImatch_data\fP\f(CR, &\fP\f(CIstart_offset\fP\f(CR, &\fP\f(CIoptions\fP\f(CR))
+      break;\fP
+
+    \f(CI/* Run the next matching operation */\fP
+
+    \f(CIrc\fP \f(CR=\fP \f(CBpcre2_match\fP\f(CR(\fP\f(CIre\fP\f(CR,\fP\&             \f(CI// the compiled pattern\fP
+                     \f(CIsubject\fP\f(CR,\fP\&        \f(CI// the subject string\fP
+                     \f(CIsubject_length\fP\f(CR,\fP \f(CI// the length of the subject\fP
+                     \f(CIstart_offset\fP\f(CR,\fP\&   \f(CI// starting offset in the subject\fP
+                     \f(CIoptions\fP\f(CR,\fP\&        \f(CI// options\fP
+                     \f(CImatch_data\fP\f(CR,\fP\&     \f(CI// block for storing the result\fP
+                     \f(CBNULL\fP\f(CR);\fP\&          \f(CI// use default match context\fP
+
+    \f(CI/* If this match attempt fails, exit the loop for subsequent matches. */\fP
+
+    \f(CRif (\fP\f(CIrc\fP \f(CR==\fP \f(CBPCRE2_ERROR_NOMATCH\fP\f(CR)
+      break;\fP
+
+    \f(CI/* Other matching errors are not recoverable. */\fP
+
+    \f(CRif (\fP\f(CIrc\fP \f(CR< 0)
+    {\fP
+      \f(CBprintf\fP\f(CR("Matching error %d\(rsn",\fP \f(CIrc\fP\f(CR);\fP
+      \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+      \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+      return 1;
+    }\fP
+
+    \f(CI/* This demonstration program depends on pcre2_next_match() to ensure that
+    the loop for second and subsequent matches does not run forever. However,
+    it would be robust practice for a production application to verify this.
+    The following block of code shows how to do this. This error case is not
+    reachable unless there is a bug in PCRE2.
+
+    Because this program does not set the PCRE2_EXTRA_ALLOW_LOOKAROUND_BSK
+    option, the logic is simple. We verify that either ovector[1] has
+    advanced, or that we have an empty match touching the end of a previous
+    non\-empty match. See the API documentation for guidance if your
+    application uses PCRE2_EXTRA_ALLOW_LOOKAROUND_BSK and searches for
+    multiple matches. */\fP
+
+    \f(CRif (!(\fP\f(CIovector\fP\f(CR[1] >\fP \f(CIovector_last\fP\f(CR[1] ||
+          (\fP\f(CIovector\fP\f(CR[1] ==\fP \f(CIovector\fP\f(CR[0] &&\fP \f(CIovector_last\fP\f(CR[1] >\fP \f(CIovector_last\fP\f(CR[0] &&\fP
+           \f(CIovector\fP\f(CR[1] ==\fP \f(CIovector_last\fP\f(CR[1])))
+    {\fP
+      \f(CBprintf\fP\f(CR(
+          "\(rs\(rsK was used in an assertion to yield non\-advancing matches.\(rsn");\fP
+      \f(CBprintf\fP\f(CR("Run abandoned\(rsn");\fP
+      \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+      \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+      return 1;
+    }\fP
+
+    \f(CIovector_last\fP\f(CR[0] =\fP \f(CIovector\fP\f(CR[0];\fP
+    \f(CIovector_last\fP\f(CR[1] =\fP \f(CIovector\fP\f(CR[1];\fP
+
+    \f(CI/* Match succeeded. */\fP
+
+    \f(CBprintf\fP\f(CR("\(rsnMatch succeeded again at offset %d\(rsn", (int)\fP\f(CIovector\fP\f(CR[0]);\fP
+
+    \f(CI/* The match succeeded, but the output vector wasn\*(Aqt big enough. This
+    should not happen. */\fP
+
+    \f(CRif (\fP\f(CIrc\fP \f(CR== 0)\fP
+      \f(CBprintf\fP\f(CR("ovector was not big enough for all the captured substrings\(rsn");\fP
+
+    \f(CI/* We guard against patterns such as /(?=.\(rsK)/ that use \(rsK in an assertion
+    to set the start of a match later than its end. As explained above, this
+    case should not occur because this demonstration program does not set the
+    PCRE2_EXTRA_ALLOW_LOOKAROUND_BSK option, however, we do include code
+    showing how to detect it. */\fP
+
+    \f(CRif (\fP\f(CIovector\fP\f(CR[0] >\fP \f(CIovector\fP\f(CR[1])
+    {\fP
+      \f(CBprintf\fP\f(CR("\(rs\(rsK was used in an assertion to set the match start after its "
+             "end.\(rsn"
+             "From end to start the match was: %.*s\(rsn",
+             (int)(\fP\f(CIovector\fP\f(CR[0] \-\fP \f(CIovector\fP\f(CR[1]), (char *)(\fP\f(CIsubject\fP \f(CR+\fP \f(CIovector\fP\f(CR[1]));\fP
+      \f(CBprintf\fP\f(CR("Run abandoned\(rsn");\fP
+      \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+      \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+      return 1;
+    }\fP
+
+    \f(CI/* As before, show substrings stored in the output vector by number, and
+    then also any named substrings. */\fP
+
+    \f(CRfor (int\fP \f(CIi\fP \f(CR= 0;\fP \f(CIi\fP \f(CR<\fP \f(CIrc\fP\f(CR;\fP \f(CIi\fP\f(CR++)
+    {
+      PCRE2_SPTR\fP \f(CIsubstring_start\fP \f(CR=\fP \f(CIsubject\fP \f(CR+\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIi\fP\f(CR];
+      size_t\fP \f(CIsubstring_length\fP \f(CR=\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIi\fP \f(CR+ 1] \-\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIi\fP\f(CR];\fP
+      \f(CBprintf\fP\f(CR("%2d: %.*s\(rsn",\fP \f(CIi\fP\f(CR, (int)\fP\f(CIsubstring_length\fP\f(CR,
+             (char *)\fP\f(CIsubstring_start\fP\f(CR);
+    }
+
+    if (\fP\f(CInamecount\fP \f(CR== 0)
+    {\fP
+      \f(CBprintf\fP\f(CR("No named substrings\(rsn");
+    }
+    else
+    {
+      PCRE2_SPTR\fP \f(CItabptr\fP \f(CR=\fP \f(CIname_table\fP\f(CR;\fP
+      \f(CBprintf\fP\f(CR("Named substrings\(rsn");
+      for (uint32_t\fP \f(CIi\fP \f(CR= 0;\fP \f(CIi\fP \f(CR<\fP \f(CInamecount\fP\f(CR;\fP \f(CIi\fP\f(CR++)
+      {
+        int\fP \f(CIn\fP \f(CR= (\fP\f(CItabptr\fP\f(CR[0] << 8) |\fP \f(CItabptr\fP\f(CR[1];\fP
+        \f(CBprintf\fP\f(CR("(%d) %*s: %.*s\(rsn",\fP \f(CIn\fP\f(CR,\fP \f(CIname_entry_size\fP \f(CR\- 3,\fP \f(CItabptr\fP \f(CR+ 2,
+               (int)(\fP\f(CIovector\fP\f(CR[2 *\fP \f(CIn\fP \f(CR+ 1] \-\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIn\fP\f(CR]),\fP
+               \f(CIsubject\fP \f(CR+\fP \f(CIovector\fP\f(CR[2 *\fP \f(CIn\fP\f(CR]);\fP
+        \f(CItabptr\fP \f(CR+=\fP \f(CIname_entry_size\fP\f(CR;
+      }
+    }
+  }\fP \f(CI// End of loop to find second and subsequent matches\fP
+
+  \f(CBprintf\fP\f(CR("\(rsn");\fP
+
+  \f(CBpcre2_match_data_free\fP\f(CR(\fP\f(CImatch_data\fP\f(CR);\fP
+  \f(CBpcre2_code_free\fP\f(CR(\fP\f(CIre\fP\f(CR);
+  return 0;
+}\fP
+
+\f(CI/* End of pcre2demo.c */\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.in \n(pIu
+.rr pI

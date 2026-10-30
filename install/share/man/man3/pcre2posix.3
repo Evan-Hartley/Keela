@@ -1,0 +1,517 @@
+'\" t
+.\"     Title: pcre2posix
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 27 November 2024
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2POSIX" "3" "27 November 2024" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2posix \- PCRE2 POSIX API
+.SH "SYNOPSIS"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CR\&#include <pcre2posix.h>
+
+int\fP \f(CBpcre2_regcomp\fP\f(CR(regex_t *\fP\f(CIpreg\fP\f(CR, const char *\fP\f(CIpattern\fP\f(CR,
+     int\fP \f(CIcflags\fP\f(CR);
+
+int\fP \f(CBpcre2_regexec\fP\f(CR(const regex_t *\fP\f(CIpreg\fP\f(CR, const char *\fP\f(CIstring\fP\f(CR,
+     size_t\fP \f(CInmatch\fP\f(CR, regmatch_t\fP \f(CIpmatch\fP\f(CR[], int\fP \f(CIeflags\fP\f(CR);
+
+size_t\fP \f(CBpcre2_regerror\fP\f(CR(int\fP \f(CIerrcode\fP\f(CR, const regex_t *\fP\f(CIpreg\fP\f(CR,
+     char *\fP\f(CIerrbuf\fP\f(CR, size_t\fP \f(CIerrbuf_size\fP\f(CR);
+
+void\fP \f(CBpcre2_regfree\fP\f(CR(regex_t *\fP\f(CIpreg\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.SH "DESCRIPTION"
+.sp
+This set of functions provides a POSIX\-style API for the PCRE2 regular
+expression 8\-bit library. There are no POSIX\-style wrappers for PCRE2\(cqs 16\-bit
+and 32\-bit libraries. See the
+\f(CRpcre2api\fP
+documentation for a description of PCRE2\(cqs native API, which contains much
+additional functionality.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Important
+.ps -1
+.br
+.sp
+The functions described here are NOT thread\-safe, and
+should not be used in multi\-threaded applications. They are also limited to
+processing subjects that are not bigger than 2GB. Use the native API instead.
+.sp .5v
+.RE
+.sp
+These functions are wrapper functions that ultimately call the PCRE2 native
+API. Their prototypes are defined in the \f(CRpcre2posix.h\fP header file, and
+they all have unique names starting with \f(CRpcre2_\fP. However, the
+\f(CRpcre2posix.h\fP header also contains macro definitions that convert the
+standard POSIX names such as \f(CBregcomp\fP\f(CR()\fP into \f(CBpcre2_regcomp()\fP etc. This
+means that a program can use the usual POSIX names without running the risk of
+accidentally linking with POSIX functions from a different library.
+.sp
+On Unix\-like systems the PCRE2 POSIX library is called \f(CRlibpcre2\-posix\fP, so
+can be accessed by adding \f(CR\-lpcre2\-posix\fP to the command for linking an
+application. Because the POSIX functions call the native ones, it is also
+necessary to add \f(CR\-lpcre2\-8\fP.
+.sp
+On Windows systems, if you are linking to a DLL version of the library, it is
+recommended that \f(CBPCRE2POSIX_SHARED\fP is defined before including the
+\f(CRpcre2posix.h\fP header, as it will allow for a more efficient way to
+invoke the functions by adding the \f(CR__declspec(\fP\f(CIdllimport\fP\f(CR)\fP decorator.
+.sp
+Although they were not defined as prototypes in \f(CRpcre2posix.h\fP, releases
+10.33 to 10.36 of the library contained functions with the POSIX names
+\f(CBregcomp\fP\f(CR()\fP etc. These simply passed their arguments to the PCRE2
+functions. These functions were provided for backwards compatibility with
+earlier versions of PCRE2, which had only POSIX names. However, this has proved
+troublesome in situations where a program links with several libraries, some of
+which use PCRE2\(cqs POSIX interface while others use the real POSIX functions.
+For this reason, the POSIX names have been removed since release 10.37.
+.sp
+Calling the header file \f(CRpcre2posix.h\fP avoids any conflict with other POSIX
+libraries. It can, of course, be renamed or aliased as \f(CRregex.h\fP, which is
+the "correct" name, if there is no clash. It provides two structure types,
+\f(CRregex_t\fP for compiled internal forms, and \f(CRregmatch_t\fP for returning
+captured substrings. It also defines some constants whose names start with
+\f(CBREG_\fP; these are used for setting options and identifying error codes.
+.SH "USING THE POSIX FUNCTIONS"
+.sp
+Note that these functions are just POSIX\-style wrappers for PCRE2\(cqs native API.
+They do not give POSIX regular expression behaviour, and they are not
+thread\-safe or even POSIX compatible.
+.sp
+Those POSIX option bits that can reasonably be mapped to PCRE2 native options
+have been implemented. In addition, the option \f(CBREG_EXTENDED\fP is defined with the
+value zero. This has no effect, but since programs that are written to the
+POSIX interface often use it, this makes it easier to slot in PCRE2 as a
+replacement library. Other POSIX options are not even defined.
+.sp
+There are also some options that are not defined by POSIX. These have been
+added at the request of users who want to make use of certain PCRE2\-specific
+features via the POSIX calling interface or to add BSD or GNU functionality.
+.sp
+When PCRE2 is called via these functions, it is only the API that is POSIX\-like
+in style. The syntax and semantics of the regular expressions themselves are
+still those of Perl, subject to the setting of various PCRE2 options, as
+described below. "POSIX\-like in style" means that the API approximates to the
+POSIX definition; it is not fully POSIX\-compatible, and in multi\-unit encoding
+domains it is probably even less compatible.
+.sp
+The descriptions below use the actual names of the functions, but, as described
+above, the standard POSIX names (without the \f(CRpcre2_\fP prefix) may also be
+used.
+.SH "COMPILING A PATTERN"
+.sp
+The function \f(CBpcre2_regcomp()\fP is called to compile a pattern into an
+internal form. By default, the pattern is a C string terminated by a binary
+zero (but see \f(CBREG_PEND\fP below). The \f(CIpreg\fP argument is a pointer to a
+\f(CRregex_t\fP structure that is used as a base for storing information about
+the compiled regular expression. It is also used for input when \f(CBREG_PEND\fP is
+set. The \f(CRregex_t\fP structure used by \f(CBpcre2_regcomp()\fP is defined in
+\f(CRpcre2posix.h\fP and is not the same as the structure used by other libraries
+that provide POSIX\-style matching.
+.sp
+The argument \f(CIcflags\fP is either zero, or contains one or more of the bits
+defined by the following macros. Any other option bits cause
+\f(CBREG_INVARG\fP to be returned.
+.sp
+.RS 4
+.PD 0
+.TP 13
+\f(CBREG_DOTALL\fP
+.ad l
+The \f(CBPCRE2_DOTALL\fP option is set when the regular expression is passed for
+compilation to the native function. Note that \f(CBREG_DOTALL\fP is not part of the
+POSIX standard.
+.TP 13
+\f(CBREG_ICASE\fP
+.ad l
+The \f(CBPCRE2_CASELESS\fP option is set when the regular expression is passed for
+compilation to the native function.
+.TP 13
+\f(CBREG_NEWLINE\fP
+.ad l
+The \f(CBPCRE2_MULTILINE\fP option is set when the regular expression is passed for
+compilation to the native function. Note that this does \fInot\fP mimic the
+defined POSIX behaviour for \f(CBREG_NEWLINE\fP (see the section
+MATCHING NEWLINE CHARACTERS).
+.TP 13
+\f(CBREG_NOSPEC\fP
+.ad l
+The \f(CBPCRE2_LITERAL\fP option is set when the regular expression is passed for
+compilation to the native function. This disables all meta characters in the
+pattern, causing it to be treated as a literal string. The only other options
+that are allowed with \f(CBREG_NOSPEC\fP are \f(CBREG_ICASE\fP, \f(CBREG_NOSUB\fP, \f(CBREG_PEND\fP, and
+\f(CBREG_UTF\fP. Note that \f(CBREG_NOSPEC\fP is not part of the POSIX standard.
+.TP 13
+\f(CBREG_NOSUB\fP
+.ad l
+When a pattern that is compiled with this flag is passed to
+\f(CBpcre2_regexec()\fP for matching, the \f(CInmatch\fP and \f(CIpmatch\fP arguments
+are ignored, and no captured strings are returned. Versions of the PCRE2 library
+prior to 10.22 used to set the \f(CBPCRE2_NO_AUTO_CAPTURE\fP compile option, but this
+no longer happens because it disables the use of backreferences.
+.TP 13
+\f(CBREG_PEND\fP
+.ad l
+If this option is set, the \f(CIreg_endp\fP field in the \f(CIpreg\fP structure
+(which has the type \f(CRconst char *\fP) must be set to point to the character beyond
+the end of the pattern before calling \f(CBpcre2_regcomp()\fP. The pattern itself
+may now contain binary zeros, which are treated as data characters. Without
+\f(CBREG_PEND\fP, a binary zero terminates the pattern and the \f(CIre_endp\fP field is
+ignored. This is a GNU extension to the POSIX standard and should be used with
+caution in software intended to be portable to other systems.
+.TP 13
+\f(CBREG_UCP\fP
+.ad l
+The \f(CBPCRE2_UCP\fP option is set when the regular expression is passed for
+compilation to the native function. This causes PCRE2 to use Unicode properties
+when matching \f(CI\(rsd\fP, \f(CI\(rsw\fP, etc., instead of just recognizing ASCII values. Note
+that \f(CBREG_UCP\fP is not part of the POSIX standard.
+.TP 13
+\f(CBREG_UNGREEDY\fP
+.ad l
+The \f(CBPCRE2_UNGREEDY\fP option is set when the regular expression is passed for
+compilation to the native function. Note that \f(CBREG_UNGREEDY\fP is not part of the
+POSIX standard.
+.TP 13
+\f(CBREG_UTF\fP
+.ad l
+The \f(CBPCRE2_UTF\fP option is set when the regular expression is passed for
+compilation to the native function. This causes the pattern itself and all data
+strings used for matching it to be treated as UTF\-8 strings. Note that \f(CBREG_UTF\fP
+is not part of the POSIX standard.
+.PD
+.RE
+.PP
+.ad l
+.sp
+In the absence of these flags, no options are passed to the native function.
+This means that the regex is compiled with PCRE2 default semantics. In
+particular, the way it handles newline characters in the subject string is the
+Perl way, not the POSIX way. Note that setting \f(CBPCRE2_MULTILINE\fP has only
+\fIsome\fP of the effects specified for \f(CBREG_NEWLINE\fP. It does not affect the way
+newlines are matched by the dot metacharacter (they are not) or by a negative
+class such as \f(CI[^a]\fP (they are).
+.sp
+The yield of \f(CBpcre2_regcomp()\fP is zero on success, and non\-zero otherwise.
+The \f(CIpreg\fP structure is filled in on success, and one other member of the
+structure (as well as \f(CIre_endp\fP) is public: \f(CIre_nsub\fP contains the
+number of capturing subpatterns in the regular expression. Various error codes
+are defined in the header file.
+.if n .sp
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+.B Note
+.ps -1
+.br
+.sp
+If the yield of \f(CBpcre2_regcomp()\fP is non\-zero, you must not attempt
+to use the contents of the \f(CIpreg\fP structure. If, for example, you pass it
+to \f(CBpcre2_regexec()\fP, the result is undefined and your program is likely to
+crash.
+.sp
+The \f(CIpreg\fP structure can still be passed to \f(CBpcre2_regerror()\fP after a
+compilation error.
+.sp .5v
+.RE
+.SH "MATCHING NEWLINE CHARACTERS"
+.sp
+This area is not simple, because POSIX and Perl take different views of things.
+It is not possible to get PCRE2 to obey POSIX semantics, but then PCRE2 was
+never intended to be a POSIX engine. The following table lists the different
+possibilities for matching newline characters in Perl and PCRE2:
+.TS
+allbox tab(:);
+ltB ltB ltB.
+T{
+.sp
+
+T}:T{
+.sp
+Default
+T}:T{
+.sp
+Change with
+T}
+.T&
+lt lt lt.
+T{
+.sp
+\f(CI.\fP matches newline
+T}:T{
+.sp
+no
+T}:T{
+.sp
+\f(CBPCRE2_\:DOTALL\fP
+T}
+T{
+.sp
+\f(CI[^a]\fP matches newline
+T}:T{
+.sp
+yes
+T}:T{
+.sp
+not changeable
+T}
+T{
+.sp
+\f(CI$\fP matches newline at end
+T}:T{
+.sp
+yes
+T}:T{
+.sp
+\f(CBPCRE2_\:DOLLAR_\:ENDONLY\fP
+T}
+T{
+.sp
+\f(CI$\fP matches newline in middle
+T}:T{
+.sp
+no
+T}:T{
+.sp
+\f(CBPCRE2_\:MULTILINE\fP
+T}
+T{
+.sp
+\f(CI^\fP matches newline in middle
+T}:T{
+.sp
+no
+T}:T{
+.sp
+\f(CBPCRE2_\:MULTILINE\fP
+T}
+.TE
+.sp
+.sp
+This is the equivalent table for a POSIX\-compatible pattern matcher:
+.TS
+allbox tab(:);
+ltB ltB ltB.
+T{
+.sp
+
+T}:T{
+.sp
+Default
+T}:T{
+.sp
+Change with
+T}
+.T&
+lt lt lt.
+T{
+.sp
+\f(CI.\fP matches newline
+T}:T{
+.sp
+yes
+T}:T{
+.sp
+\f(CBREG_\:NEWLINE\fP
+T}
+T{
+.sp
+\f(CI[^a]\fP matches newline
+T}:T{
+.sp
+yes
+T}:T{
+.sp
+\f(CBREG_\:NEWLINE\fP
+T}
+T{
+.sp
+\f(CI$\fP matches newline at end
+T}:T{
+.sp
+no
+T}:T{
+.sp
+\f(CBREG_\:NEWLINE\fP
+T}
+T{
+.sp
+\f(CI$\fP matches newline in middle
+T}:T{
+.sp
+no
+T}:T{
+.sp
+\f(CBREG_\:NEWLINE\fP
+T}
+T{
+.sp
+\f(CI^\fP matches newline in middle
+T}:T{
+.sp
+no
+T}:T{
+.sp
+\f(CBREG_\:NEWLINE\fP
+T}
+.TE
+.sp
+.sp
+This behaviour is not what happens when PCRE2 is called via its POSIX
+API. By default, PCRE2\(cqs behaviour is the same as Perl\(cqs, except that there is
+no equivalent for \f(CBPCRE2_DOLLAR_ENDONLY\fP in Perl. In both PCRE2 and Perl, there
+is no way to stop newline from matching \f(CI[^a]\fP.
+.sp
+Default POSIX newline handling can be obtained by setting \f(CBPCRE2_DOTALL\fP and
+\f(CBPCRE2_DOLLAR_ENDONLY\fP when calling \f(CBpcre2_compile()\fP directly, but there is
+no way to make PCRE2 behave exactly as for the \f(CBREG_NEWLINE\fP action. When using
+the POSIX API, passing \f(CBREG_NEWLINE\fP to PCRE2\(cqs \f(CBpcre2_regcomp()\fP function
+causes \f(CBPCRE2_MULTILINE\fP to be passed to \f(CBpcre2_compile()\fP, and \f(CBREG_DOTALL\fP
+passes \f(CBPCRE2_DOTALL\fP. There is no way to pass \f(CBPCRE2_DOLLAR_ENDONLY\fP.
+.SH "MATCHING A PATTERN"
+.sp
+The function \f(CBpcre2_regexec()\fP is called to match a compiled pattern
+\f(CIpreg\fP against a given \f(CIstring\fP, which is by default terminated by a
+zero byte (but see \f(CBREG_STARTEND\fP below), subject to the options in \f(CIeflags\fP.
+Any option bits other than those listed below cause \f(CBREG_INVARG\fP to be
+returned.
+.sp
+.RS 4
+.PD
+.TP 13
+\f(CBREG_NOTBOL\fP
+.ad l
+The \f(CBPCRE2_NOTBOL\fP option is set when calling the underlying PCRE2 matching
+function.
+.TP 13
+\f(CBREG_NOTEMPTY\fP
+.ad l
+The \f(CBPCRE2_NOTEMPTY\fP option is set when calling the underlying PCRE2 matching
+function. Note that \f(CBREG_NOTEMPTY\fP is not part of the POSIX standard. However,
+setting this option can give more POSIX\-like behaviour in some situations.
+.TP 13
+\f(CBREG_NOTEOL\fP
+.ad l
+The \f(CBPCRE2_NOTEOL\fP option is set when calling the underlying PCRE2 matching
+function.
+.TP 13
+\f(CBREG_STARTEND\fP
+.ad l
+When this option is set, the subject string starts at \f(CIstring\fP\f(CR \fP\f(CR+\fP\f(CR \fP\f(CIpmatch\fP\f(CR[0].\fP\f(CIrm_so\fP
+and ends at \f(CIstring\fP\f(CR \fP\f(CR+\fP\f(CR \fP\f(CIpmatch\fP\f(CR[0].\fP\f(CIrm_eo\fP, which
+should point to the first character beyond the string. There may be binary
+zeros within the subject string, and indeed, using \f(CBREG_STARTEND\fP is the only
+way to pass a subject string that contains a binary zero.
+.RS 13
+.sp
+Whatever the value of \f(CRpmatch[0].rm_so\fP, the offsets of the matched string
+and any captured substrings are still given relative to the start of
+\f(CIstring\fP itself. (Before PCRE2 release 10.30 these were given relative to
+\f(CIstring\fP\f(CR \fP\f(CR+\fP\f(CR \fP\f(CIpmatch\fP\f(CR[0].\fP\f(CIrm_so\fP, but this differs from other
+implementations.)
+.sp
+This is a BSD extension, compatible with but not specified by IEEE Standard
+1003.2 (POSIX.2), and should be used with caution in software intended to be
+portable to other systems. Note that a non\-zero \f(CIrm_so\fP does not imply
+\f(CBREG_NOTBOL\fP; \f(CBREG_STARTEND\fP affects only the location and length of the string,
+not how it is matched. Setting \f(CBREG_STARTEND\fP and passing \f(CIpmatch\fP as \f(CBNULL\fP
+are mutually exclusive; the error \f(CBREG_INVARG\fP is returned.
+.RE
+.PD
+.RE
+.PP
+.ad l
+.sp
+If the pattern was compiled with the \f(CBREG_NOSUB\fP flag, no data about any matched
+strings is returned. The \f(CInmatch\fP and \f(CIpmatch\fP arguments of
+\f(CBpcre2_regexec()\fP are ignored (except possibly as input for \f(CBREG_STARTEND\fP).
+.sp
+The value of \f(CInmatch\fP may be zero, and the value \f(CIpmatch\fP may be \f(CBNULL\fP
+(unless \f(CBREG_STARTEND\fP is set); in both these cases no data about any matched
+strings is returned.
+.sp
+Otherwise, the portion of the string that was matched, and also any captured
+substrings, are returned via the \f(CIpmatch\fP argument, which points to an
+array of \f(CInmatch\fP structures of type \f(CRregmatch_t\fP, containing the
+members \f(CIrm_so\fP and \f(CIrm_eo\fP. These contain the byte offset to the first
+character of each substring and the offset to the first character after the end
+of each substring, respectively. The 0th element of the vector relates to the
+entire portion of \f(CIstring\fP that was matched; subsequent elements relate to
+the capturing subpatterns of the regular expression. Unused entries in the
+array have both structure members set to \-1.
+.sp
+\f(CRregmatch_t\fP as well as the \f(CRregoff_t\fP typedef it uses are defined in
+\f(CRpcre2posix.h\fP and are not warranted to have the same size or layout as other
+similarly named types from other libraries that provide POSIX\-style matching.
+.sp
+A successful match yields a zero return; various error codes are defined in the
+header file, of which \f(CBREG_NOMATCH\fP is the "expected" failure code.
+Memory allocation failures and heap, match, or depth limit exhaustion return
+\f(CBREG_ESPACE\fP. Pattern errors detected during matching, such as recursion
+loops or invalid uses of \f(CI\(rsK\fP, return \f(CBREG_BADPAT\fP.
+.SH "ERROR MESSAGES"
+.sp
+The \f(CBpcre2_regerror()\fP function maps a non\-zero errorcode from either
+\f(CBpcre2_regcomp()\fP or \f(CBpcre2_regexec()\fP to a printable message. If
+\f(CIpreg\fP is not \f(CBNULL\fP, the error should have arisen from the use of that
+structure. A message terminated by a binary zero is placed in \f(CIerrbuf\fP. If
+the buffer is too short, only the first \f(CIerrbuf_size\fP \- 1 characters of the
+error message are used. The yield of the function is the size of buffer needed
+to hold the whole message, including the terminating zero. This value is
+greater than \f(CIerrbuf_size\fP if the message was truncated.
+.SH "MEMORY USAGE"
+.sp
+Compiling a regular expression causes memory to be allocated and associated
+with the \f(CIpreg\fP structure. The function \f(CBpcre2_regfree()\fP frees all
+such memory, after which \f(CIpreg\fP may no longer be used as a compiled
+expression.
+.SS "Author"
+.sp
+Philip Hazel
+.br
+Retired from University Computing Service
+.br
+Cambridge, England.
+.SS "Revision"
+.sp
+Last updated: 27 November 2024
+.br
+Copyright \(co 1997\-2024 University of Cambridge.

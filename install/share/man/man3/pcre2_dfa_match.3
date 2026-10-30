@@ -1,0 +1,177 @@
+'\" t
+.\"     Title: pcre2_dfa_match
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 31 August 2021
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2_DFA_MATCH" "3" "31 August 2021" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2_dfa_match \- match a compiled pattern to a subject string using the alternative matching algorithm (DFA algorithm; not Perl compatible)
+.SH "SYNOPSIS"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CR\&#include <pcre2.h>
+
+int\fP \f(CBpcre2_dfa_match\fP\f(CR(const pcre2_code *\fP\f(CIcode\fP\f(CR, PCRE2_SPTR\fP \f(CIsubject\fP\f(CR,
+                    PCRE2_SIZE\fP \f(CIlength\fP\f(CR, PCRE2_SIZE\fP \f(CIstart_offset\fP\f(CR,
+                    uint32_t\fP \f(CIoptions\fP\f(CR, pcre2_match_data *\fP\f(CImatch_data\fP\f(CR,
+                    pcre2_match_context *\fP\f(CImcontext\fP\f(CR, int *\fP\f(CIworkspace\fP\f(CR,
+                    PCRE2_SIZE\fP \f(CIwscount\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.SH "DESCRIPTION"
+.sp
+This function matches a compiled regular expression against a given subject
+string, using an alternative matching algorithm that scans the subject string
+just once (except when processing lookaround assertions). This function is
+\fInot\fP Perl\-compatible (the Perl\-compatible matching function is
+\f(CBpcre2_match()\fP). The arguments for this function are:
+.sp
+.RS 4
+.PD 0
+.TP 13
+\f(CIcode\fP
+.ad l
+Points to the compiled pattern
+.TP 13
+\f(CIsubject\fP
+.ad l
+Points to the subject string
+.TP 13
+\f(CIlength\fP
+.ad l
+Length of the subject string
+.TP 13
+\f(CIstart_offset\fP
+.ad l
+Offset in the subject at which to start matching
+.TP 13
+\f(CIoptions\fP
+.ad l
+Option bits
+.TP 13
+\f(CImatch_data\fP
+.ad l
+Points to a match data block, for results
+.TP 13
+\f(CImcontext\fP
+.ad l
+Points to a match context, or is \f(CBNULL\fP
+.TP 13
+\f(CIworkspace\fP
+.ad l
+Points to a vector of ints used as working space
+.TP 13
+\f(CIwscount\fP
+.ad l
+Number of elements in the vector
+.PD
+.RE
+.PP
+.ad l
+.sp
+The size of output vector needed to contain all the results depends on the
+number of simultaneous matches, not on the number of parentheses in the
+pattern. Using \f(CBpcre2_match_data_create_from_pattern()\fP to create the match
+data block is therefore not advisable when using this function.
+.sp
+A match context is needed only if you want to set up a callout function or
+specify the heap limit or the match or the recursion depth limits. The
+\f(CIlength\fP and \f(CIstart_offset\fP values are code units, not characters. The
+options are:
+.sp
+.RS 4
+.PD 0
+.TP 23
+\f(CBPCRE2_ANCHORED\fP
+.ad l
+Match only at the first position
+.TP 23
+\f(CBPCRE2_COPY_MATCHED_SUBJECT\fP
+.ad l
+On success, make a private subject copy
+.TP 23
+\f(CBPCRE2_ENDANCHORED\fP
+.ad l
+Pattern can match only at end of subject
+.TP 23
+\f(CBPCRE2_NOTBOL\fP
+.ad l
+Subject is not the beginning of a line
+.TP 23
+\f(CBPCRE2_NOTEOL\fP
+.ad l
+Subject is not the end of a line
+.TP 23
+\f(CBPCRE2_NOTEMPTY\fP
+.ad l
+An empty string is not a valid match
+.TP 23
+\f(CBPCRE2_NOTEMPTY_ATSTART\fP
+.ad l
+An empty string at the start of the subject
+is not a valid match
+.TP 23
+\f(CBPCRE2_NO_UTF_CHECK\fP
+.ad l
+Do not check the subject for UTF
+validity (only relevant if \f(CBPCRE2_UTF\fP
+was set at compile time)
+.TP 23
+\f(CBPCRE2_PARTIAL_HARD\fP
+.ad l
+Return \f(CBPCRE2_ERROR_PARTIAL\fP for a partial
+match even if there is a full match
+.TP 23
+\f(CBPCRE2_PARTIAL_SOFT\fP
+.ad l
+Return \f(CBPCRE2_ERROR_PARTIAL\fP for a partial
+match if no full matches are found
+.TP 23
+\f(CBPCRE2_DFA_RESTART\fP
+.ad l
+Restart after a partial match
+.TP 23
+\f(CBPCRE2_DFA_SHORTEST\fP
+.ad l
+Return only the shortest match
+.PD
+.RE
+.PP
+.ad l
+.sp
+There are restrictions on what may appear in a pattern when using this matching
+function. Details are given in the
+\f(CRpcre2matching\fP
+documentation. For details of partial matching, see the
+\f(CRpcre2partial\fP
+page. There is a complete description of the PCRE2 native API in the
+\f(CRpcre2api\fP
+page and a description of the POSIX API in the
+\f(CRpcre2posix\fP
+page.

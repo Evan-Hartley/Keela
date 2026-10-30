@@ -1,0 +1,59 @@
+'\" t
+.\"     Title: pcre2_match_data_free
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 16 August 2023
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2_MATCH_DATA_FREE" "3" "16 August 2023" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2_match_data_free \- free a match data block
+.SH "SYNOPSIS"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CR\&#include <pcre2.h>
+
+void\fP \f(CBpcre2_match_data_free\fP\f(CR(pcre2_match_data *\fP\f(CImatch_data\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.SH "DESCRIPTION"
+.sp
+If \f(CImatch_data\fP is \f(CBNULL\fP, this function does nothing. Otherwise,
+\f(CImatch_data\fP must point to a match data block, which this function frees,
+using the memory freeing function from the general context or compiled pattern
+with which it was created, or \f(CBfree\fP\f(CR()\fP if that was not set. Any heapframe
+vector attached by a previous call to \f(CBpcre2_match()\fP is also freed.
+.sp
+If the \f(CBPCRE2_COPY_MATCHED_SUBJECT\fP option was used for a successful match using this
+match data block, the copy of the subject that was referenced within the block
+is also freed.
+.sp
+There is a complete description of the PCRE2 native API in the
+\f(CRpcre2api\fP
+page and a description of the POSIX API in the
+\f(CRpcre2posix\fP
+page.

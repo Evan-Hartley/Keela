@@ -17,11 +17,11 @@ ELSE()
 ENDIF()
 
 # add dependencies incase of non-installation step
-if(TARGET third_party)
+if(TARGET keela_ready)
     #build all dependencies before the executable
     add_dependencies(
         Keela
-        third_party
+        keela_ready
     )
 endif()
 
@@ -42,9 +42,10 @@ option(USE_FFV1 "Use FFV1 codec to encode video. If disabled, keela will use h.2
 target_link_libraries(
     Keela
     PRIVATE
+        PCRE2
         GIO
+        GObject
         GLib
-        GTKMM
         GTK3
         FFmpegAvutil
         FFmpegAvfilter
@@ -60,8 +61,8 @@ target_link_libraries(
         Aravis
         AravisGst
         GTKMM
+        TBB
         spdlog::spdlog
-        TBB::tbb
 )
 
 # generate SPDLOG_* logging macros for this logging level and above
@@ -97,10 +98,6 @@ add_custom_target(clean-config
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Clean CMake configuration - use this when switching ENABLE_KEELA_VIDEOTESTSRC"
 )
-
-if (Doxygen_FOUND)
-    doxygen_add_docs(docs readme.md keela keela-widgets keela-pipeline keela-videotestsrc)
-endif ()
 
 install(
     TARGETS Keela

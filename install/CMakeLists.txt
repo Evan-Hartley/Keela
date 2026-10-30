@@ -1,17 +1,19 @@
-#include libwdi
-add_library(Libwdi SHARED IMPORTED)
+set(ENV{PKG_CONFIG_PATH} ${DEPS_INSTALL_DIR}/lib/pkgconfig)
+
+#include pcre2
+add_library(PCRE2 SHARED IMPORTED)
 
 set_target_properties(
-    Libwdi
+    PCRE2
     PROPERTIES
-        IMPORTED_LOCATION
-            "${DEPS_INSTALL_DIR}/bin/libwdi.dll"
-
         IMPORTED_IMPLIB
-            "${DEPS_INSTALL_DIR}/lib/libwdi.dll.a"
+                "${DEPS_INSTALL_DIR}/lib/libpcre2-8.lib"
+            
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/bin/libpcre2-8.dll"
         
         INTERFACE_INCLUDE_DIRECTORIES
-            "${DEPS_INSTALL_DIR}/include"
+            "${DEPS_INSTALL_DIR}/include/pcre2"
 )
 
 #include gio
@@ -24,7 +26,7 @@ set_target_properties(
             "${DEPS_INSTALL_DIR}/lib/libgio-2.0.dll.a"
 
         IMPORTED_LOCATION
-            "${DEPS_INSTALL_DIR}/lib/libgio-2.0.dll"
+            "${DEPS_INSTALL_DIR}/bin/libgio-2.0.dll"
         
         INTERFACE_INCLUDE_DIRECTORIES
             "${DEPS_INSTALL_DIR}/include/glib-2.0"
@@ -270,9 +272,18 @@ set_target_properties(
             "${DEPS_INSTALL_DIR}/lib/libgtkmm-3.0.dll.a"
         
         INTERFACE_INCLUDE_DIRECTORIES
-            "${DEPS_INSTALL_DIR}/include"
+            "${DEPS_INSTALL_DIR}/include/gtkmm-3.0"
 )
 
-set(DOXYGEN_EXECUTABLE
-    ${DEPS_INSTALL_DIR}/bin/doxygen
+#include tbb
+add_library(TBB SHARED IMPORTED)
+
+set_target_properties(
+    TBB
+    PROPERTIES
+        IMPORTED_LOCATION
+            "${DEPS_INSTALL_DIR}/lib/libtbb.dll.a"
+        
+        INTERFACE_INCLUDE_DIRECTORIES
+            "${DEPS_INSTALL_DIR}/include/tbb"
 )

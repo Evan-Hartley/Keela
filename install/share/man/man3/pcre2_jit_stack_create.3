@@ -1,0 +1,66 @@
+'\" t
+.\"     Title: pcre2_jit_stack_create
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 23 January 2023
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2_JIT_STACK_CREATE" "3" "23 January 2023" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2_jit_stack_create \- create a stack for JIT matching
+.SH "SYNOPSIS"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CR\&#include <pcre2.h>
+
+pcre2_jit_stack *\fP\f(CBpcre2_jit_stack_create\fP\f(CR(
+      size_t\fP \f(CIstartsize\fP\f(CR, size_t\fP \f(CImaxsize\fP\f(CR,
+      pcre2_general_context *\fP\f(CIgcontext\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.SH "DESCRIPTION"
+.sp
+This function is used to create a stack for use by the code compiled by the JIT
+compiler. The first two arguments are a starting size for the stack, and a
+maximum size to which it is allowed to grow. The final argument is a general
+context, for memory allocation functions, or \f(CBNULL\fP for standard memory
+allocation. The result can be passed to the JIT run\-time code by calling
+\f(CBpcre2_jit_stack_assign()\fP to associate the stack with a compiled pattern,
+which can then be processed by \f(CBpcre2_match()\fP or \f(CBpcre2_jit_match()\fP.
+A maximum stack size of 512KiB to 1MiB should be more than enough for any
+pattern. If the stack couldn\(cqt be allocated or the values passed were not
+reasonable, \f(CBNULL\fP will be returned. For more details, see the section
+Controlling the JIT stack
+in the
+\f(CRpcre2jit\fP
+page.
+.sp
+There is a complete description of the PCRE2 native API in the
+\f(CRpcre2api\fP
+page and a description of the POSIX API in the
+\f(CRpcre2posix\fP
+page.

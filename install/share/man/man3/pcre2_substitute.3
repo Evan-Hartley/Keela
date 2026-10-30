@@ -1,0 +1,267 @@
+'\" t
+.\"     Title: pcre2_substitute
+.\"    Author: [see the "AUTHOR(S)" section]
+.\" Generator: Asciidoctor 2.0.26
+.\"      Date: 03 October 2025
+.\"    Manual: PCRE2
+.\"    Source: PCRE2 10.50-DEV
+.\"  Language: English
+.\"
+.TH "PCRE2_SUBSTITUTE" "3" "03 October 2025" "PCRE2 10.50\-DEV" "PCRE2"
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.ss \n[.ss] 0
+.nh
+.ad l
+.de URL
+\fI\\$2\fP <\\$1>\\$3
+..
+.als MTO URL
+.if \n[.g] \{\
+.  mso www.tmac
+.  am URL
+.    ad l
+.  .
+.  am MTO
+.    ad l
+.  .
+.  LINKSTYLE blue R < >
+.\}
+.SH "NAME"
+pcre2_substitute \- replace matched substrings
+.SH "SYNOPSIS"
+.sp
+.ss \n[.ss]
+.nf
+.fam C
+\f(CR\&#include <pcre2.h>
+
+int\fP \f(CBpcre2_substitute\fP\f(CR(const pcre2_code *\fP\f(CIcode\fP\f(CR, PCRE2_SPTR\fP \f(CIsubject\fP\f(CR,
+                     PCRE2_SIZE\fP \f(CIlength\fP\f(CR, PCRE2_SIZE\fP \f(CIstart_offset\fP\f(CR,
+                     uint32_t\fP \f(CIoptions\fP\f(CR, pcre2_match_data *\fP\f(CImatch_data\fP\f(CR,
+                     pcre2_match_context *\fP\f(CImcontext\fP\f(CR,
+                     PCRE2_SPTR\fP \f(CIreplacement\fP\f(CR, PCRE2_SIZE\fP \f(CIrlength\fP\f(CR,
+                     PCRE2_UCHAR *\fP\f(CIbuffer\fP\f(CR, PCRE2_SIZE *\fP\f(CIblength\fP\f(CR);\fP
+.fam
+.fi
+.ss \n[.ss] 0
+.SH "DESCRIPTION"
+.sp
+This function matches a compiled regular expression against a given subject
+string, using a matching algorithm that is similar to Perl\(cqs. It then makes a
+copy of the subject, substituting a replacement string for what was matched.
+Its arguments are:
+.sp
+.RS 4
+.PD 0
+.TP 13
+\f(CIcode\fP
+.ad l
+Points to the compiled pattern
+.TP 13
+\f(CIsubject\fP
+.ad l
+Points to the subject string
+.TP 13
+\f(CIlength\fP
+.ad l
+Length of the subject string
+.TP 13
+\f(CIstart_offset\fP
+.ad l
+Offset in the subject at which to start matching
+.TP 13
+\f(CIoptions\fP
+.ad l
+Option bits
+.TP 13
+\f(CImatch_data\fP
+.ad l
+Points to a match data block, or is \f(CBNULL\fP
+.TP 13
+\f(CImcontext\fP
+.ad l
+Points to a match context, or is \f(CBNULL\fP
+.TP 13
+\f(CIreplacement\fP
+.ad l
+Points to the replacement string
+.TP 13
+\f(CIrlength\fP
+.ad l
+Length of the replacement string
+.TP 13
+\f(CIbuffer\fP
+.ad l
+Points to the output buffer, or may be \f(CBNULL\fP if \f(CIblength\fP is zero
+.TP 13
+\f(CIblength\fP
+.ad l
+Points to the length of the output buffer
+.PD
+.RE
+.PP
+.ad l
+.sp
+A match data block is needed only if you want to inspect the data from the
+final match that is returned in that block or if \f(CBPCRE2_SUBSTITUTE_MATCHED\fP is
+set. A match context is needed only if you want to:
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Set up a callout function
+.RE
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Set a matching offset limit
+.RE
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Change the backtracking match limit
+.RE
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Change the backtracking depth limit
+.RE
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.  sp -1
+.  IP \(bu 2.3
+.\}
+Set custom memory management in the match context
+.RE
+.sp
+The \f(CIlength\fP, \f(CIstart_offset\fP and \f(CIrlength\fP values are code units,
+not characters, as is the contents of the variable pointed at by
+\f(CIblength\fP. This variable must contain the length of the output buffer
+when the function is called. If the function is successful, the value is
+changed to the length of the new string, excluding the trailing zero that is
+automatically added.
+.sp
+The subject and replacement lengths can be given as \f(CBPCRE2_ZERO_TERMINATED\fP for
+zero\-terminated strings. The options are:
+.sp
+.RS 4
+.PD 0
+.TP 26
+\f(CBPCRE2_ANCHORED\fP
+.ad l
+Match only at the first position
+.TP 26
+\f(CBPCRE2_ENDANCHORED\fP
+.ad l
+Match only at end of subject
+.TP 26
+\f(CBPCRE2_NOTBOL\fP
+.ad l
+Subject is not the beginning of a
+line
+.TP 26
+\f(CBPCRE2_NOTEOL\fP
+.ad l
+Subject is not the end of a line
+.TP 26
+\f(CBPCRE2_NOTEMPTY\fP
+.ad l
+An empty string is not a
+valid match
+.TP 26
+\f(CBPCRE2_NOTEMPTY_ATSTART\fP
+.ad l
+An empty string at the start of
+the subject is not a valid match
+.TP 26
+\f(CBPCRE2_NO_JIT\fP
+.ad l
+Do not use JIT matching
+.TP 26
+\f(CBPCRE2_NO_UTF_CHECK\fP
+.ad l
+Do not check for UTF validity in
+the subject or replacement
+(only relevant if \f(CBPCRE2_UTF\fP was
+set at compile time)
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_EXTENDED\fP
+.ad l
+Do extended replacement processing
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_GLOBAL\fP
+.ad l
+Replace all occurrences in the
+subject
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_LITERAL\fP
+.ad l
+The replacement string is literal
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_MATCHED\fP
+.ad l
+Use pre\-existing match data for
+first match
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_OVERFLOW_LENGTH\fP
+.ad l
+If overflow, compute needed length
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_REPLACEMENT_ONLY\fP
+.ad l
+Return only replacement string(s)
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_UNKNOWN_UNSET\fP
+.ad l
+Treat unknown group as unset
+.TP 26
+\f(CBPCRE2_SUBSTITUTE_UNSET_EMPTY\fP
+.ad l
+Simple unset insert = empty string
+.PD
+.RE
+.PP
+.ad l
+.sp
+If \f(CBPCRE2_SUBSTITUTE_LITERAL\fP is set, \f(CBPCRE2_SUBSTITUTE_EXTENDED\fP,
+\f(CBPCRE2_SUBSTITUTE_UNKNOWN_UNSET\fP, and \f(CBPCRE2_SUBSTITUTE_UNSET_EMPTY\fP are ignored.
+.sp
+If \f(CBPCRE2_SUBSTITUTE_MATCHED\fP is set, \f(CImatch_data\fP must be non\-\f(CBNULL\fP; its
+contents must be the result of a call to \f(CBpcre2_match()\fP (or
+\f(CBpcre2_jit_match()\fP) using the same pattern, subject pointer, effective
+subject length, start offset, and match options.
+.sp
+The function returns the number of substitutions, which may be zero if there
+are no matches. The result may be greater than one only when
+\f(CBPCRE2_SUBSTITUTE_GLOBAL\fP is set. In the event of an error, a negative error code
+is returned.
+.sp
+There is a complete description of the PCRE2 native API in the
+\f(CRpcre2api\fP
+page and a description of the POSIX API in the
+\f(CRpcre2posix\fP
+page.

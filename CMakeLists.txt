@@ -2,72 +2,67 @@ CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela-Master)
 
 include(ExternalProject)
+include(ProcessorCount)
+ProcessorCount(NPROC)
 
 set(DEPS_VENDOR_DIR ${PROJECT_SOURCE_DIR}/vendor)
-set(DEPS_INSTALL_DIR ${PROJECT_SOURCE_DIR}/install)
-set(DEPS_DRIVER_DIR ${PROJECT_SOURCE_DIR}/DriverInstaller)
+set(DEPS_INSTALL_DIR '${PROJECT_SOURCE_DIR}/install')
+set(DEPS_PKCONFIG_DIR '${PROJECT_SOURCE_DIR}/install/lib/pkgconfig')
 
 #external libraries - build step
+
 ExternalProject_Add(
-    libwdi
+    pcre2
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/libwdi
+        '${DEPS_VENDOR_DIR}/pcre2'
 
-    CONFIGURE_COMMAND
-        ""
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX='${DEPS_INSTALL_DIR}'
+        -DPCRE2_BUILD_PCRE2_8=ON
+        -DPCRE2_BUILD_PCRE2_16=OFF
+        -DPCRE2_BUILD_PCRE2_32=OFF
 
-    BUILD_COMMAND
-        msbuild
-        <SOURCE_DIR>/libwdi.sln
-        /p:Configuration=Release
-        /p:Platform=x64
-
-    INSTALL_COMMAND
-        ${CMAKE_COMMAND} -E make_directory
-        ${DEPS_INSTALL_DIR}/include
-
-    COMMAND
-        ${CMAKE_COMMAND} -E make_directory
-        ${DEPS_INSTALL_DIR}/lib
-
-    COMMAND
-        ${CMAKE_COMMAND} -E copy_directory
-        <SOURCE_DIR>/libwdi
-        ${DEPS_INSTALL_DIR}/include/libwdi
-
-    COMMAND
-        ${CMAKE_COMMAND} -E copy
-        <SOURCE_DIR>/msvc/x64/Release/libwdi.lib
-        ${DEPS_INSTALL_DIR}/lib
+    INSTALL_DIR
+        '${DEPS_INSTALL_DIR}'
 )
 
 ExternalProject_Add(
     glib
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/glib
+        '${DEPS_VENDOR_DIR}/glib'
+
+    DEPENDS
+        pcre2
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
         --prefix=${DEPS_INSTALL_DIR}
 
     BUILD_COMMAND
-        meson compile -C <BINARY_DIR>
+        ninja -C <BINARY_DIR>
 
     INSTALL_COMMAND
-        meson install -C <BINARY_DIR>
+        ninja -C <BINARY_DIR> install
 )
 
 ExternalProject_Add(
     gtk
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gtk
+        '${DEPS_VENDOR_DIR}/gtk'
+
+    DEPENDS
+        glib
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -84,34 +79,46 @@ ExternalProject_Add(
     ffmpeg
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/ffmpeg
+        '${DEPS_VENDOR_DIR}/ffmpeg'
+
+    INSTALL_DIR
+        ${DEPS_INSTALL_DIR}
+
+    CMAKE_ARGS
+        -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR}
 
     CONFIGURE_COMMAND
-        bash -c
-        "cd <SOURCE_DIR> &&
-        ./configure
-        --prefix=${DEPS_INSTALL_DIR}
-        --enable-shared
-        --disable-static"
+        bash -c "cd <SOURCE_DIR>"
+        bash -c "./configure --enable-shared --disable-static"
+        bash -c "cd .."
+        bash -c "cd .."
 
     BUILD_COMMAND
-        make -j${NPROC}
+        bash -c "cd <SOURCE_DIR>"
+        bash -c "make -j${NPROC}"
+        bash -c "cd .."
+        bash -c "cd .."
 
     INSTALL_COMMAND
-        make install
+        bash -c "cd <SOURCE_DIR>"
+        bash -c "make install"
+        bash -c "cd .."
+        bash -c "cd .."
 )
 
 ExternalProject_Add(
     gstreamer
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gstreamer
+        '${DEPS_VENDOR_DIR}/gstreamer'
     
     DEPENDS
         glib
         ffmpeg
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -128,7 +135,7 @@ ExternalProject_Add(
     gst_plugins_base
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gst-plugins-base
+        '${DEPS_VENDOR_DIR}/gst-plugins-base'
 
     DEPENDS
         glib
@@ -136,6 +143,8 @@ ExternalProject_Add(
         gstreamer
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -152,15 +161,17 @@ ExternalProject_Add(
     gst_plugins_good
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gst-plugins-good
+        '${DEPS_VENDOR_DIR}/gst-plugins-good'
 
     DEPENDS
         glib
         ffmpeg
         gstreamer
-        gst_plugins-base
+        gst_plugins_base
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -177,16 +188,18 @@ ExternalProject_Add(
     gst_plugins_bad
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gst-plugins-bad
+        '${DEPS_VENDOR_DIR}/gst-plugins-bad'
 
     DEPENDS
         glib
         ffmpeg
         gstreamer
-        gst-plugins-base
-        gst-plugins-good
+        gst_plugins_base
+        gst_plugins_good
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -203,17 +216,22 @@ ExternalProject_Add(
     gst_plugins_ugly
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gst-plugins-ugly
+        '${DEPS_VENDOR_DIR}/gst-plugins-ugly'
+
+    INSTALL_DIR
+        {DEPS_INSTALL_DIR}
 
     DEPENDS
         glib
         ffmpeg
         gstreamer
-        gst-plugins-base
-        gst-plugins-good
-        gst-plugins-bad
+        gst_plugins_base
+        gst_plugins_good
+        gst_plugins_bad
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -230,18 +248,20 @@ ExternalProject_Add(
     gst_libav
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gst-libav
+        '${DEPS_VENDOR_DIR}/gst-libav'
 
     DEPENDS
         glib
         ffmpeg
         gstreamer
-        gst-plugins-base
-        gst-plugins-good
-        gst-plugins-bad
-        gst-plugins-ugly
+        gst_plugins_base
+        gst_plugins_good
+        gst_plugins_bad
+        gst_plugins_ugly
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -258,7 +278,7 @@ ExternalProject_Add(
     aravis
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/aravis
+        '${DEPS_VENDOR_DIR}/aravis'
 
     DEPENDS
         glib
@@ -266,6 +286,8 @@ ExternalProject_Add(
         gstreamer
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -283,7 +305,7 @@ ExternalProject_Add(
     gtkmm
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/gtkmm-3-24
+        '${DEPS_VENDOR_DIR}/gtkmm-3-24'
 
     DEPENDS
         glib
@@ -292,6 +314,8 @@ ExternalProject_Add(
         aravis
 
     CONFIGURE_COMMAND
+        env
+        PKG_CONFIG_PATH=${DEPS_PKCONFIG_DIR}
         meson setup
         <BINARY_DIR>
         <SOURCE_DIR>
@@ -305,43 +329,40 @@ ExternalProject_Add(
 )
 
 ExternalProject_Add(
-    doxygen
-
-    SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/doxygen
-
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR}
-        -Dbuild_doc=OFF
-        -Dbuild_wizard=OFF
-
-    INSTALL_DIR ${DEPS_INSTALL_DIR}
-)
-
-ExternalProject_Add(
     tbb
 
     SOURCE_DIR
-        ${DEPS_VENDOR_DIR}/tbb
+        '${DEPS_VENDOR_DIR}/tbb'
 
-    CMAKE_ARGS
-        -DCMAKE_INSTALL_PREFIX=${DEPS_INSTALL_DIR}
-        -DTBB_TEST=OFF
-        -DTBB_STRICT=OFF
+    INSTALL_DIR
+        ${DEPS_INSTALL_DIR}
 
-    INSTALL_DIR ${DEPS_INSTALL_DIR}
+    BUILD_COMMAND
+        bash -c "cd '<SOURCE_DIR>'"
+        bash -c "mkdir build && cd build"
+        bash -c "cmake -DCMAKE_INSTALL_PREFIX='${DEPS_INSTALL_DIR} -DTBB_TEST=OFF -DTBB_STRICT=OFF .."
+        bash -c "cmake --build"
+        bash -c "cd .."
+        bash -c "cd .."
+
+    INSTALL_COMMAND
+        bash -c "cd '<SOURCE_DIR>'"
+        bash -c "cmake --install"
+        bash -c "cd .."
+        bash -c "cd .."
 )
 
 # cmake supported libraries - fetch step
 add_subdirectory(vendor/spdlog)
-add_subdirectory(vendor/tbb)
 add_subdirectory(vendor/glad)
+add_subdirectory(install)
 
 # create a third-party bundle
 add_custom_target(third_party)
 add_dependencies(
     third_party
-    gtkmm
+    pcre2
+    glib
     gtk
     gstreamer
     gst_plugins_base
@@ -349,46 +370,43 @@ add_dependencies(
     gst_plugins_bad
     gst_plugins_ugly
     gst_libav
-    glib
     aravis
-    aravis_gst
-    doxygen
+    gtkmm
+    tbb
 )
 
-#  Add the application subfolder
-add_subdirectory(install)
-add_subdirectory(DriverInstaller)
-add_subdirectory(keela-exe)
+ExternalProject_Add(
+    keela_ready
 
-# Install required camera driver
-install(CODE [[
-    message(STATUS "Running DriverInstaller)
+    SOURCE_DIR
+        '${PROJECT_SOURCE_DIR}/keela-exe'
 
-    execute_process(
-        COMMAND "${DEPS_DRIVER_DIR}/DriverInstaller.exe"
-        RESULT_VARIABLE DRIVER_RESULT
-    )
+    DEPENDS
+        third_party
 
-    if(NOT DRIVER_RESULT EQUAL 0)
-        message(FATAL_ERROR
-            "Driver installation failed with code ${DRIVER_RESULT}"
-        )
-    endif()
-]])
+    CMAKE_ARGS
+        -DDEPS_INSTALL_DIR=${DEPS_INSTALL_DIR}
+)
+
+
+add_dependencies(
+    keela_ready
+    third_party
+)
 
 # Install dependecies in the installation-setup folder
 install(
     DIRECTORY
-        ${DEPS_INSTALL_DIR}/bin/
+        '${DEPS_INSTALL_DIR}/bin/'
     DESTINATION
-        ${PROJECT_SOURCE_DIR}/KeelaSetup/bin
+        '${PROJECT_SOURCE_DIR}/KeelaSetup/bin'
 )
 
 install(
     DIRECTORY
-        ${DEPS_INSTALL_DIR}/lib/
+        '${DEPS_INSTALL_DIR}/lib/'
     DESTINATION
-        ${PROJECT_SOURCE_DIR}/KeelaSetup/lib
+        '${PROJECT_SOURCE_DIR}/KeelaSetup/lib'
 )
 
 install(

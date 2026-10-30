@@ -1,18 +1,12 @@
 [submodule "vendor/gstreamer"]
 	path = vendor/gstreamer
 	url = https://github.com/GStreamer/gstreamer.git
-[submodule "vendor/libwdi"]
-	path = vendor/libwdi
-	url = https://github.com/pbatard/libwdi.git
 [submodule "vendor/gtk"]
 	path = vendor/gtk
 	url = https://github.com/GNOME/gtk.git
 [submodule "vendor/glib"]
 	path = vendor/glib
 	url = https://github.com/GNOME/glib.git
-[submodule "vendor/doxygen"]
-	path = vendor/doxygen
-	url = https://github.com/doxygen/doxygen.git
 [submodule "vendor/gst-plugins-base"]
 	path = vendor/gst-plugins-base
 	url = https://github.com/GStreamer/gst-plugins-base.git
@@ -44,3 +38,6 @@
 [submodule "vendor/ffmpeg"]
 	path = vendor/ffmpeg
 	url = https://github.com/FFmpeg/FFmpeg.git
+[submodule "vendor/pcre2"]
+	path = vendor/pcre2
+	url = https://github.com/PCRE2Project/pcre2.git
