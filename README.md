@@ -24,10 +24,10 @@ Download [libusbK](https://sourceforge.net/projects/libusbk/) from link and run 
 
 ### Windows
 
-- Install [MSYS2 MSYS](https://www.msys2.org/)
-- Add MSYS bin directory to PATH env variable (by default this will be C:\msys64\usr\bin)
-- Open a MSYS2 MSYS terminal via the windows search bar
-- Update the terminal using: `$pacman -Syu` (restart and reopen the mingw64 terminal if prompted)
+- Install [MSYS2 UCRT64](https://www.msys2.org/)
+- Add MSYS bin directory to PATH env variable (by default this will be C:\msys64\ucrt64\bin)
+- Open a MSYS2 UCRT64 terminal via the windows search bar
+- Update the terminal using: `$pacman -Syu` (restart and reopen the MSYS2 UCRT64 terminal if prompted)
 - Install git via pacman: `$pacman -S git`
 - Download [Keela](https://github.com/Evan-Hartley/Keela) using the git command:
 `git clone https://github.com/Evan-Hartley/Keela.git <target-location>`
