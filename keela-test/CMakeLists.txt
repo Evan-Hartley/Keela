@@ -16,7 +16,7 @@ add_executable(keela-test main.cpp pipeline.cpp
         gdk.cpp
         VideoEncoderTest.cpp)
 
-target_link_libraries(keela-test PRIVATE GTest::gtest keela-pipeline keela-widgets PkgConfig::GSTREAMER)
+target_link_libraries(keela-test PRIVATE GTest::gtest keela-pipeline keela-widgets gstreamer::gstreamer)
 
 include(GoogleTest)
 gtest_discover_tests(keela-test)

@@ -1,6 +1,5 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.28)
 project(Keela)
-find_package(PkgConfig)
 find_package(TBB REQUIRED)
 find_package(Doxygen COMPONENTS dot)
 # GoogleTest requires at least C++17
@@ -16,17 +15,17 @@ option(ENABLE_KEELA_VIDEOTESTSRC "Enable custom Keela videotestsrc plugin for de
 option(USE_HSLUV "Use HSLuv color mapping instead of basic HSL" false)
 option(USE_FFV1 "Use FFV1 codec to encode video. If disabled, keela will use h.264" true)
 
-pkg_search_module(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0)
-pkg_search_module(GSTREAMER REQUIRED IMPORTED_TARGET gstreamer-1.0)
-pkg_search_module(GST_VIDEO REQUIRED IMPORTED_TARGET gstreamer-video-1.0)
-pkg_search_module(SPDLOG REQUIRED IMPORTED_TARGET spdlog)
+find_package(gtkmm-3.0 REQUIRED CONFIG)
+find_package(gstreamer-1.0 REQUIRED CONFIG)
+find_package(gstreamer-video-1.0 REQUIRED CONFIG)
+find_package(spdlog REQUIRED CONFIG)
 add_compile_definitions(SPDLOG_ACTIVE_LEVEL=SPDLOG_LEVEL_TRACE) # generate SPDLOG_* logging macros for this logging level and above
-pkg_search_module(GIO REQUIRED IMPORTED_TARGET gio-2.0)
-pkg_search_module(ARAVIS REQUIRED IMPORTED_TARGET aravis-0.8)
+find_package(gio-2.0 REQUIRED CONFIG)
+find_package(aravis-0.8 REQUIRED CONFIG)
 
 # compile the keela-videotestsrc plugin if enabled
 if (ENABLE_KEELA_VIDEOTESTSRC)
-    pkg_search_module(GST_BASE REQUIRED IMPORTED_TARGET gstreamer-base-1.0)
+    find_package(gstreamer-base-1.0 REQUIRED CONFIG)
     add_compile_definitions(KEELA_VIDEOTESTSRC_ENABLED)
     add_subdirectory(keela-videotestsrc)
 endif ()
@@ -47,6 +46,7 @@ add_subdirectory(keela-pipeline)
 add_subdirectory(keela-exe)
 add_subdirectory(keela-test)
 add_subdirectory(reference)
+add_subdirectory(vendor/glad)
 
 # Add a target to clean configuration when switching video test source modes
 add_custom_target(clean-config
@@ -59,3 +59,18 @@ add_custom_target(clean-config
 if (Doxygen_FOUND)
     doxygen_add_docs(docs readme.md keela-exe keela-widgets keela-pipeline keela-videotestsrc)
 endif ()
+
+# setup a installer file
+set(CPACK_PACKAGE_NAME "Keela")
+set(CPACK_PACKAGE_VENDOR "Georgia Institute of Techology - CHAOS Lab")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Keela")
+
+set(CPACK_GENORATOR "NSIS")
+
+set(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut $DESKTOP\\Keela.lnk $INSTDIR\\Keela.exe")
+
+set(CPACK_NSIS_DELETE_ICONS_EXTRA "Delete $DESKTOP\\Keela.lnk")
+
+include(CPack)

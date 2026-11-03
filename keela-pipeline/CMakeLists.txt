@@ -35,6 +35,6 @@ add_library(keela-pipeline presentationbin.cpp keela-pipeline/presentationbin.h
         FFV1EncodeBin.cpp
         keela-pipeline/FFV1EncodeBin.h
 )
-target_link_libraries(keela-pipeline PUBLIC PkgConfig::GSTREAMER PkgConfig::SPDLOG)
+target_link_libraries(keela-pipeline PUBLIC gstreamer::gstreamer spdlog::spdlog)
 
 target_include_directories(keela-pipeline PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
