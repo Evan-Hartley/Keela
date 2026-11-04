@@ -13,5 +13,4 @@ ELSE()
         tracewindow.h)
 ENDIF()
 
-
-target_link_libraries(Keela PRIVATE keela-widgets keela-pipeline gstreamer::gstreamer gtkmm::gtkmm spdlog::spdlog)
+target_link_libraries(Keela PRIVATE keela-widgets keela-pipeline PkgConfig::GSTREAMER PkgConfig::GTKMM PkgConfig::SPDLOG)
