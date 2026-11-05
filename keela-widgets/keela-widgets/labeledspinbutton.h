@@ -4,7 +4,7 @@
 
 #ifndef LABELEDSPINBUTTON_H
 #define LABELEDSPINBUTTON_H
-#include <gtkmm-3.0/gtkmm.h>
+#include <gtkmm-4.0/gtkmm.h>
 namespace Keela {
 
 /**

@@ -4,7 +4,7 @@
 
 #ifndef GIZMOCONTROL_H
 #define GIZMOCONTROL_H
-#include <gtkmm-3.0/gtkmm.h>
+#include <gtkmm-4.0/gtkmm.h>
 
 #define HALF(x) (x / 2.0)
 

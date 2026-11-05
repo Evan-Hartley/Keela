@@ -4,12 +4,12 @@
 
 #ifndef FRAMEBOX_H
 #define FRAMEBOX_H
-#include <gtkmm-3.0/gtkmm.h>
+#include <gtkmm-4.0/gtkmm.h>
 namespace Keela {
 class FrameBox : public Gtk::Frame {
    public:
 	FrameBox();
-	explicit FrameBox(const std::string& title, Gtk::Orientation orientation = Gtk::ORIENTATION_HORIZONTAL);
+	explicit FrameBox(const std::string& title, Gtk::Orientation orientation = Gtk::Orientation::HORIZONTAL);
 	void add(Widget& widget) override;
 	void set_spacing(int i);
 

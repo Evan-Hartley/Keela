@@ -5,7 +5,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <gtkmm-3.0/gtkmm.h>
+#include <gtkmm-4.0/gtkmm.h>
 #include <keela-widgets/labeledspinbutton.h>
 
 #include "cameracontrolwindow.h"

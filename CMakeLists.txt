@@ -17,7 +17,7 @@ option(ENABLE_KEELA_VIDEOTESTSRC "Enable custom Keela videotestsrc plugin for de
 option(USE_HSLUV "Use HSLuv color mapping instead of basic HSL" false)
 option(USE_FFV1 "Use FFV1 codec to encode video. If disabled, keela will use h.264" true)
 
-pkg_search_module(GTKMM REQUIRED IMPORTED_TARGET gtkmm-3.0)
+pkg_search_module(GTKMM4 REQUIRED IMPORTED_TARGET gtkmm-4.0)
 pkg_search_module(GSTREAMER REQUIRED IMPORTED_TARGET gstreamer-1.0)
 pkg_search_module(GST_VIDEO REQUIRED IMPORTED_TARGET gstreamer-video-1.0)
 pkg_search_module(SPDLOG REQUIRED IMPORTED_TARGET spdlog)

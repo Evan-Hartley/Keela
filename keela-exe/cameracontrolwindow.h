@@ -4,7 +4,7 @@
 
 #ifndef CAMERACONTROLWINDOW_H
 #define CAMERACONTROLWINDOW_H
-#include <gtkmm-3.0/gtkmm.h>
+#include <gtkmm-4.0/gtkmm.h>
 #include <keela-widgets/labeledcomboboxtext.h>
 #include <keela-widgets/labeledspinbutton.h>
 
