@@ -11,7 +11,10 @@ Keela::VideoPresentation::VideoPresentation(const std::string &label_text,
       m_width(width),
       m_height(height) {
 	set_spacing(5);
-	set_border_width(5);
+	set_margin_top(5);
+	set_margin_bottom(5);
+	set_margin_left(5);
+	set_margin_right(5);
 
 	gl_area->set_size_request(width, height);
 

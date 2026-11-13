@@ -9,8 +9,8 @@ Keela::TraceWindow::TraceWindow() {
 
 	set_default_size(720, 540);
 	set_title("Traces");
-	Window::add(scrolled_window);
-	scrolled_window.add(container);
+	Window::set_child(scrolled_window);
+	scrolled_window.append(container);
 	Glib::signal_timeout().connect(sigc::mem_fun(this, &TraceWindow::on_timeout), 1000 / 60);
 }
 

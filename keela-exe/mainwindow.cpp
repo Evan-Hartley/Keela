@@ -19,13 +19,16 @@ MainWindow::MainWindow() : Gtk::Window() {
 	container.set_orientation(Gtk::ORIENTATION_VERTICAL);
 	container.set_spacing(10);
 	container.set_homogeneous(true);
-	container.set_border_width(10);
-	MainWindow::add(container);
+	container.set_margin_top(10);
+	container.set_margin_bottom(10);
+	container.set_margin_left(10);
+	container.set_margin_right(10);
+	MainWindow::set_child(container);
 
 	// Experiment Directory button
 	directory_button.set_label("Select Experiment Directory");
 	directory_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_directory_clicked));
-	container.add(directory_button);
+	container.append(directory_button);
 	// Record button
 	record_button.set_label("Start Recording");
 	record_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::on_record_button_clicked));
@@ -35,28 +38,29 @@ MainWindow::MainWindow() : Gtk::Window() {
 	record_button.override_color(red);
 	record_button.set_sensitive(false);
 	record_button.set_tooltip_text("Experiment Directory must be selected in order to begin recording");
-	container.add(record_button);
+	container.append(record_button);
 	// Framerate controls
-	framerate_spin.m_spin.set_adjustment(Gtk::Adjustment::create(500, 1, 1000, 0.1));
+	framerate_spin.m_spin.set_adjustment(Gtk::Adjustment::configure(500, 1, 1000, 0.1));
 	framerate_spin.m_spin.set_digits(1);
-	container.add(framerate_spin);
+	container.append(framerate_spin);
 
+	// TODO: Reintrodce Calcium Voltage Switching after light circuit is configured
 	// calcium voltage recording setting control, controls split frame logic
-	cv_recording_check.set_label("Calcium-Voltage Recording Setting");
-	cv_recording_check.signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::on_split_frames_changed));
-	cv_recording_check.set_active(should_split_frames);
-	container.add(cv_recording_check);
+	//cv_recording_check.set_label("Calcium-Voltage Recording Setting");
+	//cv_recording_check.signal_toggled().connect(sigc::mem_fun(*this, &MainWindow::on_split_frames_changed));
+	//cv_recording_check.set_active(should_split_frames);
+	//container.append(cv_recording_check);
 
-	const auto camera_limits = Gtk::Adjustment::create(1.0, 1.0, std::numeric_limits<double>::max());
+	const auto camera_limits = Gtk::Adjustment::configure(1.0, 1.0, std::numeric_limits<double>::max());
 	num_camera_spin.m_spin.set_adjustment(camera_limits);
 	num_camera_spin.m_spin.signal_value_changed().connect(sigc::mem_fun(*this, &MainWindow::on_camera_spin_changed));
-	container.add(num_camera_spin);
+	container.append(num_camera_spin);
 
 	show_trace_check.set_label("Show Traces");
-	trace_fps_spin.m_spin.set_adjustment(Gtk::Adjustment::create(DEFAULT_TRACE_FPS, 1, 1000, 1));
+	trace_fps_spin.m_spin.set_adjustment(Gtk::Adjustment::configure(DEFAULT_TRACE_FPS, 1, 1000, 1));
 	trace_fps_spin.m_spin.signal_value_changed().connect(sigc::mem_fun(*this, &MainWindow::on_trace_fps_changed));
 
-	trace_buffer_seconds_spin.m_spin.set_adjustment(Gtk::Adjustment::create(10, 1, 100, 1));
+	trace_buffer_seconds_spin.m_spin.set_adjustment(Gtk::Adjustment::configure(10, 1, 100, 1));
 	trace_buffer_seconds_spin.m_spin.signal_value_changed().connect(
 	    sigc::mem_fun(this, &MainWindow::on_trace_buffer_seconds_changed));
 
@@ -73,12 +77,12 @@ MainWindow::MainWindow() : Gtk::Window() {
 	trace_control_row_box.pack_start(trace_buffer_seconds_spin);
 	trace_control_row_box.pack_start(trace_clear_buffer_button);
 
-	container.add(show_trace_check);
+	container.append(show_trace_check);
 	container.pack_start(trace_control_row_box, false, false, 0);
 
 	restart_camera_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::reset_cameras));
 	restart_camera_button.set_label("Restart Camera(s)");
-	container.add(restart_camera_button);
+	container.append(restart_camera_button);
 
 	// Store connection so we can block it when closing the window programmatically
 	trace_signal_connection =
@@ -89,7 +93,7 @@ MainWindow::MainWindow() : Gtk::Window() {
 		throw std::runtime_error("Failed to create pipeline");
 	}
 
-	container.add(dump_graph_button);
+	container.apend(dump_graph_button);
 	dump_graph_button.signal_clicked().connect(sigc::mem_fun(this, &MainWindow::dump_graph));
 	// Initialize recording settings here
 	on_camera_spin_changed();
@@ -280,16 +284,38 @@ void MainWindow::on_directory_clicked() {
 		throw std::runtime_error("Experiment directory already set");
 	}
 
-	Gtk::FileChooserDialog dialog =
-	    Gtk::FileChooserDialog(*this, "Choose experiment directory", Gtk::FILE_CHOOSER_ACTION_SELECT_FOLDER);
+	Gtk::FileDialog dialog = Gtk::FileDialog::create()
+	dialog.set_title("Choose experiment directory");
+	dialog.set_accept_label("Select");
+	dialog.set_modal(true);
 
-	dialog.add_button("Select", Gtk::RESPONSE_OK);
-	dialog.add_button("Cancel", Gtk::RESPONSE_CANCEL);
-	auto result = dialog.run();
-	if(result == Gtk::RESPONSE_OK) {
-		experiment_directory = dialog.get_filename();
+	// Create file filters
+    auto filters = Gio::ListStore<Gtk::FileFilter>::create();
+
+    // Filter for Directories
+    auto filter_dir = Gtk::FileFilter::create();
+    filter_dir.set_name("Diectories");
+    filter_dir.add_mime_type("inode/directory");
+    filters.append(filter_dir);
+
+	dialog.set_filters(filters);
+
+	// Create a cancellable
+	Glib::RefPtr<Gio::Cancellable> cancellable = Gio::Cancellable::new();
+
+	// Connect the cancel signal to close the dialog
+	cancellable.connect_signal("Cancel", dialog.destroy, dialog);
+
+	dialog.open(sigc::bind(sigc::mem_fun(*this, cancellable, &MainWindow::fetch_experiment_directory), dialog));
+}
+
+void MainWindow::fetch_experiment_directory(const Glib::RefPtr<Gio::AsyncResult>& result, const Glib::RefPtr<Gtk::FileDialog>& dialog) {
+	auto file = dialog.open_finish(result);
+
+	try {
+        auto experiment_directory = file.get_filename();
 		for(const auto &c : cameras) {
-			set_experiment_directory(c);
+				set_experiment_directory(c);
 		}
 		record_button.set_tooltip_text("Current experiment directory: " + experiment_directory);
 		record_button.set_sensitive(true);
@@ -325,12 +351,16 @@ void MainWindow::on_split_frames_changed() {
 	}
 }
 bool MainWindow::on_delete_event(GdkEventAny *any_event) {
-	Gtk::MessageDialog dialog(*this,"Remember to take calibration photos",false,Gtk::MESSAGE_QUESTION,Gtk::BUTTONS_NONE,false);
-	dialog.add_button("Cancel (Return to main window)",Gtk::RESPONSE_CANCEL);
-	auto exit = dialog.add_button("Exit program",Gtk::RESPONSE_CLOSE);
+	Gtk::AlertDialog cancel_dialog;
+	cal_dialog.set_message("Remember to take calibration references")
+	cal_dialog.set_buttons({"Cancel (Return to main window)"});
+	auto exit = cal_dialog.set_buttons({"Exit Program"});
 	exit->override_color(Gdk::RGBA("red"));
-	auto response = dialog.run();
-	if(response == Gtk::RESPONSE_CANCEL) {
+	cal_dialog.set_modal(true);
+	cal_dialog.set_default_button(1);
+
+	int button_idx = cal_dialog.choose_finish();
+	if(button_idx == 0) {
 		return true;
 	}
 	return Window::on_delete_event(any_event);

@@ -54,9 +54,9 @@ class CameraControlWindow final : public Gtk::Window,
 	sigc::connection bin_mode_signal;
 
 	Keela::LabeledComboBoxText rotation_combo = Keela::LabeledComboBoxText("Select Rotation");
-	Gtk::CheckButton flip_horiz_check = Gtk::CheckButton("Flip Along Horizontal Center");
-	Gtk::CheckButton flip_vert_check = Gtk::CheckButton("Flip Along Vertical Center");
-	Gtk::Button fetch_image_button = Gtk::Button("Fetch Image");
+	Gtk::CheckButton flip_horiz_check = Gtk::CheckButton::new_with_label("Flip Along Horizontal Center");
+	Gtk::CheckButton flip_vert_check = Gtk::CheckButton::new_with_label("Flip Along Vertical Center");
+	//Gtk::Button fetch_image_button = Gtk::Button::new_with_label("Fetch Image");
 
 	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_even;
 	std::shared_ptr<Keela::TraceGizmo> trace_gizmo_odd;

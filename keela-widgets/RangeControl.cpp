@@ -19,9 +19,9 @@ void Keela::RangeControl::on_pix_fmt_changed(std::string fmt) {
     if(fmt == GRAY8) {
         max = std::numeric_limits<uint8_t>::max();
     }
-    auto adj_max = Gtk::Adjustment::create(max, 0, max, 0.1);
+    auto adj_max = Gtk::Adjustment::new(max, 0, max, 0.1);
     range_spin_max.m_spin.set_adjustment(adj_max);
-    auto adj_min = Gtk::Adjustment::create(0.0, 0, max, 0.1);
+    auto adj_min = Gtk::Adjustment::new(0.0, 0, max, 0.1);
     range_spin_min.m_spin.set_adjustment(adj_min);
     heatmap_scale = max;
 }

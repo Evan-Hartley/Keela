@@ -26,7 +26,7 @@ class MainWindow final : public Gtk::Window {
 	// Keela::LabeledComboBoxText pix_fmt_combo = Keela::LabeledComboBoxText("Pixel Format");
 	Keela::LabeledSpinButton framerate_spin = Keela::LabeledSpinButton("Framerate (Hz)");
 
-	Gtk::CheckButton cv_recording_check;
+	//Gtk::CheckButton cv_recording_check;
 	Keela::LabeledSpinButton num_camera_spin = Keela::LabeledSpinButton("Number of Cameras");
 
 	Gtk::CheckButton show_trace_check;
@@ -71,6 +71,8 @@ class MainWindow final : public Gtk::Window {
 	std::string experiment_directory = "";
 
 	void on_directory_clicked();
+
+	void fetch_experiment_directory( Glib::RefPtr<Gio::AsyncResult>& result, Glib::RefPtr<Gtk::FileDialog>& dialog) const;
 
 	void set_experiment_directory(std::shared_ptr<Keela::CameraControlWindow> c) const;
 

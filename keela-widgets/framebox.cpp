@@ -7,7 +7,7 @@
 #include <iostream>
 
 Keela::FrameBox::FrameBox() {
-	Gtk::Frame::add(m_box);
+	Gtk::Frame::set_child(m_box);
 }
 
 Keela::FrameBox::FrameBox(const std::string& title, Gtk::Orientation orientation) : FrameBox() {
@@ -16,7 +16,7 @@ Keela::FrameBox::FrameBox(const std::string& title, Gtk::Orientation orientation
 }
 
 void Keela::FrameBox::add(Widget& widget) {
-	m_box.add(widget);
+	m_box.set_child(widget);
 }
 
 void Keela::FrameBox::set_spacing(const int i) {

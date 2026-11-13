@@ -13,7 +13,8 @@ Keela::PixFmtControl::PixFmtControl(std::shared_ptr<CameraManager> cameramanager
       m_camera_manager(cameramanager),
       m_format_combo("Pixel Format"),
       m_depth_spin("Bit Depth") {
-	m_depth_spin.m_spin.set_adjustment(Gtk::Adjustment::create(8, 8, 16));
+	m_depth_spin.m_spin.set_adjustment(Gtk::Adjustment::new(8, 8, 16));
+	Gtk::Editable::set_editable(m_depth_spin.m_spin, false)
 
 	on_params_changed();
 	m_depth_spin.m_spin.signal_changed().connect(sigc::mem_fun(*this, &PixFmtControl::on_params_changed));

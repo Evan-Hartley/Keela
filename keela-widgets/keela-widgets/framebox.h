@@ -9,7 +9,7 @@ namespace Keela {
 class FrameBox : public Gtk::Frame {
    public:
 	FrameBox();
-	explicit FrameBox(const std::string& title, Gtk::Orientation orientation = Gtk::Orientation::HORIZONTAL);
+	explicit FrameBox(const std::string& title, Gtk::Orientation orientation = Gtk::ORIENTATION_HORIZONTAL);
 	void add(Widget& widget) override;
 	void set_spacing(int i);
 

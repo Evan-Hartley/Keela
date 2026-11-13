@@ -22,16 +22,16 @@ Keela::GLTraceRender::GLTraceRender(const std::shared_ptr<ITraceable> &cam_to_tr
 
 	name_label.set_text(cam_to_trace->get_name());
 	auto hbox = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL);
-	Container::add(*hbox);
+	Container::append(*hbox);
 
-	hbox->add(name_label);
+	hbox->append(name_label);
 	hbox->pack_end(min_label);
 	hbox->pack_end(max_label);
 
 	invert_y_axis_check.set_label("Invert Y Axis");
 	hbox->pack_end(invert_y_axis_check);
 
-	Container::add(gl_area);
+	Container::append(gl_area);
 	// Expand so traces take up all available space
 	gl_area.set_vexpand(true);
 	gl_area.set_hexpand(true);

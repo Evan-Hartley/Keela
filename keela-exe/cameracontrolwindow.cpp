@@ -18,7 +18,10 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	set_resizable(false);
 	set_deletable(false);
 	v_container.set_spacing(10);
-	v_container.set_border_width(10);
+	v_container.set_margin_top(10);
+	v_container.set_margin_bottom(10);
+	v_container.set_margin_left(10);
+	v_container.set_margin_right(10);
 	h_container.pack_start(v_container, false, false, 10);
 	Window::add(h_container);
 
@@ -49,8 +52,17 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 	bin_spin.m_spin.set_sensitive(false);
 	bin_spin_signal =
 	    bin_spin.m_spin.signal_value_changed().connect(sigc::mem_fun(*this, &CameraControlWindow::on_bin_spin_changed));
+	
+	// Apply CSS to hide arrows
+    Gtk::CssProvider *provider = Gtk::CssProvider::new();
+    Gtk::CssProvider::load_from_data(provider,
+        "spinbutton > button { display: none; }", -1);
+
+    Gtk::StyleContext *context = Gtk::Widget::get_style_context(bin_spin);
+    Gtk::StyleContext::add_provider(context, Gtk::StyleProvider(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
 	v_container.add(bin_spin);
 
+	/** Image orientation controls */
 	rotation_combo.m_combo.append(ROTATION_NONE, "---");
 	rotation_combo.m_combo.append(ROTATION_90, "Rotate 90 degrees clockwise");
 	rotation_combo.m_combo.append(ROTATION_180, "Rotate 180 degrees");
@@ -66,9 +78,9 @@ Keela::CameraControlWindow::CameraControlWindow(const guint id, std::string pix_
 
 	// TODO: dynamically cast camera_manager->presentation to a WidgetElement to
 	// get a handle to a widget to add to the window
-	fetch_image_button.signal_clicked().connect(
-	    sigc::mem_fun(*camera_manager->camera_stream_even->snapshot, &Keela::SnapshotBin::take_snapshot));
-	v_container.add(fetch_image_button);
+	//fetch_image_button.signal_clicked().connect(
+	//    sigc::mem_fun(*camera_manager->camera_stream_even->snapshot, &Keela::SnapshotBin::take_snapshot));
+	//v_container.add(fetch_image_button);
 
 	set_vexpand(false);
 
@@ -285,7 +297,7 @@ void Keela::CameraControlWindow::update_gain_range() {
 	}
 	// update the gain spin with the new range and current setting
 	gain_signal.block();
-	gain_spin.m_spin.set_adjustment(Gtk::Adjustment::create(min_gain, min_gain, max_gain, 1.0));
+	gain_spin.m_spin.set_adjustment(Gtk::Adjustment::new(min_gain, min_gain, max_gain, 1.0));
 	gain_spin.m_spin.set_value(current_gain);
 	gain_spin.m_spin.set_sensitive(true);
 	gain_signal.unblock();
@@ -307,7 +319,7 @@ void Keela::CameraControlWindow::update_exposure_time_range() {
 	// update ui based on hardware capabilities and current setting
 	exposure_time_signal.block();
 	exposure_time_spin.m_spin.set_adjustment(
-	    Gtk::Adjustment::create(min_exposure_time, min_exposure_time, max_exposure_time, 1000.0));
+	    Gtk::Adjustment::new(min_exposure_time, min_exposure_time, max_exposure_time, 1000.0));
 	exposure_time_spin.m_spin.set_value(current_exposure_time);
 	exposure_time_spin.m_spin.set_sensitive(true);
 	exposure_time_signal.unblock();
@@ -355,7 +367,7 @@ void Keela::CameraControlWindow::update_binning_range() {
 	bin_spin_signal.block();
 	// update the binning spin with the new range, preserving current value
 	bin_spin.m_spin.set_adjustment(
-	    Gtk::Adjustment::create(current_binning, min_x_binning, max_x_binning, x_binning_increment));
+	    Gtk::Adjustment::new(current_binning, min_x_binning, max_x_binning, x_binning_increment));
 
 	bin_spin.m_spin.set_value(current_binning);
 	bin_spin_signal.unblock();

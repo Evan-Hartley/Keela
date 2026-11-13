@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
 	spdlog::info("Registering shader resources");
 	g_resources_register(shader_resources_get_resource());
 	spdlog::info("Creating app");
-	auto app = Gtk::Application::create(argc, argv, "com.gatech.keela");
+	auto app = Gtk::Application(argc, argv, "com.gatech.keela");
 	gst_init(&argc, &argv);
 
 	spdlog::info("Initializing GStreamer plugins, if available");

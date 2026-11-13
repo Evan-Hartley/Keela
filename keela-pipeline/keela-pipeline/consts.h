@@ -8,7 +8,7 @@
 #define GRAY16_LE "GRAY16_LE"
 #define GRAY16_BE "GRAY16_BE"
 
-#define DEFAULT_TRACE_FPS 125
+#define DEFAULT_TRACE_FPS 500
 
 // Default VideoPresentation dimensions
 #define DEFAULT_PRESENTATION_WIDTH 720
